@@ -4,8 +4,17 @@
 <meta charset="utf-8" />
 <title>Shift Systems · empresas lentas perdem dinheiro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Shift Systems — sistemas sob medida, automações e inteligência artificial para empresas que querem parar de operar no improviso." />
+<meta name="theme-color" content="#08080b" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="shortcut icon" href="favicon.svg" />
+
+<!-- social preview -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Shift Systems · empresas lentas perdem dinheiro" />
+<meta property="og:description" content="Sistemas, automações e IA sob medida. Menos improviso. Mais sistema. Mais resultado." />
+<meta property="og:image" content="favicon.svg" />
+<meta name="twitter:card" content="summary_large_image" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,9 +40,19 @@
   }
 </script>
 
+<!-- three.js (modules) for the WebGL layer -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
 <style>
   html, body { background: #08080b; color: #f6f5f1; font-family: 'Geist', system-ui, sans-serif; }
-  body { -webkit-font-smoothing: antialiased; }
+  body { -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
   /* base layered background — vignette + soft purple wash + grid */
   .page-bg {
@@ -43,6 +62,14 @@
       radial-gradient(900px 700px at 50% 110%, rgba(181,107,255,0.10), transparent 60%),
       #08080b;
   }
+
+  /* ===== WebGL canvas — fixed behind everything, never blocks clicks ===== */
+  #webgl {
+    position: fixed; inset: 0; width: 100vw; height: 100vh;
+    z-index: 0; pointer-events: none; display: block;
+  }
+  #root { position: relative; z-index: 1; }
+
   .grid-overlay {
     position: absolute; inset: 0; pointer-events: none;
     background-image:
@@ -73,6 +100,7 @@
     background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
     border: 1px solid rgba(255,255,255,0.1);
     backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   /* button */
@@ -93,18 +121,14 @@
 
   /* glow ring used behind logo / icons */
   .ring-glow { box-shadow: 0 0 60px 0 rgba(181,107,255,0.4); }
-
-  /* underline accent */
   .accent-dot { color: #B56BFF; }
 
-  /* eyebrow label */
   .eyebrow {
     font-family: 'Geist Mono', monospace; font-size: 11px;
     letter-spacing: 0.24em; text-transform: uppercase;
     color: #B56BFF;
   }
 
-  /* big headline */
   .display {
     font-family: 'Geist', sans-serif;
     font-weight: 600;
@@ -113,7 +137,6 @@
     text-wrap: balance;
   }
 
-  /* animated diagonal lines used as background motif (echo the mark) */
   @keyframes slide-down {
     0%   { transform: translateY(-20%); opacity: 0; }
     20%  { opacity: 0.6; }
@@ -125,14 +148,12 @@
     animation: slide-down 8s linear infinite;
   }
 
-  /* float */
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-8px); }
   }
   .floaty { animation: float 6s ease-in-out infinite; }
 
-  /* mark "shift" loop — slabs nudge apart then back */
   @keyframes shift-loop {
     0%, 70%, 100% { transform: translate(0, 0); }
     80%           { transform: translate(2px, -1px); }
@@ -141,7 +162,6 @@
   .mark-shift .slab-top    { animation: shift-loop 5s ease-in-out infinite; transform-origin: center; }
   .mark-shift .slab-bottom { animation: shift-loop 5s ease-in-out infinite reverse; transform-origin: center; }
 
-  /* shimmer sweep across cards */
   @keyframes shimmer-sweep {
     0%   { transform: translateX(-100%); }
     100% { transform: translateX(200%); }
@@ -154,7 +174,6 @@
   }
   .shimmer:hover::after { animation: shimmer-sweep 1.2s ease; }
 
-  /* orbiting particle for hero */
   @keyframes orbit {
     from { transform: rotate(0deg) translateX(180px) rotate(0deg); }
     to   { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
@@ -162,20 +181,17 @@
   .orbit { animation: orbit 18s linear infinite; }
   .orbit.r2 { animation: orbit 26s linear infinite reverse; }
 
-  /* aurora pulse */
   @keyframes aurora {
     0%, 100% { opacity: 0.25; transform: scale(1); }
     50%      { opacity: 0.45; transform: scale(1.08); }
   }
   .aurora { animation: aurora 7s ease-in-out infinite; }
 
-  /* draw line on view */
   @keyframes draw {
     from { stroke-dashoffset: var(--dash-len, 1000); }
     to   { stroke-dashoffset: 0; }
   }
 
-  /* traveling dot down a path */
   @keyframes travel-y {
     0%   { top: 0%; opacity: 0; }
     8%   { opacity: 1; }
@@ -184,25 +200,19 @@
   }
   .travel-dot { animation: travel-y 5s linear infinite; }
 
-  /* terminal cursor */
   @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
   .blink { animation: blink 1s steps(1) infinite; }
 
-  /* horizontal marquee for activity log */
   @keyframes scroll-up {
     from { transform: translateY(0); }
     to   { transform: translateY(-50%); }
   }
   .scroll-up { animation: scroll-up 22s linear infinite; }
 
-  /* type bar marquee speed variants */
   .marquee-slow { animation: marquee 60s linear infinite; }
   .marquee-fast { animation: marquee 24s linear infinite; }
 
-  /* gradient border via mask trick */
-  .grad-border {
-    position: relative;
-  }
+  .grad-border { position: relative; }
   .grad-border::before {
     content: ''; position: absolute; inset: 0; padding: 1px;
     border-radius: inherit;
@@ -213,7 +223,6 @@
     opacity: 0.6;
   }
 
-  /* spotlight that follows cursor on cards */
   .spot { position: relative; }
   .spot::before {
     content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
@@ -222,20 +231,29 @@
   }
   .spot:hover::before { opacity: 1; }
 
-  /* reveal on scroll */
-  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s cubic-bezier(.2,.7,.3,1), transform .9s cubic-bezier(.2,.7,.3,1); }
-  .reveal.in { opacity: 1; transform: none; }
+  /* ===== cinematic scroll reveal ===== */
+  .reveal { opacity: 0; transform: translateY(34px); filter: blur(8px);
+    transition: opacity 1s cubic-bezier(.2,.7,.3,1), transform 1s cubic-bezier(.2,.7,.3,1), filter 1s cubic-bezier(.2,.7,.3,1); }
+  .reveal.in { opacity: 1; transform: none; filter: none; }
+  .reveal-up   { transform: translateY(60px); }
+  .reveal-left { transform: translateX(-60px); }
+  .reveal-right{ transform: translateX(60px); }
+  .reveal-scale{ transform: scale(.92); }
+  /* staggered children */
+  .stagger > * { opacity: 0; transform: translateY(40px); filter: blur(6px);
+    transition: opacity .9s cubic-bezier(.2,.7,.3,1), transform .9s cubic-bezier(.2,.7,.3,1), filter .9s cubic-bezier(.2,.7,.3,1); }
+  .stagger.in > * { opacity: 1; transform: none; filter: none; }
+  .stagger.in > *:nth-child(1){ transition-delay:.05s } .stagger.in > *:nth-child(2){ transition-delay:.15s }
+  .stagger.in > *:nth-child(3){ transition-delay:.25s } .stagger.in > *:nth-child(4){ transition-delay:.35s }
+  .stagger.in > *:nth-child(5){ transition-delay:.45s }
 
-  /* utility */
   .num-tag {
     font-family: 'Geist Mono', monospace; font-size: 11px;
     letter-spacing: 0.2em; color: rgba(181,107,255,0.9);
   }
 
-  /* selection */
   ::selection { background: #B56BFF; color: #0c0414; }
 
-  /* hide scrollbar for the marquee */
   .marquee-wrap { overflow: hidden; }
   @keyframes marquee {
     from { transform: translateX(0); }
@@ -246,10 +264,61 @@
     animation: marquee 38s linear infinite;
   }
 
-  /* divider gradient */
   .hr-grad {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+  }
+
+  /* ===== 3D tilt cards ===== */
+  .tilt { transition: transform .18s ease-out; will-change: transform; }
+
+  /* ===== scroll progress bar ===== */
+  #scroll-progress {
+    position: fixed; top: 0; left: 0; height: 2px; width: 0%; z-index: 60;
+    background: linear-gradient(90deg, #8A4DCC, #B56BFF);
+    box-shadow: 0 0 12px rgba(181,107,255,0.8);
+    transition: width .1s linear;
+  }
+
+  /* ===== custom cursor ===== */
+  @media (hover: hover) and (pointer: fine) {
+    html.cursor-ready * { cursor: none !important; }
+    #cursor-dot, #cursor-ring { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
+      border-radius: 9999px; transform: translate(-50%, -50%); mix-blend-mode: screen; }
+    #cursor-dot  { width: 7px; height: 7px; background: #B56BFF; box-shadow: 0 0 10px rgba(181,107,255,.9); }
+    #cursor-ring { width: 34px; height: 34px; border: 1px solid rgba(181,107,255,.6);
+      transition: width .25s, height .25s, border-color .25s, background .25s; }
+    #cursor-ring.hover { width: 58px; height: 58px; border-color: rgba(181,107,255,.9); background: rgba(181,107,255,.08); }
+  }
+  @media (hover: none), (pointer: coarse) {
+    #cursor-dot, #cursor-ring { display: none; }
+  }
+
+  /* ===== cinematic preloader ===== */
+  #preloader {
+    position: fixed; inset: 0; z-index: 9998; background: #08080b;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+    transition: opacity .8s ease, visibility .8s ease;
+  }
+  #preloader.done { opacity: 0; visibility: hidden; }
+  #preloader .mk { filter: drop-shadow(0 0 24px rgba(181,107,255,.6)); }
+  #preloader .mk rect, #preloader .mk path {
+    stroke: #B56BFF; stroke-width: 3; fill: transparent;
+    stroke-dasharray: 320; stroke-dashoffset: 320;
+    animation: pl-draw 1.4s cubic-bezier(.6,.2,.2,1) forwards;
+  }
+  #preloader .mk path { animation-delay: .25s; }
+  #preloader .mk rect:last-of-type { animation-delay: .5s; }
+  @keyframes pl-draw { to { stroke-dashoffset: 0; fill: #B56BFF; } }
+  #pl-bar { width: 180px; height: 2px; background: rgba(255,255,255,.08); border-radius: 2px; overflow: hidden; }
+  #pl-bar span { display: block; height: 100%; width: 0%;
+    background: linear-gradient(90deg, #8A4DCC, #B56BFF); transition: width .3s ease; }
+  #pl-label { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: .3em;
+    text-transform: uppercase; color: rgba(255,255,255,.4); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .floaty, .aurora, .scan-line, .orbit, .travel-dot, .marquee, .scroll-up { animation: none !important; }
+    .reveal, .stagger > * { transition-duration: .3s; }
   }
 </style>
 
@@ -258,10 +327,58 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 </head>
 <body class="page-bg">
+
+<!-- cinematic preloader -->
+<div id="preloader">
+  <svg class="mk" width="64" height="64" viewBox="0 0 100 100">
+    <rect x="26" y="18" width="60" height="14" rx="2" />
+    <path d="M38 32 L62 68" />
+    <rect x="14" y="68" width="60" height="14" rx="2" />
+  </svg>
+  <div id="pl-bar"><span></span></div>
+  <div id="pl-label">inicializando sistema</div>
+</div>
+
+<!-- scroll progress + custom cursor -->
+<div id="scroll-progress"></div>
+<div id="cursor-ring"></div>
+<div id="cursor-dot"></div>
+
+<!-- WebGL background -->
+<canvas id="webgl"></canvas>
+
 <div id="root"></div>
 
+<!-- preloader controller (plain JS, runs immediately) -->
+<script>
+  (function () {
+    var pre = document.getElementById('preloader');
+    var bar = document.querySelector('#pl-bar span');
+    var pct = 0, ready = false;
+    var crawl = setInterval(function () {
+      pct += (90 - pct) * 0.08 + 0.6;
+      if (pct > 90) pct = 90;
+      bar.style.width = pct.toFixed(1) + '%';
+    }, 90);
+    function finish() {
+      if (pre.classList.contains('done')) return;
+      clearInterval(crawl);
+      bar.style.width = '100%';
+      setTimeout(function () { pre.classList.add('done'); }, 280);
+    }
+    window.addEventListener('shift:scene-ready', function () { ready = true; finish(); });
+    // fallbacks so it never gets stuck
+    window.addEventListener('load', function () { setTimeout(function () { if (!ready) finish(); }, 1200); });
+    setTimeout(function () { if (!ready) finish(); }, 5000);
+  })();
+</script>
+
+<!-- React/Babel layer -->
 <script type="text/babel" src="landing/components.jsx"></script>
 <script type="text/babel" src="landing/sections.jsx"></script>
 <script type="text/babel" src="landing/app.jsx"></script>
+
+<!-- WebGL scene (module) -->
+<script type="module" src="landing/scene.js"></script>
 </body>
 </html>

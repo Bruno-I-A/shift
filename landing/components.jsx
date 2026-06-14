@@ -124,10 +124,10 @@ function GhostBtn({ children, className = '', ...rest }) {
   );
 }
 
-// --- Reveal on scroll hook ------------------------------------------
+// --- Reveal on scroll hook (handles .reveal + .stagger) --------------
 function useReveal() {
   React.useEffect(() => {
-    const els = document.querySelectorAll('.reveal');
+    const els = document.querySelectorAll('.reveal, .stagger');
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
@@ -135,9 +135,104 @@ function useReveal() {
           io.unobserve(e.target);
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
     els.forEach(el => io.observe(el));
     return () => io.disconnect();
+  }, []);
+}
+
+// --- Custom cursor + magnetic targets -------------------------------
+function useCursor() {
+  React.useEffect(() => {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    if (!dot || !ring) return;
+    document.documentElement.classList.add('cursor-ready');
+
+    let mx = innerWidth / 2, my = innerHeight / 2;
+    let rx = mx, ry = my;
+    const onMove = (e) => { mx = e.clientX; my = e.clientY; dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`; };
+    window.addEventListener('mousemove', onMove, { passive: true });
+
+    let raf;
+    const loop = () => {
+      rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+      ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+      raf = requestAnimationFrame(loop);
+    };
+    loop();
+
+    // grow ring over interactive things
+    const hoverSel = 'a, button, [data-magnetic], .tilt, input, [role="button"]';
+    const onOver = (e) => { if (e.target.closest(hoverSel)) ring.classList.add('hover'); };
+    const onOut  = (e) => { if (e.target.closest(hoverSel)) ring.classList.remove('hover'); };
+    document.addEventListener('mouseover', onOver);
+    document.addEventListener('mouseout', onOut);
+
+    // magnetic pull
+    const magnets = Array.from(document.querySelectorAll('[data-magnetic]'));
+    const mAbort = [];
+    magnets.forEach((el) => {
+      const strength = parseFloat(el.getAttribute('data-magnetic')) || 0.4;
+      const move = (e) => {
+        const r = el.getBoundingClientRect();
+        const x = e.clientX - (r.left + r.width / 2);
+        const y = e.clientY - (r.top + r.height / 2);
+        el.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
+      };
+      const reset = () => { el.style.transform = 'translate(0,0)'; };
+      el.addEventListener('mousemove', move);
+      el.addEventListener('mouseleave', reset);
+      mAbort.push(() => { el.removeEventListener('mousemove', move); el.removeEventListener('mouseleave', reset); });
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseover', onOver);
+      document.removeEventListener('mouseout', onOut);
+      mAbort.forEach(fn => fn());
+    };
+  }, []);
+}
+
+// --- 3D tilt on cards ------------------------------------------------
+function useTilt() {
+  React.useEffect(() => {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const cards = Array.from(document.querySelectorAll('.tilt'));
+    const cleanups = [];
+    cards.forEach((el) => {
+      const max = parseFloat(el.getAttribute('data-tilt')) || 9;
+      const move = (e) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = `perspective(900px) rotateY(${px * max}deg) rotateX(${-py * max}deg) translateZ(0)`;
+      };
+      const reset = () => { el.style.transform = 'perspective(900px) rotateY(0) rotateX(0)'; };
+      el.addEventListener('mousemove', move);
+      el.addEventListener('mouseleave', reset);
+      cleanups.push(() => { el.removeEventListener('mousemove', move); el.removeEventListener('mouseleave', reset); });
+    });
+    return () => cleanups.forEach(fn => fn());
+  }, []);
+}
+
+// --- Scroll progress bar --------------------------------------------
+function useScrollProgress() {
+  React.useEffect(() => {
+    const bar = document.getElementById('scroll-progress');
+    if (!bar) return;
+    const on = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      bar.style.width = (max > 0 ? (scrollY / max) * 100 : 0) + '%';
+    };
+    on();
+    window.addEventListener('scroll', on, { passive: true });
+    window.addEventListener('resize', on);
+    return () => { window.removeEventListener('scroll', on); window.removeEventListener('resize', on); };
   }, []);
 }
 
@@ -192,4 +287,4 @@ const Icon = {
   ),
 };
 
-Object.assign(window, { MarkA, Wordmark, Section, PrimaryBtn, GhostBtn, useReveal, useSpotlight, Counter, Typed, Icon });
+Object.assign(window, { MarkA, Wordmark, Section, PrimaryBtn, GhostBtn, useReveal, useCursor, useTilt, useScrollProgress, useSpotlight, Counter, Typed, Icon });

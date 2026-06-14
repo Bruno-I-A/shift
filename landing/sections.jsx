@@ -49,7 +49,7 @@ function Header() {
           </nav>
 
           {/* CTA */}
-          <a href="#contato"
+          <a href="#contato" data-magnetic="0.3"
           className="hidden sm:inline-flex items-center gap-2 btn-primary rounded-full px-5 py-2.5 text-xs font-semibold tracking-tight">
             automatizar minha empresa
             <Icon.Arrow s={14} />
@@ -105,7 +105,7 @@ function Hero() {
             </p>
 
             <div className="mt-10 md:mt-12 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
-              <a href="#contato" className="w-full sm:w-auto">
+              <a href="#contato" data-magnetic="0.25" className="w-full sm:w-auto">
                 <PrimaryBtn className="text-base px-8 py-4 w-full inline-flex items-center justify-center gap-2">
                   quero acelerar meu negócio <Icon.Arrow s={16} />
                 </PrimaryBtn>
@@ -393,9 +393,9 @@ function Provocative() {
       eyebrow="O custo do improviso"
       title={<>se sua empresa ainda depende de planilhas, retrabalho e WhatsApp bagunçado, <span className="text-white/40">ela já está atrasada</span><span className="text-purple">.</span></>}>
       
-      <div className="grid md:grid-cols-3 gap-6 reveal">
+      <div className="grid md:grid-cols-3 gap-6 stagger">
         {cards.map((c) =>
-        <div key={c.tag} onMouseMove={onMove} className="glass spot shimmer rounded-2xl p-7 transition-all duration-300 group">
+        <div key={c.tag} onMouseMove={onMove} data-tilt="7" className="tilt glass spot shimmer rounded-2xl p-7 transition-all duration-300 group">
             <div className="flex items-center justify-between mb-8">
               <span className="num-tag">/ {c.tag}</span>
               <div className="text-white/40 group-hover:text-purple transition-colors">{c.icon}</div>
@@ -456,9 +456,9 @@ function Solutions() {
       title={<>tecnologia sob medida para fazer <br className="hidden md:block" />sua empresa rodar melhor<span className="text-purple">.</span></>}
       intro="cinco linhas de trabalho. cada uma resolve um lugar específico onde sua empresa está perdendo tempo, atenção ou dinheiro.">
       
-      <div className="grid md:grid-cols-3 gap-5 reveal">
+      <div className="grid md:grid-cols-3 gap-5 stagger">
         {cards.map((c, i) =>
-        <div key={i} onMouseMove={onMove} className={`glass spot shimmer rounded-2xl p-7 flex flex-col transition-all duration-300 group ${c.span || ''}`}>
+        <div key={i} onMouseMove={onMove} data-tilt="6" className={`tilt glass spot shimmer rounded-2xl p-7 flex flex-col transition-all duration-300 group ${c.span || ''}`}>
             <div className="flex items-start justify-between mb-10">
               <div className="w-11 h-11 rounded-xl bg-purple/10 border border-purple/25 flex items-center justify-center text-purple group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
                 {c.icon}
@@ -625,7 +625,7 @@ function CTA() {
         </p>
 
         <div className="mt-14 flex flex-wrap justify-center items-center gap-4">
-          <a href="https://wa.me/5554984184808?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Shift%20Systems%20e%20quero%20saber%20mais." target="_blank" rel="noopener noreferrer">
+          <a href="https://wa.me/5554984184808?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Shift%20Systems%20e%20quero%20saber%20mais." target="_blank" rel="noopener noreferrer" data-magnetic="0.3">
             <PrimaryBtn className="text-base px-9 py-4 inline-flex items-center gap-2">
               falar com a Shift <Icon.Arrow s={16} />
             </PrimaryBtn>
@@ -686,9 +686,6 @@ function Footer() {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></svg>
                   whatsapp direto
                 </a>
-              </li>
-              <li>
-                <a href="mailto:hello@shift.systems" className="hover:text-purple transition"></a>
               </li>
             </ul>
           </div>
