@@ -99,7 +99,7 @@ function Section({ id, num, eyebrow, title, intro, children, className = '' }) {
           </div>
         )}
         {title && (
-          <h2 className="display text-4xl md:text-6xl lg:text-7xl max-w-5xl mb-8 reveal">{title}</h2>
+          <h2 className="display text-4xl md:text-6xl lg:text-7xl max-w-5xl mb-8 build">{title}</h2>
         )}
         {intro && <p className="text-lg md:text-xl text-white/65 max-w-3xl mb-16 leading-relaxed reveal">{intro}</p>}
         {children}
@@ -139,6 +139,32 @@ function useReveal() {
     els.forEach(el => io.observe(el));
     return () => io.disconnect();
   }, []);
+}
+
+// --- Split .build headlines into per-word spans (preserves nested markup)
+function splitForBuild() {
+  document.querySelectorAll('.build').forEach((root) => {
+    if (root.dataset.split) return;
+    const walk = (node) => {
+      Array.from(node.childNodes).forEach((child) => {
+        if (child.nodeType === 3) {
+          const parts = child.textContent.split(/(\s+)/);
+          const frag = document.createDocumentFragment();
+          parts.forEach((tok) => {
+            if (tok === '') return;
+            if (/^\s+$/.test(tok)) frag.appendChild(document.createTextNode(tok));
+            else { const s = document.createElement('span'); s.className = 'w'; s.textContent = tok; frag.appendChild(s); }
+          });
+          node.replaceChild(frag, child);
+        } else if (child.nodeType === 1 && child.tagName !== 'BR') {
+          walk(child);
+        }
+      });
+    };
+    walk(root);
+    root.querySelectorAll('.w').forEach((w, i) => { w.style.animationDelay = (i * 0.045) + 's'; });
+    root.dataset.split = '1';
+  });
 }
 
 // --- Cinematic engine: Lenis smooth scroll + GSAP scroll choreography
@@ -186,15 +212,20 @@ function useCinematic() {
     // feed the WebGL film a single normalized scroll value
     ST.create({ start: 0, end: 'max', onUpdate: (self) => { window.__shiftScrollN = self.progress; } });
 
+    // ---- text build: split headlines into words (animated via .in class) ----
+    splitForBuild();
+
     // ---- reveals: reliable .in-class fade-in (fails OPEN — never hides) ----
     const io = new IntersectionObserver((es) => es.forEach(e => {
       if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     }), { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
-    document.querySelectorAll('.reveal, .stagger').forEach(el => io.observe(el));
-    // safety net: if anything is still hidden after 3.5s, force it visible
+    document.querySelectorAll('.reveal, .stagger, .build').forEach(el => io.observe(el));
+    // safety net: anything visible/passed that's still hidden after 3s, force in
     const safety = setTimeout(() => {
-      document.querySelectorAll('.reveal, .stagger').forEach(el => el.classList.add('in'));
-    }, 3500);
+      document.querySelectorAll('.reveal, .stagger, .build').forEach(el => {
+        if (el.getBoundingClientRect().top < innerHeight * 1.1) el.classList.add('in');
+      });
+    }, 3000);
 
     // ---- depth parallax (safe: only translates, never hides) ----
     const triggers = [];

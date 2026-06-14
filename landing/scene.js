@@ -45,7 +45,7 @@ function boot() {
   renderer.setSize(W(), H());
   renderer.setClearColor(0x06060a, 1); // opaque dark base so light text stays readable
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.0;
 
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x08080b, 0.026);
@@ -59,7 +59,7 @@ function boot() {
   // =================================================================
   // PARTICLES — chaotic cloud  ⇄  ordered lattice  (driven by uOrder)
   // =================================================================
-  const COUNT = reduced ? 1100 : (isMobile ? 2200 : 4200);
+  const COUNT = reduced ? 900 : (isMobile ? 1600 : 2800);
   const positions = new Float32Array(COUNT * 3);   // base cloud
   const targets   = new Float32Array(COUNT * 3);   // ordered lattice
   const scales = new Float32Array(COUNT);
@@ -149,7 +149,7 @@ function boot() {
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         gl_Position = projectionMatrix * mv;
         float twinkle = 0.6 + 0.4 * sin(uTime * 1.4 + aSeed * 3.0);
-        gl_PointSize = aScale * (24.0 + o * 10.0) * uPixelRatio * twinkle / -mv.z;
+        gl_PointSize = aScale * (19.0 + o * 8.0) * uPixelRatio * twinkle / -mv.z;
         vGlow = twinkle * smoothstep(-26.0, 4.0, mv.z);
         vOrder = o;
       }`,
@@ -161,7 +161,7 @@ function boot() {
         if(d > 0.5) discard;
         float a = smoothstep(0.5, 0.0, d);
         vec3 col = mix(uColorA, uColorB, pow(a, 3.0) * (0.6 + vOrder * 0.3));
-        gl_FragColor = vec4(col, a * vGlow * 0.5);
+        gl_FragColor = vec4(col, a * vGlow * 0.32);
       }`,
   });
   const field = new THREE.Points(geo, mat);
@@ -192,7 +192,7 @@ function boot() {
   // =================================================================
   const mark = new THREE.Group();
   const k = 0.085, depth = 1.15;
-  const markMat = new THREE.MeshStandardMaterial({ color: PURPLE, emissive: PURPLE_DEEP, emissiveIntensity: 1.35, metalness: 0.55, roughness: 0.22 });
+  const markMat = new THREE.MeshStandardMaterial({ color: PURPLE, emissive: PURPLE_DEEP, emissiveIntensity: 1.0, metalness: 0.55, roughness: 0.22 });
   const slabGeo = new RoundedBoxGeometry(60*k, 14*k, depth, 6, 0.22);
   const top = new THREE.Mesh(slabGeo, markMat);
   const bottom = new THREE.Mesh(slabGeo, markMat);
@@ -209,7 +209,7 @@ function boot() {
   // =================================================================
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), reduced ? 0.45 : 0.7, 0.5, 0.2);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), reduced ? 0.3 : 0.42, 0.4, 0.3);
   composer.addPass(bloom);
   composer.setSize(W(), H());
 
@@ -309,9 +309,9 @@ function boot() {
       mark.position.z = lerp(-1.5, 0.5, ex);
       mark.rotation.y = Math.sin(t * 0.3) * 0.5 + mouse.x * 0.4 + shatter * 1.2;
       mark.rotation.x = Math.cos(t * 0.25) * 0.16 - mouse.y * 0.3;
-      const base = isMobile ? 0.85 : 1.2;
+      const base = isMobile ? 0.8 : 1.05;
       mark.scale.setScalar(base * (0.7 + 0.45 * endWhole + 0.25 * heroWhole));
-      markMat.emissiveIntensity = 1.35 * vis;
+      markMat.emissiveIntensity = 1.0 * vis;
     }
 
     composer.render();

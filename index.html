@@ -65,9 +65,16 @@
   .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
   .lenis.lenis-stopped { overflow: hidden; }
 
-  /* when GSAP drives the choreography, neutralize the CSS reveal baseline */
-  html.gsap-on .reveal,
-  html.gsap-on .stagger > * { opacity: 1; transform: none; filter: none; }
+  /* ===== word-by-word text build ===== */
+  @keyframes word-in {
+    from { opacity: 0; transform: translateY(0.5em); filter: blur(6px); }
+    to   { opacity: 1; transform: none; filter: none; }
+  }
+  .build .w { display: inline-block; opacity: 0; }
+  .build.in .w { animation: word-in .7s cubic-bezier(.2,.7,.3,1) both; }
+  @media (prefers-reduced-motion: reduce) {
+    .build .w, .build.in .w { opacity: 1; animation: none; }
+  }
 
   /* base layered background — vignette + soft purple wash + grid */
   .page-bg {

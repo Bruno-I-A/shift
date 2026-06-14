@@ -91,7 +91,7 @@ function Hero() {
               <span className="eyebrow">Shift / Systems · 2026</span>
             </div>
 
-            <h1 className="display text-[44px] sm:text-6xl md:text-7xl lg:text-[88px]">
+            <h1 className="display text-[44px] sm:text-6xl md:text-7xl lg:text-[88px] build">
               empresas lentas<br />
               <span className="text-white/45">perdem</span> <span className="text-purple" style={{ textShadow: '0 0 32px rgba(181,107,255,0.45)' }}>dinheiro<span className="text-purple">.</span></span>
             </h1>
@@ -568,7 +568,7 @@ function Positioning() {
 
           <div className="relative">
             <div className="num-tag mb-6">/ 04 · posicionamento</div>
-            <h2 className="display text-4xl md:text-6xl lg:text-7xl max-w-4xl reveal">
+            <h2 className="display text-4xl md:text-6xl lg:text-7xl max-w-4xl build">
               tecnologia não precisa <span className="text-white/40 italic font-light">impressionar</span>.<br />
               precisa <span className="text-purple">resolver</span><span className="text-purple">.</span>
             </h2>
@@ -615,7 +615,7 @@ function CTA() {
           <span className="eyebrow">vagas abertas · 2026</span>
         </div>
 
-        <h2 className="display text-5xl md:text-7xl lg:text-[88px] reveal">
+        <h2 className="display text-5xl md:text-7xl lg:text-[88px] build">
           o manual <br className="md:hidden" />custa mais caro<br />
           do que você imagina<span className="text-purple">.</span>
         </h2>
