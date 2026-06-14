@@ -26,3 +26,12 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+// tell the boot screen the site has mounted → it lifts and the site forms in.
+// fire via rAF (paints first) AND a timeout fallback (rAF is paused on hidden tabs).
+(function () {
+  var fired = false;
+  function signal() { if (fired) return; fired = true; window.dispatchEvent(new Event('shift:react-ready')); }
+  requestAnimationFrame(function () { requestAnimationFrame(signal); });
+  setTimeout(signal, 150);
+})();

@@ -327,5 +327,8 @@ function boot() {
   requestAnimationFrame(() => requestAnimationFrame(markReady));
 }
 
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-else boot();
+// init the heavy 3D AFTER the site has formed in, so the entrance never janks
+let booted = false;
+function go() { if (booted) return; booted = true; boot(); }
+window.addEventListener('shift:react-ready', function () { setTimeout(go, 400); }, { once: true });
+setTimeout(go, 2600); // fallback if react never signals
