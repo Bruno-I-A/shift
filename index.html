@@ -40,10 +40,10 @@
   }
 </script>
 
-<!-- smooth scroll + scroll-driven timeline (the "film" engine) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+<!-- smooth scroll + scroll-driven timeline (the "film" engine) — deferred so the opening paints instantly -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script defer src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
 
 <!-- three.js (modules) for the WebGL layer -->
 <script type="importmap">
@@ -320,27 +320,60 @@
     #cursor-dot, #cursor-ring { display: none; }
   }
 
-  /* ===== cinematic preloader ===== */
-  #preloader {
-    position: fixed; inset: 0; z-index: 9998; background: #08080b;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
-    transition: opacity .8s ease, visibility .8s ease;
+  /* ===== cinematic opening — the mark assembles, then a diagonal slit reveals the site ===== */
+  #preloader { position: fixed; inset: 0; z-index: 9998; pointer-events: auto; }
+  #preloader.done { pointer-events: none; }
+
+  /* two panels split along a diagonal that echoes the mark's slice */
+  .pl-panel { position: absolute; inset: 0; background: #08080b; will-change: transform;
+    transition: transform 1s cubic-bezier(.76,0,.24,1); }
+  .pl-top { clip-path: polygon(0 0, 100% 0, 100% 56%, 0 44%); }
+  .pl-bot { clip-path: polygon(0 44%, 100% 56%, 100% 100%, 0 100%); }
+  #preloader.done .pl-top { transform: translate(-3%, -103%); }
+  #preloader.done .pl-bot { transform: translate(3%, 103%); }
+
+  .pl-stage { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 20px;
+    transition: opacity .4s ease, transform .4s ease; }
+  #preloader.done .pl-stage { opacity: 0; transform: scale(.96); }
+
+  .pl-mark { overflow: visible; filter: drop-shadow(0 0 22px rgba(181,107,255,.5));
+    animation: pl-pulse 1.1s ease .85s; }
+  .pl-mark rect { fill: #B56BFF; transform-box: fill-box; transform-origin: center; }
+  .pl-mark .pl-diag { fill: none; stroke: #B56BFF; stroke-width: 14; stroke-linecap: round;
+    stroke-dasharray: 44; stroke-dashoffset: 44; animation: pl-diag .5s ease .42s forwards; }
+  .pl-slab-top { opacity: 0; transform: translateX(-46px); animation: pl-in-l .55s cubic-bezier(.5,1.5,.4,1) .05s forwards; }
+  .pl-slab-bot { opacity: 0; transform: translateX(46px);  animation: pl-in-r .55s cubic-bezier(.5,1.5,.4,1) .05s forwards; }
+  @keyframes pl-in-l { to { opacity: 1; transform: translateX(0); } }
+  @keyframes pl-in-r { to { opacity: 1; transform: translateX(0); } }
+  @keyframes pl-diag { to { stroke-dashoffset: 0; } }
+  @keyframes pl-pulse {
+    0%,100% { filter: drop-shadow(0 0 22px rgba(181,107,255,.5)); }
+    50%     { filter: drop-shadow(0 0 48px rgba(181,107,255,.95)); }
   }
-  #preloader.done { opacity: 0; visibility: hidden; }
-  #preloader .mk { filter: drop-shadow(0 0 24px rgba(181,107,255,.6)); }
-  #preloader .mk rect, #preloader .mk path {
-    stroke: #B56BFF; stroke-width: 3; fill: transparent;
-    stroke-dasharray: 320; stroke-dashoffset: 320;
-    animation: pl-draw 1.4s cubic-bezier(.6,.2,.2,1) forwards;
-  }
-  #preloader .mk path { animation-delay: .25s; }
-  #preloader .mk rect:last-of-type { animation-delay: .5s; }
-  @keyframes pl-draw { to { stroke-dashoffset: 0; fill: #B56BFF; } }
-  #pl-bar { width: 180px; height: 2px; background: rgba(255,255,255,.08); border-radius: 2px; overflow: hidden; }
-  #pl-bar span { display: block; height: 100%; width: 0%;
+
+  .pl-word { font-family: 'Geist', sans-serif; font-weight: 600; letter-spacing: -.02em; font-size: 20px;
+    opacity: 0; transform: translateY(8px); animation: pl-up .5s ease .95s forwards; }
+  .pl-word b { color: #B56BFF; }
+  .pl-word span { font-family: 'Geist Mono', monospace; font-weight: 400; font-size: .55em;
+    letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-left: 8px; }
+  .pl-status { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: .26em;
+    text-transform: uppercase; color: rgba(181,107,255,.85); height: 12px;
+    opacity: 0; animation: pl-up .5s ease 1.05s forwards; }
+  #pl-bar { width: 170px; height: 2px; background: rgba(255,255,255,.08); border-radius: 2px; overflow: hidden;
+    opacity: 0; animation: pl-up .5s ease 1.1s forwards; }
+  #pl-bar span { display: block; height: 100%; width: 0%; box-shadow: 0 0 10px rgba(181,107,255,.7);
     background: linear-gradient(90deg, #8A4DCC, #B56BFF); transition: width .3s ease; }
-  #pl-label { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: .3em;
-    text-transform: uppercase; color: rgba(255,255,255,.4); }
+  @keyframes pl-up { to { opacity: 1; transform: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pl-slab-top, .pl-slab-bot, .pl-diag, .pl-word, .pl-status, #pl-bar {
+      animation: none !important; opacity: 1 !important; transform: none !important; stroke-dashoffset: 0 !important; }
+    .pl-mark { animation: none !important; }
+    #preloader { transition: opacity .5s ease; }
+    #preloader.done { opacity: 0; visibility: hidden; }
+    #preloader.done .pl-top, #preloader.done .pl-bot { transform: none; }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .floaty, .aurora, .scan-line, .orbit, .travel-dot, .marquee, .scroll-up { animation: none !important; }
@@ -348,21 +381,26 @@
   }
 </style>
 
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script defer src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script defer src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script defer src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 </head>
 <body class="page-bg">
 
-<!-- cinematic preloader -->
+<!-- cinematic opening -->
 <div id="preloader">
-  <svg class="mk" width="64" height="64" viewBox="0 0 100 100">
-    <rect x="26" y="18" width="60" height="14" rx="2" />
-    <path d="M38 32 L62 68" />
-    <rect x="14" y="68" width="60" height="14" rx="2" />
-  </svg>
-  <div id="pl-bar"><span></span></div>
-  <div id="pl-label">inicializando sistema</div>
+  <div class="pl-panel pl-top"></div>
+  <div class="pl-panel pl-bot"></div>
+  <div class="pl-stage">
+    <svg class="pl-mark" width="78" height="78" viewBox="0 0 100 100">
+      <rect class="pl-slab-top" x="26" y="18" width="60" height="14" rx="2" />
+      <path class="pl-diag" d="M38 32 L62 68" />
+      <rect class="pl-slab-bot" x="14" y="68" width="60" height="14" rx="2" />
+    </svg>
+    <div class="pl-word">shift<b>.</b><span>systems</span></div>
+    <div class="pl-status"><span id="pl-status">conectando processos</span></div>
+    <div id="pl-bar"><span></span></div>
+  </div>
 </div>
 
 <!-- scroll progress + custom cursor -->
@@ -380,22 +418,29 @@
   (function () {
     var pre = document.getElementById('preloader');
     var bar = document.querySelector('#pl-bar span');
+    var st = document.getElementById('pl-status');
+    // status log tied to what Shift actually builds
+    var phrases = ['conectando processos', 'sincronizando automações', 'ativando agentes de ia', 'montando dashboards', 'tudo conversando'];
+    var pi = 0;
+    var cyc = setInterval(function () { pi = (pi + 1) % phrases.length; if (st) st.textContent = phrases[pi]; }, 360);
     var pct = 0, ready = false;
     var crawl = setInterval(function () {
-      pct += (90 - pct) * 0.08 + 0.6;
-      if (pct > 90) pct = 90;
-      bar.style.width = pct.toFixed(1) + '%';
+      pct += (92 - pct) * 0.08 + 0.7; if (pct > 92) pct = 92;
+      if (bar) bar.style.width = pct.toFixed(1) + '%';
     }, 90);
-    function finish() {
+    var start = Date.now(), MIN = 1900; // let the assembly play out before revealing
+    function reveal() {
       if (pre.classList.contains('done')) return;
-      clearInterval(crawl);
-      bar.style.width = '100%';
-      setTimeout(function () { pre.classList.add('done'); }, 280);
+      clearInterval(crawl); clearInterval(cyc);
+      if (bar) bar.style.width = '100%';
+      if (st) st.textContent = 'sistema pronto';
+      setTimeout(function () { pre.classList.add('done'); }, 320);
     }
-    window.addEventListener('shift:scene-ready', function () { ready = true; finish(); });
+    function tryFinish() { var e = Date.now() - start; if (e >= MIN) reveal(); else setTimeout(reveal, MIN - e); }
+    window.addEventListener('shift:scene-ready', function () { ready = true; tryFinish(); });
     // fallbacks so it never gets stuck
-    window.addEventListener('load', function () { setTimeout(function () { if (!ready) finish(); }, 1200); });
-    setTimeout(function () { if (!ready) finish(); }, 5000);
+    window.addEventListener('load', function () { setTimeout(function () { if (!ready) tryFinish(); }, 1400); });
+    setTimeout(function () { if (!pre.classList.contains('done')) reveal(); }, 6000);
   })();
 </script>
 
