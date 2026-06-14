@@ -217,13 +217,20 @@ function useCinematic() {
 
     // ---- reveals: reliable .in-class fade-in (fails OPEN — never hides) ----
     const io = new IntersectionObserver((es) => es.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      if (e.isIntersecting) {
+        const el = e.target; el.classList.add('in'); io.unobserve(el);
+        // after the build plays, hard-lock to a static visible state (anti-stuck)
+        if (el.classList.contains('build')) setTimeout(() => el.classList.add('done'), 1600);
+      }
     }), { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
     document.querySelectorAll('.reveal, .stagger, .build').forEach(el => io.observe(el));
-    // safety net: anything visible/passed that's still hidden after 3s, force in
+    // safety net: anything visible/passed that's still hidden after 3s, force visible
     const safety = setTimeout(() => {
       document.querySelectorAll('.reveal, .stagger, .build').forEach(el => {
-        if (el.getBoundingClientRect().top < innerHeight * 1.1) el.classList.add('in');
+        if (el.getBoundingClientRect().top < innerHeight * 1.1) {
+          el.classList.add('in');
+          if (el.classList.contains('build')) el.classList.add('done');
+        }
       });
     }, 3000);
 

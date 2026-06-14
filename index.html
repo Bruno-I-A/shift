@@ -65,15 +65,19 @@
   .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
   .lenis.lenis-stopped { overflow: hidden; }
 
-  /* ===== word-by-word text build ===== */
+  /* ===== word-by-word text build =====
+     base state is VISIBLE (fail-open): if JS/anim never runs, text still shows.
+     the animation only plays once .in is added, revealing from hidden. */
   @keyframes word-in {
     from { opacity: 0; transform: translateY(0.5em); filter: blur(6px); }
     to   { opacity: 1; transform: none; filter: none; }
   }
-  .build .w { display: inline-block; opacity: 0; }
+  .build .w { display: inline-block; }
   .build.in .w { animation: word-in .7s cubic-bezier(.2,.7,.3,1) both; }
+  /* hard guarantee: once "done", text is statically visible (no compositor needed) */
+  .build.done .w { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
   @media (prefers-reduced-motion: reduce) {
-    .build .w, .build.in .w { opacity: 1; animation: none; }
+    .build.in .w { animation: none; }
   }
 
   /* base layered background — vignette + soft purple wash + grid */
