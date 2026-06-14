@@ -43,8 +43,9 @@ function boot() {
   const W = () => window.innerWidth, H = () => window.innerHeight;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(W(), H());
+  renderer.setClearColor(0x06060a, 1); // opaque dark base so light text stays readable
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.05;
 
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x08080b, 0.026);
@@ -160,7 +161,7 @@ function boot() {
         if(d > 0.5) discard;
         float a = smoothstep(0.5, 0.0, d);
         vec3 col = mix(uColorA, uColorB, pow(a, 3.0) * (0.6 + vOrder * 0.3));
-        gl_FragColor = vec4(col, a * vGlow);
+        gl_FragColor = vec4(col, a * vGlow * 0.5);
       }`,
   });
   const field = new THREE.Points(geo, mat);
@@ -192,11 +193,11 @@ function boot() {
   const mark = new THREE.Group();
   const k = 0.085, depth = 1.15;
   const markMat = new THREE.MeshStandardMaterial({ color: PURPLE, emissive: PURPLE_DEEP, emissiveIntensity: 1.35, metalness: 0.55, roughness: 0.22 });
-  const slabGeo = new THREE.RoundedBoxGeometry(60*k, 14*k, depth, 6, 0.22);
+  const slabGeo = new RoundedBoxGeometry(60*k, 14*k, depth, 6, 0.22);
   const top = new THREE.Mesh(slabGeo, markMat);
   const bottom = new THREE.Mesh(slabGeo, markMat);
   const diagLen = Math.sqrt(24*24 + 36*36);
-  const diag = new THREE.Mesh(new THREE.RoundedBoxGeometry(diagLen*k, 14*k, depth, 6, 0.22), markMat);
+  const diag = new THREE.Mesh(new RoundedBoxGeometry(diagLen*k, 14*k, depth, 6, 0.22), markMat);
   const topBase = new THREE.Vector3((56-50)*k, (50-25)*k, 0);
   const botBase = new THREE.Vector3((44-50)*k, (50-75)*k, 0);
   const diagRot = Math.atan2(-36, 24);
@@ -208,7 +209,7 @@ function boot() {
   // =================================================================
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), reduced ? 0.6 : 1.0, 0.62, 0.0);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), reduced ? 0.45 : 0.7, 0.5, 0.2);
   composer.addPass(bloom);
   composer.setSize(W(), H());
 

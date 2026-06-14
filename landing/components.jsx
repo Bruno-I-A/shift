@@ -158,7 +158,6 @@ function useCinematic() {
     }
 
     gsap.registerPlugin(ST);
-    document.documentElement.classList.add('gsap-on');
 
     // ---- Lenis smooth scroll (the buttery rail) ----
     let lenis = null;
@@ -187,25 +186,18 @@ function useCinematic() {
     // feed the WebGL film a single normalized scroll value
     ST.create({ start: 0, end: 'max', onUpdate: (self) => { window.__shiftScrollN = self.progress; } });
 
+    // ---- reveals: reliable .in-class fade-in (fails OPEN — never hides) ----
+    const io = new IntersectionObserver((es) => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+    document.querySelectorAll('.reveal, .stagger').forEach(el => io.observe(el));
+    // safety net: if anything is still hidden after 3.5s, force it visible
+    const safety = setTimeout(() => {
+      document.querySelectorAll('.reveal, .stagger').forEach(el => el.classList.add('in'));
+    }, 3500);
+
+    // ---- depth parallax (safe: only translates, never hides) ----
     const triggers = [];
-    // block reveals — rise + de-blur
-    gsap.utils.toArray('.reveal').forEach((el) => {
-      const tw = gsap.from(el, {
-        opacity: 0, y: 50, filter: 'blur(10px)', duration: 1.1, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 86%', once: true },
-      });
-      if (tw.scrollTrigger) triggers.push(tw.scrollTrigger);
-    });
-    // staggered grids — cards fly in from depth with a tilt
-    gsap.utils.toArray('.stagger').forEach((grid) => {
-      const tw = gsap.from(grid.children, {
-        opacity: 0, y: 80, rotateX: -16, z: -180, transformOrigin: '50% 100%', transformPerspective: 1000,
-        duration: 1.0, ease: 'power3.out', stagger: 0.12,
-        scrollTrigger: { trigger: grid, start: 'top 82%', once: true },
-      });
-      if (tw.scrollTrigger) triggers.push(tw.scrollTrigger);
-    });
-    // depth parallax
     gsap.utils.toArray('[data-parallax]').forEach((el) => {
       const amt = parseFloat(el.getAttribute('data-parallax')) || 18;
       const tw = gsap.to(el, {
@@ -220,12 +212,12 @@ function useCinematic() {
     const rid = setTimeout(refresh, 600);
 
     return () => {
-      clearTimeout(rid);
+      clearTimeout(rid); clearTimeout(safety);
+      io.disconnect();
       window.removeEventListener('load', refresh);
       document.removeEventListener('click', onAnchor);
       triggers.forEach(t => t.kill());
       if (lenis) lenis.destroy();
-      document.documentElement.classList.remove('gsap-on');
     };
   }, []);
 }
