@@ -123,7 +123,7 @@ function Hero() {
           </div>
 
           {/* Visual column — floating system graph */}
-          <div className="lg:col-span-5 relative mt-16 lg:mt-0">
+          <div data-parallax="-12" className="lg:col-span-5 relative mt-16 lg:mt-0">
             <HeroVisual />
           </div>
         </div>

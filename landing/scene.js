@@ -1,7 +1,8 @@
-/* Shift Systems · WebGL scene
- * a "living system": glowing particle flow-field + node network +
- * the 3D-extruded Shift mark, lit with bloom. mouse-parallax + scroll dolly.
- * pure three.js (module) — runs independently of the React/Babel layer.
+/* Shift Systems · WebGL film
+ * a scroll-driven journey: the mark hangs whole → shatters into a chaotic
+ * particle storm → the storm snaps into an ordered lattice → the mark reforms
+ * behind the final CTA. camera flies through choreographed stations.
+ * the whole thing is scrubbed by a single scroll progress value (0..1).
  */
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -12,9 +13,19 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 const PURPLE = 0xB56BFF;
 const PURPLE_DEEP = 0x8A4DCC;
 
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const lerp = (a, b, t) => a + (b - a) * t;
+
 function markReady() {
   window.__shiftSceneReady = true;
   window.dispatchEvent(new Event('shift:scene-ready'));
+}
+
+// global scroll progress (cinematic hook writes window.__shiftScrollN; we fall back)
+function scrollProgress() {
+  if (typeof window.__shiftScrollN === 'number') return window.__shiftScrollN;
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  return max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
 }
 
 function boot() {
@@ -26,55 +37,58 @@ function boot() {
 
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({
-      canvas, antialias: true, alpha: true, powerPreference: 'high-performance',
-    });
-  } catch (e) {
-    // no webgl — let the CSS background carry the page
-    markReady();
-    return;
-  }
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  } catch (e) { markReady(); return; }
 
-  const W = () => window.innerWidth;
-  const H = () => window.innerHeight;
-
+  const W = () => window.innerWidth, H = () => window.innerHeight;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(W(), H());
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x08080b, 0.028);
-
-  const camera = new THREE.PerspectiveCamera(58, W() / H(), 0.1, 120);
+  scene.fog = new THREE.FogExp2(0x08080b, 0.026);
+  const camera = new THREE.PerspectiveCamera(60, W() / H(), 0.1, 200);
   camera.position.set(0, 0, 16);
 
-  // ---- lights (for the standard-material mark) ----------------------
   scene.add(new THREE.AmbientLight(0x402a66, 1.1));
-  const key = new THREE.PointLight(PURPLE, 60, 60); key.position.set(6, 6, 10); scene.add(key);
-  const rim = new THREE.PointLight(0xffffff, 22, 60); rim.position.set(-8, -4, 6); scene.add(rim);
+  const key = new THREE.PointLight(PURPLE, 70, 80); key.position.set(6, 6, 12); scene.add(key);
+  const rim = new THREE.PointLight(0xffffff, 24, 80); rim.position.set(-8, -4, 8); scene.add(rim);
 
   // =================================================================
-  // 1 · PARTICLE FLOW-FIELD
+  // PARTICLES — chaotic cloud  ⇄  ordered lattice  (driven by uOrder)
   // =================================================================
-  const COUNT = reduced ? 900 : (isMobile ? 1600 : 3600);
-  const positions = new Float32Array(COUNT * 3);
+  const COUNT = reduced ? 1100 : (isMobile ? 2200 : 4200);
+  const positions = new Float32Array(COUNT * 3);   // base cloud
+  const targets   = new Float32Array(COUNT * 3);   // ordered lattice
   const scales = new Float32Array(COUNT);
-  const seeds = new Float32Array(COUNT);
-  const RX = 26, RY = 18, RZ = 18;
-  for (let i = 0; i < COUNT; i++) {
-    positions[i * 3]     = (Math.random() * 2 - 1) * RX;
-    positions[i * 3 + 1] = (Math.random() * 2 - 1) * RY;
-    positions[i * 3 + 2] = (Math.random() * 2 - 1) * RZ;
-    scales[i] = Math.random() * 0.9 + 0.25;
-    seeds[i]  = Math.random() * 6.2831;
-  }
-  const fieldGeo = new THREE.BufferGeometry();
-  fieldGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  fieldGeo.setAttribute('aScale', new THREE.BufferAttribute(scales, 1));
-  fieldGeo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
+  const seeds  = new Float32Array(COUNT);
+  const RX = 30, RY = 20, RZ = 20;
 
-  // compact ashima simplex noise (3d) for organic drift
+  // lattice dimensions
+  const gx = Math.ceil(Math.cbrt(COUNT * (RX / RY)));
+  const gy = Math.ceil(Math.cbrt(COUNT * (RY / RX)));
+  const gz = Math.ceil(COUNT / (gx * gy));
+  const LSX = 22, LSY = 13, LSZ = 14;
+  let n = 0;
+  for (let i = 0; i < COUNT; i++) {
+    positions[i*3]   = (Math.random() * 2 - 1) * RX;
+    positions[i*3+1] = (Math.random() * 2 - 1) * RY;
+    positions[i*3+2] = (Math.random() * 2 - 1) * RZ;
+    scales[i] = Math.random() * 0.9 + 0.28;
+    seeds[i]  = Math.random() * 6.2831;
+    const ix = n % gx, iy = Math.floor(n / gx) % gy, iz = Math.floor(n / (gx * gy));
+    targets[i*3]   = (ix / (gx - 1) - 0.5) * LSX;
+    targets[i*3+1] = (iy / (gy - 1) - 0.5) * LSY;
+    targets[i*3+2] = (iz / Math.max(1, gz - 1) - 0.5) * LSZ;
+    n++;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('aTarget', new THREE.BufferAttribute(targets, 3));
+  geo.setAttribute('aScale', new THREE.BufferAttribute(scales, 1));
+  geo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
+
   const NOISE = `
     vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x,289.0);}
     vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
@@ -99,153 +113,144 @@ function boot() {
       return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
     }`;
 
-  const fieldMat = new THREE.ShaderMaterial({
+  const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
     uniforms: {
       uTime: { value: 0 }, uPixelRatio: { value: renderer.getPixelRatio() },
-      uMouse: { value: new THREE.Vector2(0, 0) },
+      uMouse: { value: new THREE.Vector2() },
+      uOrder: { value: 0 },    // 0 = chaos cloud, 1 = ordered lattice
+      uChaos: { value: 0 },    // extra turbulence during the "problem" act
       uColorA: { value: new THREE.Color(PURPLE) },
       uColorB: { value: new THREE.Color(0xffffff) },
     },
     vertexShader: `
       ${NOISE}
-      uniform float uTime; uniform float uPixelRatio; uniform vec2 uMouse;
-      attribute float aScale; attribute float aSeed;
-      varying float vGlow;
+      uniform float uTime, uPixelRatio, uOrder, uChaos; uniform vec2 uMouse;
+      attribute vec3 aTarget; attribute float aScale, aSeed;
+      varying float vGlow, vOrder;
       void main(){
-        vec3 p = position;
         float t = uTime * 0.06;
-        float n1 = snoise(p * 0.06 + vec3(t, t*0.7, t*0.4));
-        float n2 = snoise(p * 0.12 + vec3(-t*0.5, t, aSeed));
-        p.x += n1 * 2.2;  p.y += n2 * 2.0;  p.z += n1 * 1.6;
-        // gentle pull toward cursor
-        p.xy += uMouse * (1.2 + aScale);
+        vec3 cloud = position;
+        float n1 = snoise(position * 0.06 + vec3(t, t*0.7, t*0.4));
+        float n2 = snoise(position * 0.12 + vec3(-t*0.5, t, aSeed));
+        cloud.x += n1 * (2.2 + uChaos * 4.0);
+        cloud.y += n2 * (2.0 + uChaos * 4.0);
+        cloud.z += n1 * (1.6 + uChaos * 3.0);
+        cloud.xy += uMouse * (1.1 + aScale);
+
+        // lattice breathes slightly so it feels alive even when ordered
+        vec3 lat = aTarget;
+        lat += 0.18 * vec3(sin(uTime*0.9+aSeed), cos(uTime*0.8+aSeed*1.3), sin(uTime*0.7+aSeed*0.6));
+
+        float o = smoothstep(0.0, 1.0, uOrder);
+        vec3 p = mix(cloud, lat, o);
+
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         gl_Position = projectionMatrix * mv;
         float twinkle = 0.6 + 0.4 * sin(uTime * 1.4 + aSeed * 3.0);
-        gl_PointSize = aScale * 26.0 * uPixelRatio * twinkle / -mv.z;
-        vGlow = twinkle * smoothstep(-22.0, 4.0, mv.z);
+        gl_PointSize = aScale * (24.0 + o * 10.0) * uPixelRatio * twinkle / -mv.z;
+        vGlow = twinkle * smoothstep(-26.0, 4.0, mv.z);
+        vOrder = o;
       }`,
     fragmentShader: `
-      uniform vec3 uColorA; uniform vec3 uColorB;
-      varying float vGlow;
+      uniform vec3 uColorA, uColorB;
+      varying float vGlow, vOrder;
       void main(){
         float d = length(gl_PointCoord - 0.5);
         if(d > 0.5) discard;
         float a = smoothstep(0.5, 0.0, d);
-        vec3 col = mix(uColorA, uColorB, pow(a, 3.0) * 0.7);
+        vec3 col = mix(uColorA, uColorB, pow(a, 3.0) * (0.6 + vOrder * 0.3));
         gl_FragColor = vec4(col, a * vGlow);
       }`,
   });
-  const field = new THREE.Points(fieldGeo, fieldMat);
+  const field = new THREE.Points(geo, mat);
   scene.add(field);
 
   // =================================================================
-  // 2 · NODE NETWORK  (nodes + connecting lines, slowly rotating)
+  // NODE NETWORK — subtle, always present, slowly rotating
   // =================================================================
-  const netGroup = new THREE.Group();
-  scene.add(netGroup);
-  const NODES = reduced ? 26 : 54;
-  const nodePts = [];
+  const netGroup = new THREE.Group(); scene.add(netGroup);
+  const NODES = reduced ? 24 : 50;
+  const np = [];
   for (let i = 0; i < NODES; i++) {
-    // biased to a shell so the center stays readable
-    const r = 6 + Math.random() * 5;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(Math.random() * 2 - 1);
-    nodePts.push(new THREE.Vector3(
-      r * Math.sin(phi) * Math.cos(theta),
-      r * Math.sin(phi) * Math.sin(theta) * 0.7,
-      r * Math.cos(phi),
-    ));
+    const r = 7 + Math.random() * 5, th = Math.random() * 6.2831, ph = Math.acos(Math.random() * 2 - 1);
+    np.push(new THREE.Vector3(r*Math.sin(ph)*Math.cos(th), r*Math.sin(ph)*Math.sin(th)*0.7, r*Math.cos(ph)));
   }
-  const nodePos = new Float32Array(NODES * 3);
-  nodePts.forEach((v, i) => { nodePos[i*3]=v.x; nodePos[i*3+1]=v.y; nodePos[i*3+2]=v.z; });
-  const nodeGeo = new THREE.BufferGeometry();
-  nodeGeo.setAttribute('position', new THREE.BufferAttribute(nodePos, 3));
-  const nodeMat = new THREE.PointsMaterial({
-    color: PURPLE, size: 0.16, transparent: true, opacity: 0.95,
-    blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
-  });
-  netGroup.add(new THREE.Points(nodeGeo, nodeMat));
-
-  // connections within a threshold (capped)
-  const linePos = [];
-  const maxSeg = 160; let seg = 0;
-  for (let i = 0; i < NODES && seg < maxSeg; i++) {
-    for (let j = i + 1; j < NODES && seg < maxSeg; j++) {
-      if (nodePts[i].distanceTo(nodePts[j]) < 4.4) {
-        linePos.push(nodePts[i].x, nodePts[i].y, nodePts[i].z,
-                     nodePts[j].x, nodePts[j].y, nodePts[j].z);
-        seg++;
-      }
-    }
-  }
-  const lineGeo = new THREE.BufferGeometry();
-  lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(linePos), 3));
-  const lineMat = new THREE.LineBasicMaterial({
-    color: PURPLE, transparent: true, opacity: 0.14,
-    blending: THREE.AdditiveBlending, depthWrite: false,
-  });
-  netGroup.add(new THREE.LineSegments(lineGeo, lineMat));
+  const npos = new Float32Array(NODES * 3);
+  np.forEach((v, i) => { npos[i*3]=v.x; npos[i*3+1]=v.y; npos[i*3+2]=v.z; });
+  const ng = new THREE.BufferGeometry(); ng.setAttribute('position', new THREE.BufferAttribute(npos, 3));
+  netGroup.add(new THREE.Points(ng, new THREE.PointsMaterial({ color: PURPLE, size: 0.15, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })));
+  const lp = []; let seg = 0;
+  for (let i = 0; i < NODES && seg < 150; i++) for (let j = i+1; j < NODES && seg < 150; j++)
+    if (np[i].distanceTo(np[j]) < 4.6) { lp.push(np[i].x,np[i].y,np[i].z, np[j].x,np[j].y,np[j].z); seg++; }
+  const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(lp), 3));
+  netGroup.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.12, blending: THREE.AdditiveBlending, depthWrite: false })));
 
   // =================================================================
-  // 3 · THE 3D SHIFT MARK  (extruded from the SVG geometry)
+  // THE 3D MARK — shatters apart then reassembles
   // =================================================================
   const mark = new THREE.Group();
-  const k = 0.085; // svg→world scale
-  const depth = 1.15;
-  const markMat = new THREE.MeshStandardMaterial({
-    color: PURPLE, emissive: PURPLE_DEEP, emissiveIntensity: 1.35,
-    metalness: 0.55, roughness: 0.22,
-  });
-  const slabGeo = new THREE.RoundedBoxGeometry(60 * k, 14 * k, depth, 6, 0.22);
-  // top slab  (svg center 56,25 → world, y flipped about 50)
+  const k = 0.085, depth = 1.15;
+  const markMat = new THREE.MeshStandardMaterial({ color: PURPLE, emissive: PURPLE_DEEP, emissiveIntensity: 1.35, metalness: 0.55, roughness: 0.22 });
+  const slabGeo = new THREE.RoundedBoxGeometry(60*k, 14*k, depth, 6, 0.22);
   const top = new THREE.Mesh(slabGeo, markMat);
-  top.position.set((56 - 50) * k, (50 - 25) * k, 0);
-  // bottom slab (svg center 44,75)
   const bottom = new THREE.Mesh(slabGeo, markMat);
-  bottom.position.set((44 - 50) * k, (50 - 75) * k, 0);
-  // diagonal (svg 38,32 → 62,68), length 43.27, angle in flipped space
-  const diagLen = Math.sqrt(24 * 24 + 36 * 36);
-  const diag = new THREE.Mesh(new THREE.RoundedBoxGeometry(diagLen * k, 14 * k, depth, 6, 0.22), markMat);
-  diag.rotation.z = Math.atan2(-36, 24);
+  const diagLen = Math.sqrt(24*24 + 36*36);
+  const diag = new THREE.Mesh(new THREE.RoundedBoxGeometry(diagLen*k, 14*k, depth, 6, 0.22), markMat);
+  const topBase = new THREE.Vector3((56-50)*k, (50-25)*k, 0);
+  const botBase = new THREE.Vector3((44-50)*k, (50-75)*k, 0);
+  const diagRot = Math.atan2(-36, 24);
   mark.add(top, bottom, diag);
-  mark.position.set(isMobile ? 0 : 4.2, isMobile ? 4.5 : 0.2, isMobile ? -4 : -1.5);
-  mark.scale.setScalar(isMobile ? 0.8 : 1.18);
   scene.add(mark);
 
   // =================================================================
-  // POST · bloom
+  // POST — bloom
   // =================================================================
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()),
-    reduced ? 0.55 : 0.95, 0.62, 0.0);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), reduced ? 0.6 : 1.0, 0.62, 0.0);
   composer.addPass(bloom);
   composer.setSize(W(), H());
 
   // =================================================================
-  // interaction state
+  // camera stations — the film's keyframes
   // =================================================================
-  const mouse = new THREE.Vector2(0, 0);
-  const target = new THREE.Vector2(0, 0);
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const stations = [
+    { at: 0.00, pos: V(0, 0, 16),     look: V(0, 0, 0) },
+    { at: 0.20, pos: V(2.4, -1, 12),  look: V(0.8, -1, 0) },
+    { at: 0.45, pos: V(-2.6, -2, 9),  look: V(0, -2, 0) },     // ordered lattice — orbit
+    { at: 0.66, pos: V(2.2, -3, 11),  look: V(0, -3, 0) },
+    { at: 0.84, pos: V(0, -3.6, 9),   look: V(0, -3.6, 0) },
+    { at: 1.00, pos: V(0, -4, 6.5),   look: V(0, -4, 0) },     // CTA portal
+  ];
+  const camTarget = new THREE.Vector3(), lookTarget = new THREE.Vector3();
+  function sampleStations(s) {
+    for (let i = 0; i < stations.length - 1; i++) {
+      const a = stations[i], b = stations[i + 1];
+      if (s <= b.at) {
+        const t = (s - a.at) / (b.at - a.at), e = t * t * (3 - 2 * t);
+        camTarget.lerpVectors(a.pos, b.pos, e);
+        lookTarget.lerpVectors(a.look, b.look, e);
+        return;
+      }
+    }
+    const L = stations[stations.length - 1];
+    camTarget.copy(L.pos); lookTarget.copy(L.look);
+  }
+
+  // =================================================================
+  // interaction
+  // =================================================================
+  const mouse = new THREE.Vector2(), mtarget = new THREE.Vector2();
   window.addEventListener('mousemove', (e) => {
-    target.x = (e.clientX / W()) * 2 - 1;
-    target.y = -((e.clientY / H()) * 2 - 1);
+    mtarget.x = (e.clientX / W()) * 2 - 1;
+    mtarget.y = -((e.clientY / H()) * 2 - 1);
   }, { passive: true });
-
-  let scrollN = 0; // 0..1 over the whole page
-  const onScroll = () => {
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    scrollN = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
   window.addEventListener('resize', () => {
     camera.aspect = W() / H(); camera.updateProjectionMatrix();
     renderer.setSize(W(), H()); composer.setSize(W(), H());
-    fieldMat.uniforms.uPixelRatio.value = renderer.getPixelRatio();
+    mat.uniforms.uPixelRatio.value = renderer.getPixelRatio();
   });
 
   // =================================================================
@@ -253,32 +258,60 @@ function boot() {
   // =================================================================
   const clock = new THREE.Clock();
   let raf;
+  const _look = new THREE.Vector3();
   function tick() {
     const t = clock.getElapsedTime();
-    mouse.x += (target.x - mouse.x) * 0.04;
-    mouse.y += (target.y - mouse.y) * 0.04;
+    const s = scrollProgress();
+    mouse.x += (mtarget.x - mouse.x) * 0.045;
+    mouse.y += (mtarget.y - mouse.y) * 0.045;
 
-    fieldMat.uniforms.uTime.value = t;
-    fieldMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
+    // ---- particle acts ----
+    // chaos peaks across the "problema" act, order peaks across "soluções"
+    const chaos = smooth(0.08, 0.22, s) * (1 - smooth(0.34, 0.46, s));
+    const order = smooth(0.34, 0.46, s) * (1 - smooth(0.60, 0.72, s));
+    mat.uniforms.uTime.value = t;
+    mat.uniforms.uMouse.value.set(mouse.x, mouse.y);
+    mat.uniforms.uOrder.value += (order - mat.uniforms.uOrder.value) * 0.08;
+    mat.uniforms.uChaos.value += (chaos - mat.uniforms.uChaos.value) * 0.08;
 
-    // scroll = fly forward + descend through the field
-    camera.position.x += (mouse.x * 1.6 - camera.position.x) * 0.05;
-    camera.position.y += ((mouse.y * 1.1 - scrollN * 4.0) - camera.position.y) * 0.05;
-    camera.position.z = 16 - scrollN * 9.0;
-    camera.lookAt(0, -scrollN * 2.0, 0);
-
-    field.rotation.y = t * 0.02 + scrollN * 0.6;
+    field.rotation.y = t * 0.02 + s * 0.7;
     netGroup.rotation.y = t * 0.05;
     netGroup.rotation.x = t * 0.02 + mouse.y * 0.2;
 
-    // mark floats, rotates, follows cursor, fades out past the hero
-    mark.rotation.y = Math.sin(t * 0.3) * 0.5 + mouse.x * 0.4;
-    mark.rotation.x = Math.cos(t * 0.25) * 0.18 - mouse.y * 0.3;
-    mark.position.y = (isMobile ? 4.5 : 0.2) + Math.sin(t * 0.8) * 0.22;
-    const markFade = Math.max(0, 1 - scrollN * 3.2);
-    markMat.emissiveIntensity = 1.35 * markFade;
-    mark.visible = markFade > 0.02;
-    mark.scale.setScalar((isMobile ? 0.8 : 1.18) * (0.6 + 0.4 * markFade));
+    // ---- camera film ----
+    sampleStations(s);
+    camera.position.x += (camTarget.x + mouse.x * 1.4 - camera.position.x) * 0.06;
+    camera.position.y += (camTarget.y + mouse.y * 0.9 - camera.position.y) * 0.06;
+    camera.position.z += (camTarget.z - camera.position.z) * 0.06;
+    _look.copy(lookTarget); _look.x += mouse.x * 0.6; _look.y += mouse.y * 0.4;
+    camera.lookAt(_look);
+
+    // ---- the mark: whole → shatter → (gone) → reform ----
+    const heroWhole = 1 - smooth(0.04, 0.20, s);   // 1 at top, 0 after hero
+    const endWhole  = smooth(0.78, 0.94, s);        // reassembles near CTA
+    const assembled = Math.max(heroWhole, endWhole);
+    const shatter = 1 - assembled;
+    const vis = Math.max(heroWhole, endWhole * 0.95);
+
+    mark.visible = vis > 0.02;
+    if (mark.visible) {
+      // slabs fly apart as it shatters, snap together as it reforms
+      top.position.set(topBase.x + shatter * 1.6, topBase.y + shatter * 1.3, shatter * 1.2);
+      bottom.position.set(botBase.x - shatter * 1.6, botBase.y - shatter * 1.3, -shatter * 1.2);
+      diag.rotation.z = diagRot + shatter * 1.4;
+      diag.position.set(0, 0, shatter * 0.6);
+
+      // hero spot is center-right; CTA spot is centered
+      const ex = endWhole;
+      mark.position.x = lerp(isMobile ? 0 : 4.2, 0, ex);
+      mark.position.y = lerp(0.2 + Math.sin(t * 0.8) * 0.22, -4, ex);
+      mark.position.z = lerp(-1.5, 0.5, ex);
+      mark.rotation.y = Math.sin(t * 0.3) * 0.5 + mouse.x * 0.4 + shatter * 1.2;
+      mark.rotation.x = Math.cos(t * 0.25) * 0.16 - mouse.y * 0.3;
+      const base = isMobile ? 0.85 : 1.2;
+      mark.scale.setScalar(base * (0.7 + 0.45 * endWhole + 0.25 * heroWhole));
+      markMat.emissiveIntensity = 1.35 * vis;
+    }
 
     composer.render();
     raf = requestAnimationFrame(tick);
@@ -286,16 +319,12 @@ function boot() {
   tick();
 
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { cancelAnimationFrame(raf); }
+    if (document.hidden) cancelAnimationFrame(raf);
     else { clock.start(); tick(); }
   });
 
-  // first frame is on screen — tell the preloader it can lift
   requestAnimationFrame(() => requestAnimationFrame(markReady));
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', boot);
-} else {
-  boot();
-}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();

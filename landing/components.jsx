@@ -141,6 +141,95 @@ function useReveal() {
   }, []);
 }
 
+// --- Cinematic engine: Lenis smooth scroll + GSAP scroll choreography
+function useCinematic() {
+  React.useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const gsap = window.gsap, ST = window.ScrollTrigger, Lenis = window.Lenis;
+
+    // fallback — plain reveal if libs missing or motion reduced
+    if (reduced || !gsap || !ST) {
+      const els = document.querySelectorAll('.reveal, .stagger');
+      const io = new IntersectionObserver((es) => es.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      }), { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      els.forEach(el => io.observe(el));
+      return () => io.disconnect();
+    }
+
+    gsap.registerPlugin(ST);
+    document.documentElement.classList.add('gsap-on');
+
+    // ---- Lenis smooth scroll (the buttery rail) ----
+    let lenis = null;
+    if (Lenis) {
+      lenis = new Lenis({ duration: 1.15, lerp: 0.1, smoothWheel: true, wheelMultiplier: 1, touchMultiplier: 1.5 });
+      window.__lenis = lenis;
+      lenis.on('scroll', ST.update);
+      gsap.ticker.add((t) => lenis.raf(t * 1000));
+      gsap.ticker.lagSmoothing(0);
+    }
+
+    // smooth anchor navigation
+    const onAnchor = (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute('href');
+      if (id.length < 2) return;
+      const el = document.querySelector(id);
+      if (!el) return;
+      e.preventDefault();
+      if (lenis) lenis.scrollTo(el, { offset: -40, duration: 1.4 });
+      else el.scrollIntoView({ behavior: 'smooth' });
+    };
+    document.addEventListener('click', onAnchor);
+
+    // feed the WebGL film a single normalized scroll value
+    ST.create({ start: 0, end: 'max', onUpdate: (self) => { window.__shiftScrollN = self.progress; } });
+
+    const triggers = [];
+    // block reveals — rise + de-blur
+    gsap.utils.toArray('.reveal').forEach((el) => {
+      const tw = gsap.from(el, {
+        opacity: 0, y: 50, filter: 'blur(10px)', duration: 1.1, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 86%', once: true },
+      });
+      if (tw.scrollTrigger) triggers.push(tw.scrollTrigger);
+    });
+    // staggered grids — cards fly in from depth with a tilt
+    gsap.utils.toArray('.stagger').forEach((grid) => {
+      const tw = gsap.from(grid.children, {
+        opacity: 0, y: 80, rotateX: -16, z: -180, transformOrigin: '50% 100%', transformPerspective: 1000,
+        duration: 1.0, ease: 'power3.out', stagger: 0.12,
+        scrollTrigger: { trigger: grid, start: 'top 82%', once: true },
+      });
+      if (tw.scrollTrigger) triggers.push(tw.scrollTrigger);
+    });
+    // depth parallax
+    gsap.utils.toArray('[data-parallax]').forEach((el) => {
+      const amt = parseFloat(el.getAttribute('data-parallax')) || 18;
+      const tw = gsap.to(el, {
+        yPercent: amt, ease: 'none',
+        scrollTrigger: { trigger: el.closest('section') || el, start: 'top bottom', end: 'bottom top', scrub: true },
+      });
+      if (tw.scrollTrigger) triggers.push(tw.scrollTrigger);
+    });
+
+    const refresh = () => ST.refresh();
+    window.addEventListener('load', refresh);
+    const rid = setTimeout(refresh, 600);
+
+    return () => {
+      clearTimeout(rid);
+      window.removeEventListener('load', refresh);
+      document.removeEventListener('click', onAnchor);
+      triggers.forEach(t => t.kill());
+      if (lenis) lenis.destroy();
+      document.documentElement.classList.remove('gsap-on');
+    };
+  }, []);
+}
+
 // --- Custom cursor + magnetic targets -------------------------------
 function useCursor() {
   React.useEffect(() => {
@@ -287,4 +376,4 @@ const Icon = {
   ),
 };
 
-Object.assign(window, { MarkA, Wordmark, Section, PrimaryBtn, GhostBtn, useReveal, useCursor, useTilt, useScrollProgress, useSpotlight, Counter, Typed, Icon });
+Object.assign(window, { MarkA, Wordmark, Section, PrimaryBtn, GhostBtn, useReveal, useCinematic, useCursor, useTilt, useScrollProgress, useSpotlight, Counter, Typed, Icon });

@@ -40,6 +40,11 @@
   }
 </script>
 
+<!-- smooth scroll + scroll-driven timeline (the "film" engine) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+
 <!-- three.js (modules) for the WebGL layer -->
 <script type="importmap">
 {
@@ -53,6 +58,16 @@
 <style>
   html, body { background: #08080b; color: #f6f5f1; font-family: 'Geist', system-ui, sans-serif; }
   body { -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+  /* ===== Lenis smooth scroll ===== */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-stopped { overflow: hidden; }
+
+  /* when GSAP drives the choreography, neutralize the CSS reveal baseline */
+  html.gsap-on .reveal,
+  html.gsap-on .stagger > * { opacity: 1; transform: none; filter: none; }
 
   /* base layered background — vignette + soft purple wash + grid */
   .page-bg {

@@ -1,10 +1,10 @@
 /* Shift Systems · app entry */
 
 const { Header, Hero, Provocative, Solutions, Process, Positioning, CTA, Footer, MarqueeStrip,
-  useReveal, useCursor, useTilt, useScrollProgress } = window;
+  useCinematic, useCursor, useTilt, useScrollProgress } = window;
 
 function App() {
-  useReveal();
+  useCinematic();
   useScrollProgress();
   useCursor();
   useTilt();
