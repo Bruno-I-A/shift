@@ -97,11 +97,11 @@ function Hero() {
             </h1>
 
             <p className="mt-10 text-xl md:text-2xl text-white/75 max-w-2xl leading-relaxed">
-              sistemas, automações e inteligência artificial para empresas que querem parar de operar no improviso.
+              sistemas sob medida, automações e inteligência artificial para empresas que cansaram de operar no improviso.
             </p>
 
             <p className="mt-6 text-base md:text-lg text-white/55 max-w-2xl leading-relaxed">
-              a Shift Systems transforma processos manuais, atendimento desorganizado e tarefas repetitivas em tecnologia simples, inteligente e escalável.
+              transformamos processos manuais, atendimento desorganizado e tarefas repetitivas em tecnologia que trabalha por você — simples, inteligente e escalável.
             </p>
 
             <div className="mt-10 md:mt-12 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
@@ -380,7 +380,7 @@ function Provocative() {
     tag: '03',
     icon: <Icon.Eye />,
     title: 'gestão sem clareza',
-    body: 'você sente que algo está errado mas não consegue provar. número certo, em tempo real, nunca está à mão.',
+    body: 'você sente que algo está errado, mas não consegue provar. o número certo, em tempo real, nunca está à mão.',
     stat: <>decisões<span className="text-white/40 ml-2 font-normal text-base">no escuro</span></>,
     stat_sub: 'baseadas em achismo'
   }];
@@ -437,7 +437,7 @@ function Solutions() {
   },
   {
     icon: <Icon.Bars />, title: 'dashboards',
-    body: 'paineis em tempo real que mostram o que importa: receita, gargalos, conversão, performance por canal.',
+    body: 'painéis em tempo real que mostram o que importa: receita, gargalos, conversão e performance por canal.',
     tags: ['BI sob medida', 'tempo real']
   },
   {
@@ -573,7 +573,7 @@ function Positioning() {
               precisa <span className="text-purple">resolver</span><span className="text-purple">.</span>
             </h2>
             <p className="mt-10 text-lg md:text-xl text-white/65 max-w-3xl leading-relaxed reveal">
-              nosso foco é criar soluções digitais que reduzem esforço operacional, organizam processos e ajudam empresas a crescerem com mais controle.
+              criamos soluções digitais que reduzem o esforço operacional, organizam processos e fazem sua empresa crescer com mais controle.
             </p>
 
             <div className="hr-grad my-12"></div>
@@ -621,7 +621,7 @@ function CTA() {
         </h2>
 
         <p className="mt-10 text-lg md:text-xl text-white/65 max-w-2xl mx-auto leading-relaxed reveal">
-          vamos identificar onde sua empresa está perdendo tempo e transformar isso em sistema, automação ou IA.
+          em uma conversa, a gente identifica onde sua empresa perde tempo e dinheiro — e transforma isso em sistema, automação ou IA.
         </p>
 
         <div className="mt-14 flex flex-wrap justify-center items-center gap-4">
