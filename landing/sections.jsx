@@ -569,11 +569,11 @@ function Positioning() {
           <div className="relative">
             <div className="num-tag mb-6">/ 04 · posicionamento</div>
             <h2 className="display text-4xl md:text-6xl lg:text-7xl max-w-4xl build">
-              tecnologia não precisa <span className="text-white/40 italic font-light">impressionar</span>.<br />
-              precisa <span className="text-purple">resolver</span><span className="text-purple">.</span>
+              bonito por fora<span className="text-purple">.</span><br />
+              <span className="text-purple">inteligente por dentro</span><span className="text-purple">.</span>
             </h2>
             <p className="mt-10 text-lg md:text-xl text-white/65 max-w-3xl leading-relaxed reveal">
-              criamos soluções digitais que reduzem o esforço operacional, organizam processos e fazem sua empresa crescer com mais controle.
+              criamos sistemas bonitos de usar e fáceis de operar — que reduzem o esforço, organizam processos e fazem sua empresa crescer com mais controle.
             </p>
 
             <div className="hr-grad my-12"></div>
