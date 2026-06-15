@@ -13,7 +13,6 @@ function App() {
       <Header />
       <main>
         <Hero />
-        <MarqueeStrip />
         <Provocative />
         <Solutions />
         <Process />
