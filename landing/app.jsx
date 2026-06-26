@@ -1,6 +1,6 @@
 /* Shift Systems · app entry */
 
-const { Header, Hero, Provocative, Solutions, Process, Positioning, CTA, Footer, MarqueeStrip,
+const { Header, Hero, Provocative, Solutions, BuildMenu, Process, DiagnosticLab, Positioning, CTA, Footer, MarqueeStrip,
   useCinematic, useCursor, useTilt, useScrollProgress } = window;
 
 function App() {
@@ -13,9 +13,12 @@ function App() {
       <Header />
       <main>
         <Hero />
+        <MarqueeStrip />
         <Provocative />
         <Solutions />
+        <BuildMenu />
         <Process />
+        <DiagnosticLab />
         <Positioning />
         <CTA />
       </main>

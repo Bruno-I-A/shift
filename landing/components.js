@@ -1,6 +1,5 @@
-/* AUTO-GENERATED from components.jsx — do not edit directly */
-(function(){
-function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+/* AUTO-GENERATED from components.jsx — edit the .jsx then run "node build.js" */
+(function () {
 /* Shift Systems · shared atoms */
 
 // --- The Mark A (Sliced S) logo --------------------------------------
@@ -120,7 +119,7 @@ function Typed({
     className: className
   }, out, /*#__PURE__*/React.createElement("span", {
     className: "blink text-purple"
-  }, "\u258C"));
+  }, "▌"));
 }
 
 // --- Spotlight tracker (sets --mx/--my on a card) ------------------
@@ -198,18 +197,20 @@ function PrimaryBtn({
   className = '',
   ...rest
 }) {
-  return /*#__PURE__*/React.createElement("button", _extends({
-    className: `btn-primary rounded-full px-7 py-3.5 text-sm font-semibold tracking-tight ${className}`
-  }, rest), children);
+  return /*#__PURE__*/React.createElement("button", {
+    className: `btn-primary rounded-full px-7 py-3.5 text-sm font-semibold tracking-tight ${className}`,
+    ...rest
+  }, children);
 }
 function GhostBtn({
   children,
   className = '',
   ...rest
 }) {
-  return /*#__PURE__*/React.createElement("button", _extends({
-    className: `btn-ghost rounded-full px-7 py-3.5 text-sm font-medium tracking-tight ${className}`
-  }, rest), children);
+  return /*#__PURE__*/React.createElement("button", {
+    className: `btn-ghost rounded-full px-7 py-3.5 text-sm font-medium tracking-tight ${className}`,
+    ...rest
+  }, children);
 }
 
 // --- Reveal on scroll hook (handles .reveal + .stagger) --------------

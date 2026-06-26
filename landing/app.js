@@ -7,7 +7,9 @@ const {
   Hero,
   Provocative,
   Solutions,
+  BuildMenu,
   Process,
+  DiagnosticLab,
   Positioning,
   CTA,
   Footer,
@@ -24,7 +26,7 @@ function App() {
   useTilt();
   return /*#__PURE__*/React.createElement("div", {
     className: "min-h-screen relative"
-  }, /*#__PURE__*/React.createElement(Header, null), /*#__PURE__*/React.createElement("main", null, /*#__PURE__*/React.createElement(Hero, null), /*#__PURE__*/React.createElement(Provocative, null), /*#__PURE__*/React.createElement(Solutions, null), /*#__PURE__*/React.createElement(Process, null), /*#__PURE__*/React.createElement(Positioning, null), /*#__PURE__*/React.createElement(CTA, null)), /*#__PURE__*/React.createElement(Footer, null));
+  }, /*#__PURE__*/React.createElement(Header, null), /*#__PURE__*/React.createElement("main", null, /*#__PURE__*/React.createElement(Hero, null), /*#__PURE__*/React.createElement(MarqueeStrip, null), /*#__PURE__*/React.createElement(Provocative, null), /*#__PURE__*/React.createElement(Solutions, null), /*#__PURE__*/React.createElement(BuildMenu, null), /*#__PURE__*/React.createElement(Process, null), /*#__PURE__*/React.createElement(DiagnosticLab, null), /*#__PURE__*/React.createElement(Positioning, null), /*#__PURE__*/React.createElement(CTA, null)), /*#__PURE__*/React.createElement(Footer, null));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));
 

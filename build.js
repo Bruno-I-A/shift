@@ -7,7 +7,7 @@ const fs = require('fs');
 
 ['components', 'sections', 'app'].forEach((n) => {
   const src = fs.readFileSync(`landing/${n}.jsx`, 'utf8');
-  const code = B.transform(src, { presets: ['react'], filename: `${n}.jsx` }).code;
+  const code = B.transform(src, { presets: [['react', { runtime: 'classic' }]], filename: `${n}.jsx` }).code;
   const out = `/* AUTO-GENERATED from ${n}.jsx — edit the .jsx then run "node build.js" */\n(function () {\n${code}\n})();\n`;
   fs.writeFileSync(`landing/${n}.js`, out);
   console.log('built landing/' + n + '.js');
