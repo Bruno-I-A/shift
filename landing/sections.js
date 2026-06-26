@@ -622,9 +622,96 @@ function Solutions() {
   }];
   const [selected, setSelected] = React.useState(solutions[0].id);
   const active = solutions.find(s => s.id === selected) || solutions[0];
-  const ActiveIcon = active.icon;
   const onMove = useSpotlight();
-  const wa = `https://wa.me/5554984184808?text=${encodeURIComponent(`Olá! Vim pelo site da Shift Systems e quero conversar sobre ${active.title}.`)}`;
+  const panelId = id => `solution-panel-${id}`;
+  const DetailPanel = ({
+    solution,
+    id,
+    compact = false
+  }) => {
+    const DetailIcon = solution.icon;
+    const wa = `https://wa.me/5554984184808?text=${encodeURIComponent(`Olá! Vim pelo site da Shift Systems e quero conversar sobre ${solution.title}.`)}`;
+    return /*#__PURE__*/React.createElement("div", {
+      id: id,
+      role: "tabpanel",
+      onMouseMove: onMove,
+      className: `${compact ? 'mt-3' : ''} glass-strong spot rounded-3xl p-5 md:p-8 relative overflow-hidden`
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "absolute -right-20 -top-20 w-64 h-64 rounded-full bg-purple/20 blur-3xl"
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "absolute right-8 bottom-8 w-28 h-28 rounded-full bg-cyan-300/10 blur-2xl"
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "relative"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-start justify-between gap-5"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-4"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-purple/15 border border-purple/30 text-purple flex items-center justify-center ring-glow"
+    }, /*#__PURE__*/React.createElement(DetailIcon, {
+      s: 24
+    })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "eyebrow mb-2"
+    }, solution.eyebrow), /*#__PURE__*/React.createElement("h3", {
+      className: "text-2xl md:text-4xl font-semibold tracking-tight leading-tight"
+    }, solution.title))), /*#__PURE__*/React.createElement("div", {
+      className: "hidden sm:block text-right"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "text-[10px] font-mono uppercase tracking-[0.22em] text-white/35"
+    }, "resultado foco"), /*#__PURE__*/React.createElement("div", {
+      className: "mt-1 text-purple font-semibold tracking-tight"
+    }, solution.metric))), /*#__PURE__*/React.createElement("p", {
+      className: "mt-6 text-white/65 leading-relaxed md:text-lg"
+    }, solution.summary), /*#__PURE__*/React.createElement("div", {
+      className: "grid md:grid-cols-2 gap-4 mt-7"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "rounded-2xl border border-white/10 bg-white/[0.025] p-5"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-200 mb-3"
+    }, "para quem é"), /*#__PURE__*/React.createElement("p", {
+      className: "text-white/65 leading-relaxed text-sm"
+    }, solution.forWho)), /*#__PURE__*/React.createElement("div", {
+      className: "rounded-2xl border border-white/10 bg-white/[0.025] p-5"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "text-[10px] font-mono uppercase tracking-[0.22em] text-purple mb-3"
+    }, "resultado esperado"), /*#__PURE__*/React.createElement("p", {
+      className: "text-white/65 leading-relaxed text-sm"
+    }, solution.result))), /*#__PURE__*/React.createElement("div", {
+      className: "grid md:grid-cols-2 gap-6 mt-7 pt-7 border-t border-white/10"
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "text-[10px] font-mono uppercase tracking-[0.22em] text-purple mb-4"
+    }, "o que entregamos"), /*#__PURE__*/React.createElement("ul", {
+      className: "space-y-3"
+    }, solution.deliver.map(item => /*#__PURE__*/React.createElement("li", {
+      key: item,
+      className: "flex gap-3 text-sm text-white/65 leading-relaxed"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "mt-2 w-1.5 h-1.5 rounded-full bg-purple shrink-0 ring-glow"
+    }), /*#__PURE__*/React.createElement("span", null, item))))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-200 mb-4"
+    }, "integrações / stack"), /*#__PURE__*/React.createElement("div", {
+      className: "flex flex-wrap gap-2"
+    }, solution.stack.map(s => /*#__PURE__*/React.createElement("span", {
+      key: s,
+      className: "text-[10px] font-mono uppercase tracking-wider text-white/65 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03]"
+    }, s))))), /*#__PURE__*/React.createElement("div", {
+      className: "mt-7 pt-7 border-t border-white/10 flex flex-col xl:flex-row xl:items-center justify-between gap-5"
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "text-[10px] font-mono uppercase tracking-[0.22em] text-white/35 mb-3"
+    }, "cta / contexto"), /*#__PURE__*/React.createElement("p", {
+      className: "text-white/60 leading-relaxed max-w-2xl"
+    }, solution.context)), /*#__PURE__*/React.createElement("a", {
+      href: wa,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      "data-magnetic": "0.25",
+      className: "w-full xl:w-auto shrink-0"
+    }, /*#__PURE__*/React.createElement(PrimaryBtn, {
+      className: "w-full xl:w-auto inline-flex items-center justify-center gap-2 px-7 py-4"
+    }, "conversar sobre isso ", /*#__PURE__*/React.createElement(Icon.Arrow, {
+      s: 16
+    }))))));
+  };
   return /*#__PURE__*/React.createElement(Section, {
     id: "solucoes",
     num: "/ 02",
@@ -636,22 +723,20 @@ function Solutions() {
     }, ".")),
     intro: "seis linhas de trabalho, agora com site de alta conversão no stack. cada aba mostra onde a solução encaixa, o que entregamos e o efeito esperado."
   }, /*#__PURE__*/React.createElement("div", {
-    className: "grid md:grid-cols-2 xl:grid-cols-3 gap-4 stagger",
-    role: "tablist",
-    "aria-label": "Soluções Shift Systems"
+    className: "lg:hidden space-y-4 stagger"
   }, solutions.map((s, i) => {
     const SolutionIcon = s.icon;
     const isActive = active.id === s.id;
-    return /*#__PURE__*/React.createElement("button", {
-      key: s.id,
+    return /*#__PURE__*/React.createElement("div", {
+      key: s.id
+    }, /*#__PURE__*/React.createElement("button", {
       type: "button",
-      role: "tab",
-      "aria-selected": isActive,
-      "aria-controls": "solution-panel",
+      "aria-expanded": isActive,
+      "aria-controls": panelId(s.id),
       onClick: () => setSelected(s.id),
       onMouseMove: onMove,
       "data-tilt": "5",
-      className: `tilt glass spot shimmer rounded-2xl p-6 text-left flex flex-col transition-all duration-300 group ${isActive ? 'border-purple/45 bg-purple/10 shadow-[0_0_44px_-20px_rgba(181,107,255,0.8)]' : 'hover:border-cyan-300/30 hover:bg-cyan-300/[0.035]'}`
+      className: `w-full tilt glass spot shimmer rounded-2xl p-6 text-left flex flex-col transition-all duration-300 group ${isActive ? 'border-purple/45 bg-purple/10 shadow-[0_0_44px_-20px_rgba(181,107,255,0.8)]' : 'hover:border-cyan-300/30 hover:bg-cyan-300/[0.035]'}`
     }, /*#__PURE__*/React.createElement("div", {
       className: "flex items-start justify-between gap-4 mb-7"
     }, /*#__PURE__*/React.createElement("div", {
@@ -673,93 +758,67 @@ function Solutions() {
     }, s.tags.map(t => /*#__PURE__*/React.createElement("span", {
       key: t,
       className: `text-[10px] font-mono tracking-wider uppercase px-2.5 py-1 rounded-full border transition-colors ${isActive ? 'text-white border-purple/30 bg-purple/10' : 'text-white/55 border-white/10 bg-white/[0.03] group-hover:border-cyan-300/25 group-hover:text-white'}`
-    }, t))));
+    }, t))), /*#__PURE__*/React.createElement("div", {
+      className: `mt-6 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.18em] ${isActive ? 'text-cyan-200' : 'text-white/40'}`
+    }, /*#__PURE__*/React.createElement("span", null, isActive ? 'detalhes abertos' : 'ver detalhes'), /*#__PURE__*/React.createElement(Icon.Arrow, {
+      s: 14
+    }))), isActive && /*#__PURE__*/React.createElement(DetailPanel, {
+      solution: s,
+      id: panelId(s.id),
+      compact: true
+    }));
   })), /*#__PURE__*/React.createElement("div", {
-    id: "solution-panel",
-    role: "tabpanel",
-    className: "mt-8 grid lg:grid-cols-12 gap-5 items-stretch reveal"
+    className: "hidden lg:grid lg:grid-cols-12 gap-5 items-start reveal"
   }, /*#__PURE__*/React.createElement("div", {
-    onMouseMove: onMove,
-    className: "lg:col-span-5 glass-strong spot rounded-3xl p-7 md:p-8 relative overflow-hidden"
+    className: "lg:col-span-4 glass rounded-3xl p-4 xl:p-5"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "absolute -right-20 -top-20 w-64 h-64 rounded-full bg-purple/20 blur-3xl"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "absolute right-8 bottom-8 w-28 h-28 rounded-full bg-cyan-300/10 blur-2xl"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "relative"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between gap-5"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "w-14 h-14 rounded-2xl bg-purple/15 border border-purple/30 text-purple flex items-center justify-center ring-glow"
-  }, /*#__PURE__*/React.createElement(ActiveIcon, {
-    s: 24
+    className: "flex items-center justify-between gap-4 px-2 pb-4"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-200"
+  }, "abas de solução"), /*#__PURE__*/React.createElement("div", {
+    className: "mt-1 text-sm text-white/45"
+  }, "clique para ver o detalhe ao lado")), /*#__PURE__*/React.createElement("span", {
+    className: "w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_18px_rgba(103,232,249,0.8)]"
   })), /*#__PURE__*/React.createElement("div", {
-    className: "text-right"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "text-[10px] font-mono uppercase tracking-[0.22em] text-white/35"
-  }, "resultado foco"), /*#__PURE__*/React.createElement("div", {
-    className: "mt-1 text-purple font-semibold tracking-tight"
-  }, active.metric))), /*#__PURE__*/React.createElement("div", {
-    className: "mt-10"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "eyebrow mb-4"
-  }, active.eyebrow), /*#__PURE__*/React.createElement("h3", {
-    className: "text-3xl md:text-5xl font-semibold tracking-tight leading-tight"
-  }, active.title), /*#__PURE__*/React.createElement("p", {
-    className: "mt-5 text-white/65 leading-relaxed md:text-lg"
-  }, active.summary)), /*#__PURE__*/React.createElement("div", {
-    className: "hr-grad my-8"
-  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-200 mb-3"
-  }, "para quem é"), /*#__PURE__*/React.createElement("p", {
-    className: "text-white/65 leading-relaxed"
-  }, active.forWho)))), /*#__PURE__*/React.createElement("div", {
-    className: "lg:col-span-7 glass rounded-3xl p-7 md:p-8 relative overflow-hidden"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple/60 to-transparent"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "grid md:grid-cols-2 gap-x-8 gap-y-8"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "text-[10px] font-mono uppercase tracking-[0.22em] text-purple mb-4"
-  }, "o que entregamos"), /*#__PURE__*/React.createElement("ul", {
-    className: "space-y-3"
-  }, active.deliver.map(item => /*#__PURE__*/React.createElement("li", {
-    key: item,
-    className: "flex gap-3 text-sm text-white/65 leading-relaxed"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "mt-2 w-1.5 h-1.5 rounded-full bg-purple shrink-0 ring-glow"
-  }), /*#__PURE__*/React.createElement("span", null, item))))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-200 mb-4"
-  }, "integrações / stack"), /*#__PURE__*/React.createElement("div", {
-    className: "flex flex-wrap gap-2"
-  }, active.stack.map(s => /*#__PURE__*/React.createElement("span", {
-    key: s,
-    className: "text-[10px] font-mono uppercase tracking-wider text-white/65 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03]"
-  }, s))), /*#__PURE__*/React.createElement("div", {
-    className: "mt-8 pt-6 border-t border-white/10"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "text-[10px] font-mono uppercase tracking-[0.22em] text-purple mb-3"
-  }, "resultado esperado"), /*#__PURE__*/React.createElement("p", {
-    className: "text-white/65 leading-relaxed"
-  }, active.result))), /*#__PURE__*/React.createElement("div", {
-    className: "md:col-span-2 pt-7 border-t border-white/10"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex flex-col lg:flex-row lg:items-center justify-between gap-5"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "text-[10px] font-mono uppercase tracking-[0.22em] text-white/35 mb-3"
-  }, "cta / contexto"), /*#__PURE__*/React.createElement("p", {
-    className: "text-white/60 leading-relaxed max-w-2xl"
-  }, active.context)), /*#__PURE__*/React.createElement("a", {
-    href: wa,
-    target: "_blank",
-    rel: "noopener noreferrer",
-    "data-magnetic": "0.25",
-    className: "w-full lg:w-auto shrink-0"
-  }, /*#__PURE__*/React.createElement(PrimaryBtn, {
-    className: "w-full lg:w-auto inline-flex items-center justify-center gap-2 px-7 py-4"
-  }, "conversar sobre isso ", /*#__PURE__*/React.createElement(Icon.Arrow, {
-    s: 16
-  })))))))));
+    className: "space-y-3",
+    role: "tablist",
+    "aria-label": "Soluções Shift Systems"
+  }, solutions.map((s, i) => {
+    const SolutionIcon = s.icon;
+    const isActive = active.id === s.id;
+    return /*#__PURE__*/React.createElement("button", {
+      key: s.id,
+      type: "button",
+      role: "tab",
+      "aria-selected": isActive,
+      "aria-controls": "solution-panel-desktop",
+      onClick: () => setSelected(s.id),
+      className: `w-full rounded-2xl border p-4 text-left transition-all duration-300 group ${isActive ? 'border-purple/45 bg-purple/10 shadow-[0_0_44px_-22px_rgba(181,107,255,0.8)]' : 'border-white/10 bg-white/[0.025] hover:border-cyan-300/30 hover:bg-cyan-300/[0.035]'}`
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-4"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: `w-11 h-11 rounded-xl border flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-purple/15 border-purple/35 text-purple' : 'bg-white/[0.03] border-white/10 text-white/45 group-hover:text-cyan-200 group-hover:border-cyan-300/30'}`
+    }, /*#__PURE__*/React.createElement(SolutionIcon, null)), /*#__PURE__*/React.createElement("div", {
+      className: "min-w-0 flex-1"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center justify-between gap-3"
+    }, /*#__PURE__*/React.createElement("h3", {
+      className: "font-semibold tracking-tight truncate"
+    }, s.title), /*#__PURE__*/React.createElement("span", {
+      className: `num-tag shrink-0 ${isActive ? 'opacity-100' : 'opacity-45'}`
+    }, "0", i + 1)), /*#__PURE__*/React.createElement("div", {
+      className: `mt-1 text-[10px] font-mono uppercase tracking-[0.16em] ${isActive ? 'text-purple' : 'text-white/35 group-hover:text-cyan-200'}`
+    }, s.signal))), /*#__PURE__*/React.createElement("div", {
+      className: `mt-4 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.18em] ${isActive ? 'text-cyan-200' : 'text-white/35 group-hover:text-white/55'}`
+    }, /*#__PURE__*/React.createElement("span", null, isActive ? 'detalhes abertos' : 'ver detalhes'), /*#__PURE__*/React.createElement(Icon.Arrow, {
+      s: 14
+    })));
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "lg:col-span-8"
+  }, /*#__PURE__*/React.createElement(DetailPanel, {
+    solution: active,
+    id: "solution-panel-desktop"
+  }))));
 }
 
 // =====================================================================

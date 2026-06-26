@@ -546,95 +546,57 @@ function Solutions() {
 
   const [selected, setSelected] = React.useState(solutions[0].id);
   const active = solutions.find((s) => s.id === selected) || solutions[0];
-  const ActiveIcon = active.icon;
   const onMove = useSpotlight();
-  const wa = `https://wa.me/5554984184808?text=${encodeURIComponent(`Olá! Vim pelo site da Shift Systems e quero conversar sobre ${active.title}.`)}`;
+  const panelId = (id) => `solution-panel-${id}`;
 
-  return (
-    <Section
-      id="solucoes"
-      num="/ 02"
-      eyebrow="Soluções"
-      title={<>escolha a alavanca certa para fazer <br className="hidden md:block" />sua empresa rodar melhor<span className="text-purple">.</span></>}
-      intro="seis linhas de trabalho, agora com site de alta conversão no stack. cada aba mostra onde a solução encaixa, o que entregamos e o efeito esperado.">
-      
-      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4 stagger" role="tablist" aria-label="Soluções Shift Systems">
-        {solutions.map((s, i) => {
-          const SolutionIcon = s.icon;
-          const isActive = active.id === s.id;
-          return (
-            <button
-              key={s.id}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              aria-controls="solution-panel"
-              onClick={() => setSelected(s.id)}
-              onMouseMove={onMove}
-              data-tilt="5"
-              className={`tilt glass spot shimmer rounded-2xl p-6 text-left flex flex-col transition-all duration-300 group ${isActive ? 'border-purple/45 bg-purple/10 shadow-[0_0_44px_-20px_rgba(181,107,255,0.8)]' : 'hover:border-cyan-300/30 hover:bg-cyan-300/[0.035]'}`}>
-              <div className="flex items-start justify-between gap-4 mb-7">
-                <div className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all duration-500 ${isActive ? 'bg-purple/15 border-purple/35 text-purple scale-105' : 'bg-white/[0.03] border-white/10 text-white/45 group-hover:text-cyan-200 group-hover:border-cyan-300/30 group-hover:scale-105'}`}>
-                  <SolutionIcon />
-                </div>
-                <div className="text-right">
-                  <span className={`num-tag ${isActive ? 'text-purple opacity-100' : 'opacity-45'}`}>0{i + 1}</span>
-                  <div className={`mt-2 text-[10px] font-mono uppercase tracking-[0.18em] ${isActive ? 'text-purple' : 'text-white/35 group-hover:text-cyan-200'}`}>{s.signal}</div>
-                </div>
-              </div>
+  const DetailPanel = ({ solution, id, compact = false }) => {
+    const DetailIcon = solution.icon;
+    const wa = `https://wa.me/5554984184808?text=${encodeURIComponent(`Olá! Vim pelo site da Shift Systems e quero conversar sobre ${solution.title}.`)}`;
 
-              <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-white/35 mb-3">{s.eyebrow}</div>
-              <h3 className="text-2xl font-semibold tracking-tight mb-3">{s.title}</h3>
-              <p className="text-white/60 leading-relaxed text-sm flex-1">{s.summary}</p>
-              <div className="mt-6 flex flex-wrap gap-2">
-                {s.tags.map((t) =>
-                  <span key={t} className={`text-[10px] font-mono tracking-wider uppercase px-2.5 py-1 rounded-full border transition-colors ${isActive ? 'text-white border-purple/30 bg-purple/10' : 'text-white/55 border-white/10 bg-white/[0.03] group-hover:border-cyan-300/25 group-hover:text-white'}`}>{t}</span>
-                )}
-              </div>
-            </button>);
-        })}
-      </div>
-
+    return (
       <div
-        id="solution-panel"
+        id={id}
         role="tabpanel"
-        className="mt-8 grid lg:grid-cols-12 gap-5 items-stretch reveal">
-        <div onMouseMove={onMove} className="lg:col-span-5 glass-strong spot rounded-3xl p-7 md:p-8 relative overflow-hidden">
-          <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-purple/20 blur-3xl" />
-          <div className="absolute right-8 bottom-8 w-28 h-28 rounded-full bg-cyan-300/10 blur-2xl" />
-          <div className="relative">
-            <div className="flex items-center justify-between gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-purple/15 border border-purple/30 text-purple flex items-center justify-center ring-glow">
-                <ActiveIcon s={24} />
+        onMouseMove={onMove}
+        className={`${compact ? 'mt-3' : ''} glass-strong spot rounded-3xl p-5 md:p-8 relative overflow-hidden`}>
+        <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-purple/20 blur-3xl" />
+        <div className="absolute right-8 bottom-8 w-28 h-28 rounded-full bg-cyan-300/10 blur-2xl" />
+
+        <div className="relative">
+          <div className="flex items-start justify-between gap-5">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-purple/15 border border-purple/30 text-purple flex items-center justify-center ring-glow">
+                <DetailIcon s={24} />
               </div>
-              <div className="text-right">
-                <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-white/35">resultado foco</div>
-                <div className="mt-1 text-purple font-semibold tracking-tight">{active.metric}</div>
+              <div>
+                <div className="eyebrow mb-2">{solution.eyebrow}</div>
+                <h3 className="text-2xl md:text-4xl font-semibold tracking-tight leading-tight">{solution.title}</h3>
               </div>
             </div>
-
-            <div className="mt-10">
-              <div className="eyebrow mb-4">{active.eyebrow}</div>
-              <h3 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight">{active.title}</h3>
-              <p className="mt-5 text-white/65 leading-relaxed md:text-lg">{active.summary}</p>
-            </div>
-
-            <div className="hr-grad my-8"></div>
-
-            <div>
-              <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-200 mb-3">para quem é</div>
-              <p className="text-white/65 leading-relaxed">{active.forWho}</p>
+            <div className="hidden sm:block text-right">
+              <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-white/35">resultado foco</div>
+              <div className="mt-1 text-purple font-semibold tracking-tight">{solution.metric}</div>
             </div>
           </div>
-        </div>
 
-        <div className="lg:col-span-7 glass rounded-3xl p-7 md:p-8 relative overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple/60 to-transparent" />
-          <div className="grid md:grid-cols-2 gap-x-8 gap-y-8">
+          <p className="mt-6 text-white/65 leading-relaxed md:text-lg">{solution.summary}</p>
+
+          <div className="grid md:grid-cols-2 gap-4 mt-7">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5">
+              <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-200 mb-3">para quem é</div>
+              <p className="text-white/65 leading-relaxed text-sm">{solution.forWho}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5">
+              <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-purple mb-3">resultado esperado</div>
+              <p className="text-white/65 leading-relaxed text-sm">{solution.result}</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mt-7 pt-7 border-t border-white/10">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-purple mb-4">o que entregamos</div>
               <ul className="space-y-3">
-                {active.deliver.map((item) =>
+                {solution.deliver.map((item) =>
                   <li key={item} className="flex gap-3 text-sm text-white/65 leading-relaxed">
                     <span className="mt-2 w-1.5 h-1.5 rounded-full bg-purple shrink-0 ring-glow" />
                     <span>{item}</span>
@@ -646,31 +608,126 @@ function Solutions() {
             <div>
               <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-200 mb-4">integrações / stack</div>
               <div className="flex flex-wrap gap-2">
-                {active.stack.map((s) =>
+                {solution.stack.map((s) =>
                   <span key={s} className="text-[10px] font-mono uppercase tracking-wider text-white/65 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03]">{s}</span>
                 )}
               </div>
-
-              <div className="mt-8 pt-6 border-t border-white/10">
-                <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-purple mb-3">resultado esperado</div>
-                <p className="text-white/65 leading-relaxed">{active.result}</p>
-              </div>
-            </div>
-
-            <div className="md:col-span-2 pt-7 border-t border-white/10">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                <div>
-                  <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-white/35 mb-3">cta / contexto</div>
-                  <p className="text-white/60 leading-relaxed max-w-2xl">{active.context}</p>
-                </div>
-                <a href={wa} target="_blank" rel="noopener noreferrer" data-magnetic="0.25" className="w-full lg:w-auto shrink-0">
-                  <PrimaryBtn className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-7 py-4">
-                    conversar sobre isso <Icon.Arrow s={16} />
-                  </PrimaryBtn>
-                </a>
-              </div>
             </div>
           </div>
+
+          <div className="mt-7 pt-7 border-t border-white/10 flex flex-col xl:flex-row xl:items-center justify-between gap-5">
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-white/35 mb-3">cta / contexto</div>
+              <p className="text-white/60 leading-relaxed max-w-2xl">{solution.context}</p>
+            </div>
+            <a href={wa} target="_blank" rel="noopener noreferrer" data-magnetic="0.25" className="w-full xl:w-auto shrink-0">
+              <PrimaryBtn className="w-full xl:w-auto inline-flex items-center justify-center gap-2 px-7 py-4">
+                conversar sobre isso <Icon.Arrow s={16} />
+              </PrimaryBtn>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <Section
+      id="solucoes"
+      num="/ 02"
+      eyebrow="Soluções"
+      title={<>escolha a alavanca certa para fazer <br className="hidden md:block" />sua empresa rodar melhor<span className="text-purple">.</span></>}
+      intro="seis linhas de trabalho, agora com site de alta conversão no stack. cada aba mostra onde a solução encaixa, o que entregamos e o efeito esperado.">
+
+      <div className="lg:hidden space-y-4 stagger">
+        {solutions.map((s, i) => {
+          const SolutionIcon = s.icon;
+          const isActive = active.id === s.id;
+          return (
+            <div key={s.id}>
+              <button
+                type="button"
+                aria-expanded={isActive}
+                aria-controls={panelId(s.id)}
+                onClick={() => setSelected(s.id)}
+                onMouseMove={onMove}
+                data-tilt="5"
+                className={`w-full tilt glass spot shimmer rounded-2xl p-6 text-left flex flex-col transition-all duration-300 group ${isActive ? 'border-purple/45 bg-purple/10 shadow-[0_0_44px_-20px_rgba(181,107,255,0.8)]' : 'hover:border-cyan-300/30 hover:bg-cyan-300/[0.035]'}`}>
+                <div className="flex items-start justify-between gap-4 mb-7">
+                  <div className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all duration-500 ${isActive ? 'bg-purple/15 border-purple/35 text-purple scale-105' : 'bg-white/[0.03] border-white/10 text-white/45 group-hover:text-cyan-200 group-hover:border-cyan-300/30 group-hover:scale-105'}`}>
+                    <SolutionIcon />
+                  </div>
+                  <div className="text-right">
+                    <span className={`num-tag ${isActive ? 'text-purple opacity-100' : 'opacity-45'}`}>0{i + 1}</span>
+                    <div className={`mt-2 text-[10px] font-mono uppercase tracking-[0.18em] ${isActive ? 'text-purple' : 'text-white/35 group-hover:text-cyan-200'}`}>{s.signal}</div>
+                  </div>
+                </div>
+
+                <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-white/35 mb-3">{s.eyebrow}</div>
+                <h3 className="text-2xl font-semibold tracking-tight mb-3">{s.title}</h3>
+                <p className="text-white/60 leading-relaxed text-sm flex-1">{s.summary}</p>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {s.tags.map((t) =>
+                    <span key={t} className={`text-[10px] font-mono tracking-wider uppercase px-2.5 py-1 rounded-full border transition-colors ${isActive ? 'text-white border-purple/30 bg-purple/10' : 'text-white/55 border-white/10 bg-white/[0.03] group-hover:border-cyan-300/25 group-hover:text-white'}`}>{t}</span>
+                  )}
+                </div>
+                <div className={`mt-6 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.18em] ${isActive ? 'text-cyan-200' : 'text-white/40'}`}>
+                  <span>{isActive ? 'detalhes abertos' : 'ver detalhes'}</span>
+                  <Icon.Arrow s={14} />
+                </div>
+              </button>
+              {isActive && <DetailPanel solution={s} id={panelId(s.id)} compact />}
+            </div>);
+        })}
+      </div>
+
+      <div className="hidden lg:grid lg:grid-cols-12 gap-5 items-start reveal">
+        <div className="lg:col-span-4 glass rounded-3xl p-4 xl:p-5">
+          <div className="flex items-center justify-between gap-4 px-2 pb-4">
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-200">abas de solução</div>
+              <div className="mt-1 text-sm text-white/45">clique para ver o detalhe ao lado</div>
+            </div>
+            <span className="w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_18px_rgba(103,232,249,0.8)]" />
+          </div>
+
+          <div className="space-y-3" role="tablist" aria-label="Soluções Shift Systems">
+            {solutions.map((s, i) => {
+              const SolutionIcon = s.icon;
+              const isActive = active.id === s.id;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls="solution-panel-desktop"
+                  onClick={() => setSelected(s.id)}
+                  className={`w-full rounded-2xl border p-4 text-left transition-all duration-300 group ${isActive ? 'border-purple/45 bg-purple/10 shadow-[0_0_44px_-22px_rgba(181,107,255,0.8)]' : 'border-white/10 bg-white/[0.025] hover:border-cyan-300/30 hover:bg-cyan-300/[0.035]'}`}>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-purple/15 border-purple/35 text-purple' : 'bg-white/[0.03] border-white/10 text-white/45 group-hover:text-cyan-200 group-hover:border-cyan-300/30'}`}>
+                      <SolutionIcon />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="font-semibold tracking-tight truncate">{s.title}</h3>
+                        <span className={`num-tag shrink-0 ${isActive ? 'opacity-100' : 'opacity-45'}`}>0{i + 1}</span>
+                      </div>
+                      <div className={`mt-1 text-[10px] font-mono uppercase tracking-[0.16em] ${isActive ? 'text-purple' : 'text-white/35 group-hover:text-cyan-200'}`}>{s.signal}</div>
+                    </div>
+                  </div>
+                  <div className={`mt-4 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.18em] ${isActive ? 'text-cyan-200' : 'text-white/35 group-hover:text-white/55'}`}>
+                    <span>{isActive ? 'detalhes abertos' : 'ver detalhes'}</span>
+                    <Icon.Arrow s={14} />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="lg:col-span-8">
+          <DetailPanel solution={active} id="solution-panel-desktop" />
         </div>
       </div>
     </Section>);
