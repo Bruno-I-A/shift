@@ -394,6 +394,8 @@ function useCinematic() {
 // --- Custom cursor + magnetic targets -------------------------------
 function useCursor() {
   React.useEffect(() => {
+    const enableCustomCursor = false;
+    if (!enableCustomCursor) return;
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const dot = document.getElementById('cursor-dot');
     const ring = document.getElementById('cursor-ring');
