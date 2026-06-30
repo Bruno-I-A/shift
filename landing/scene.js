@@ -35,6 +35,21 @@ function boot() {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
+  // ===== perf gate =====
+  // the 3D film is a desktop showcase. on phones it's dimmed to near-invisible
+  // anyway (see #webgl mobile opacity), yet a phone still pays full GPU cost for
+  // the bloom composer + shaders every single frame — that's the main source of
+  // the jank. so on touch/small screens, on very low-power machines, or when the
+  // user asked for reduced motion, we skip WebGL entirely and let the CSS gradient
+  // background carry the ambiance. no render loop = nothing to stutter.
+  const lowPower =
+    (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4) ||
+    (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 2);
+  if (isMobile || reduced || lowPower) {
+    canvas.style.display = 'none';   // free the layer; page-bg gradient shows through
+    return;
+  }
+
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
