@@ -269,12 +269,17 @@ function splitForBuild() {
 function useCinematic() {
   React.useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
     const gsap = window.gsap,
       ST = window.ScrollTrigger,
       Lenis = window.Lenis;
 
-    // fallback — plain reveal if libs missing or motion reduced
-    if (reduced || !gsap || !ST) {
+    // light path — plain fade-in, no Lenis / no GSAP scrub parallax.
+    // used when motion is reduced, libs are missing, OR on mobile: phones already
+    // scroll natively (Lenis smoothTouch is off), so the heavy raf loop + per-frame
+    // scrub only burn battery and frames without smoothing anything. native scroll
+    // plus a simple reveal is lighter and feels better on touch.
+    if (reduced || isMobile || !gsap || !ST) {
       const els = document.querySelectorAll('.reveal, .stagger');
       const io = new IntersectionObserver(es => es.forEach(e => {
         if (e.isIntersecting) {
