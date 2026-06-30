@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Política de Privacidade · Shift Systems</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Política de Privacidade da Shift Systems — como coletamos, usamos e protegemos seus dados, em conformidade com a LGPD." />
+<meta name="theme-color" content="#08080b" />
+<meta name="robots" content="index, follow" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="shortcut icon" href="favicon.svg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  if (window.tailwind) {
+    window.tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#08080b',
+            ink2: '#0e0e13',
+            purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC', glow: 'rgba(181,107,255,0.55)' },
+            signal: { DEFAULT: '#38F4FF', glow: 'rgba(56,244,255,0.42)' },
+            paper: '#f6f5f1',
+          },
+          fontFamily: {
+            sans: ['Geist', 'system-ui', 'sans-serif'],
+            mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+          },
+        }
+      }
+    };
+  }
+</script>
+
+<style>
+  :root {
+    color-scheme: dark;
+    --shift-ink: #08080b;
+    --shift-paper: #f6f5f1;
+    --shift-purple: #B56BFF;
+    --shift-signal: #38F4FF;
+    --shift-border: rgba(255,255,255,0.1);
+    --shift-focus: rgba(56,244,255,0.74);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { background: var(--shift-ink); color: var(--shift-paper); font-family: 'Geist', system-ui, sans-serif; }
+  body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; overflow-x: hidden; }
+
+  .page-bg {
+    background:
+      radial-gradient(900px 560px at 82% -12%, rgba(56,244,255,0.08), transparent 58%),
+      radial-gradient(1100px 700px at 80% -10%, rgba(181,107,255,0.18), transparent 60%),
+      radial-gradient(800px 600px at -10% 30%, rgba(138,77,204,0.10), transparent 60%),
+      var(--shift-ink);
+  }
+  .grid-overlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.026) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(56,244,255,0.026) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+
+  .glass {
+    background: linear-gradient(180deg, rgba(15,15,22,0.88), rgba(8,8,11,0.74));
+    border: 1px solid var(--shift-border);
+    box-shadow: 0 18px 70px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .eyebrow {
+    font-family: 'Geist Mono', monospace; font-size: 11px;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--shift-signal);
+    text-shadow: 0 0 22px rgba(56,244,255,0.22);
+  }
+  .display {
+    font-family: 'Geist', sans-serif; font-weight: 600;
+    letter-spacing: -0.035em; line-height: 0.98; text-wrap: balance;
+  }
+  .hr-grad {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(181,107,255,0.2), rgba(56,244,255,0.18), transparent);
+  }
+
+  .ring-glow { box-shadow: 0 0 50px 0 rgba(181,107,255,0.42), 0 0 26px -10px rgba(56,244,255,0.42); }
+
+  /* ===== legal prose ===== */
+  .prose h2 {
+    font-family: 'Geist', sans-serif; font-weight: 600; letter-spacing: -0.02em;
+    font-size: 1.4rem; color: var(--shift-paper);
+    margin-top: 2.75rem; margin-bottom: 1rem;
+    display: flex; align-items: baseline; gap: 0.75rem;
+  }
+  .prose h2 .n {
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em;
+    color: rgba(181,107,255,0.9); transform: translateY(-2px);
+  }
+  .prose h3 {
+    font-weight: 600; font-size: 1.02rem; color: rgba(246,245,241,0.92);
+    margin-top: 1.6rem; margin-bottom: 0.5rem;
+  }
+  .prose p { color: rgba(246,245,241,0.72); line-height: 1.75; margin-bottom: 1rem; }
+  .prose ul { margin: 0 0 1.1rem 0; padding: 0; }
+  .prose li {
+    color: rgba(246,245,241,0.72); line-height: 1.7;
+    padding-left: 1.4rem; position: relative; margin-bottom: 0.55rem;
+  }
+  .prose li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 6px; height: 6px; border-radius: 9999px;
+    background: var(--shift-purple); box-shadow: 0 0 10px rgba(181,107,255,0.7);
+  }
+  .prose strong { color: var(--shift-paper); font-weight: 600; }
+  .prose a { color: var(--shift-signal); text-decoration: none; }
+  .prose a:hover { text-decoration: underline; }
+
+  ::selection { background: var(--shift-signal); color: #041013; }
+  :where(a, button):focus-visible {
+    outline: 2px solid var(--shift-focus); outline-offset: 4px;
+    box-shadow: 0 0 0 6px rgba(56,244,255,0.12);
+  }
+</style>
+</head>
+<body class="page-bg">
+<div class="grid-overlay"></div>
+
+<div class="relative z-10 max-w-3xl mx-auto px-6 md:px-8 py-12 md:py-20">
+
+  <!-- top bar -->
+  <header class="flex items-center justify-between mb-14">
+    <a href="index.html#inicio" class="flex items-center gap-3 group">
+      <span class="ring-glow inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#0b0b10] border border-white/10">
+        <svg viewBox="0 0 100 100" width="20" height="20">
+          <rect x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+          <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" fill="none" stroke-linecap="round" />
+          <rect x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+        </svg>
+      </span>
+      <span class="font-sans font-semibold tracking-tight text-base leading-none flex items-baseline">
+        <span>Shift</span><span class="text-purple">.</span>
+        <span class="ml-1.5 font-mono font-normal text-[10px] tracking-[0.32em] uppercase text-white/45 -translate-y-px">Systems</span>
+      </span>
+    </a>
+    <a href="index.html#inicio" class="text-sm text-white/65 hover:text-white inline-flex items-center gap-2 transition-colors">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      voltar ao site
+    </a>
+  </header>
+
+  <!-- title -->
+  <div class="mb-12">
+    <div class="eyebrow mb-5">Shift / Systems · legal</div>
+    <h1 class="display text-4xl md:text-5xl">política de privacidade<span class="text-purple">.</span></h1>
+    <p class="mt-6 text-white/60 leading-relaxed">
+      Esta política explica como a <strong class="text-white/85">Shift Systems</strong> coleta, utiliza, armazena e protege os
+      dados pessoais de quem interage com nosso site e nossos serviços, em conformidade com a
+      Lei nº 13.709/2018 (Lei Geral de Proteção de Dados — LGPD).
+    </p>
+    <div class="mt-6 inline-flex items-center gap-2 text-xs font-mono tracking-wider uppercase text-white/40 glass rounded-full px-4 py-2">
+      última atualização · 30 de junho de 2026
+    </div>
+  </div>
+
+  <div class="hr-grad mb-2"></div>
+
+  <article class="prose">
+
+    <h2><span class="n">01</span> quem somos</h2>
+    <p>
+      A <strong>SHIFT SYSTEMS LTDA.</strong>, inscrita no CNPJ sob o nº <strong>66.982.894/0001-70</strong>
+      ("Shift Systems"), desenvolve sistemas sob medida, automações e soluções de inteligência
+      artificial para empresas. Para os fins desta política, a Shift Systems atua como
+      <strong>controladora</strong> dos dados pessoais coletados por meio deste site e dos canais de contato
+      por ela disponibilizados.
+    </p>
+
+    <h2><span class="n">02</span> dados que coletamos</h2>
+    <p>Podemos coletar as seguintes categorias de dados:</p>
+    <h3>Dados que você nos fornece</h3>
+    <ul>
+      <li><strong>Dados de contato</strong> — nome, telefone/WhatsApp, e-mail e nome da empresa, quando você nos procura por formulário, WhatsApp ou redes sociais.</li>
+      <li><strong>Conteúdo das mensagens</strong> — informações sobre seu negócio, processos e necessidades que você compartilha conosco durante o atendimento ou diagnóstico.</li>
+    </ul>
+    <h3>Dados coletados automaticamente</h3>
+    <ul>
+      <li><strong>Dados de navegação</strong> — endereço IP, tipo de dispositivo, navegador, páginas visitadas e tempo de permanência.</li>
+      <li><strong>Cookies e tecnologias semelhantes</strong> — utilizados para o funcionamento do site e para entender como ele é usado (ver seção 06).</li>
+    </ul>
+
+    <h2><span class="n">03</span> por que usamos seus dados</h2>
+    <p>Tratamos seus dados pessoais para as seguintes finalidades:</p>
+    <ul>
+      <li>responder a contatos, dúvidas e solicitações de orçamento ou diagnóstico;</li>
+      <li>elaborar propostas e prestar os serviços contratados;</li>
+      <li>comunicar novidades, conteúdos e oportunidades relacionadas aos nossos serviços (quando você autorizar);</li>
+      <li>melhorar o site, nossos serviços e a experiência de quem nos procura;</li>
+      <li>cumprir obrigações legais, regulatórias e contratuais.</li>
+    </ul>
+
+    <h2><span class="n">04</span> bases legais</h2>
+    <p>
+      O tratamento dos seus dados se apoia nas bases legais previstas na LGPD, em especial:
+      <strong>consentimento</strong>, <strong>execução de contrato</strong> ou de procedimentos preliminares
+      a seu pedido, <strong>cumprimento de obrigação legal</strong> e <strong>legítimo interesse</strong>,
+      sempre respeitando seus direitos e liberdades fundamentais.
+    </p>
+
+    <h2><span class="n">05</span> compartilhamento de dados</h2>
+    <p>
+      A Shift Systems <strong>não vende</strong> seus dados pessoais. Podemos compartilhá-los apenas quando
+      necessário com:
+    </p>
+    <ul>
+      <li><strong>prestadores de serviço e parceiros de tecnologia</strong> (por exemplo, hospedagem, e-mail, mensageria e ferramentas de automação) que nos apoiam na operação, sob obrigações de confidencialidade;</li>
+      <li><strong>autoridades públicas</strong>, quando exigido por lei ou ordem judicial.</li>
+    </ul>
+    <p>
+      Alguns desses parceiros podem estar localizados fora do Brasil. Nesses casos, adotamos
+      salvaguardas adequadas para a transferência internacional de dados, conforme a LGPD.
+    </p>
+
+    <h2><span class="n">06</span> cookies</h2>
+    <p>
+      Utilizamos cookies e tecnologias semelhantes para manter o site funcionando, lembrar
+      preferências e medir audiência. Você pode gerenciar ou bloquear cookies nas configurações do
+      seu navegador — observando que isso pode afetar algumas funcionalidades do site.
+    </p>
+
+    <h2><span class="n">07</span> por quanto tempo guardamos</h2>
+    <p>
+      Mantemos seus dados pessoais apenas pelo tempo necessário para cumprir as finalidades descritas
+      nesta política ou para atender a obrigações legais. Encerrado esse período, os dados são
+      eliminados ou anonimizados de forma segura.
+    </p>
+
+    <h2><span class="n">08</span> segurança</h2>
+    <p>
+      Adotamos medidas técnicas e organizacionais razoáveis para proteger seus dados contra acesso
+      não autorizado, perda, alteração ou divulgação indevida. Nenhum sistema, porém, é totalmente
+      imune a riscos, e nos comprometemos a comunicar incidentes relevantes nos termos da lei.
+    </p>
+
+    <h2><span class="n">09</span> seus direitos</h2>
+    <p>Como titular dos dados, você pode, a qualquer momento, solicitar:</p>
+    <ul>
+      <li>a confirmação da existência de tratamento e o acesso aos seus dados;</li>
+      <li>a correção de dados incompletos, inexatos ou desatualizados;</li>
+      <li>a anonimização, bloqueio ou eliminação de dados desnecessários ou excessivos;</li>
+      <li>a portabilidade dos dados;</li>
+      <li>a revogação do consentimento e a eliminação dos dados tratados com base nele;</li>
+      <li>informações sobre o compartilhamento dos seus dados.</li>
+    </ul>
+    <p>Para exercer esses direitos, utilize os canais indicados na seção 11.</p>
+
+    <h2><span class="n">10</span> alterações nesta política</h2>
+    <p>
+      Esta política pode ser atualizada a qualquer momento para refletir mudanças em nossos serviços
+      ou na legislação. A versão vigente estará sempre disponível nesta página, com a data da última
+      atualização indicada no topo.
+    </p>
+
+    <h2><span class="n">11</span> fale com a gente</h2>
+    <p>
+      Em caso de dúvidas sobre esta política ou para exercer seus direitos como titular de dados,
+      entre em contato pelos nossos canais:
+    </p>
+    <ul>
+      <li><strong>WhatsApp</strong> — <a href="https://wa.me/5554984184808?text=Ol%C3%A1%21%20Tenho%20uma%20d%C3%BAvida%20sobre%20privacidade%20de%20dados." target="_blank" rel="noopener noreferrer">+55 54 98418-4808</a></li>
+      <li><strong>Instagram</strong> — <a href="https://instagram.com/shift_systemss" target="_blank" rel="noopener noreferrer">@shift_systemss</a></li>
+    </ul>
+
+  </article>
+
+  <div class="hr-grad my-12"></div>
+
+  <footer class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono tracking-wider uppercase text-white/40">
+    <div>© 2026 Shift Systems · todos os direitos reservados</div>
+    <a href="index.html#inicio" class="hover:text-purple transition-colors">voltar ao site →</a>
+  </footer>
+
+</div>
+</body>
+</html>

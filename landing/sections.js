@@ -1403,7 +1403,12 @@ function Footer() {
     className: "hr-grad my-12"
   }), /*#__PURE__*/React.createElement("div", {
     className: "flex flex-wrap items-center justify-between gap-4 text-xs font-mono tracking-wider uppercase text-white/40"
-  }, /*#__PURE__*/React.createElement("div", null, "© 2026 Shift Systems · todos os direitos reservados"), /*#__PURE__*/React.createElement("div", null, "v.01 · feito pra rodar"))));
+  }, /*#__PURE__*/React.createElement("div", null, "© 2026 Shift Systems · todos os direitos reservados"), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-5"
+  }, /*#__PURE__*/React.createElement("a", {
+    href: "privacidade.html",
+    className: "hover:text-purple transition"
+  }, "política de privacidade"), /*#__PURE__*/React.createElement("span", null, "v.01 · feito pra rodar")))));
 }
 Object.assign(window, {
   Header,

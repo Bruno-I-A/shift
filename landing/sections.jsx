@@ -1211,7 +1211,10 @@ function Footer() {
 
         <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-mono tracking-wider uppercase text-white/40">
           <div>© 2026 Shift Systems · todos os direitos reservados</div>
-          <div>v.01 · feito pra rodar</div>
+          <div className="flex items-center gap-5">
+            <a href="privacidade.html" className="hover:text-purple transition">política de privacidade</a>
+            <span>v.01 · feito pra rodar</span>
+          </div>
         </div>
       </div>
     </footer>);
