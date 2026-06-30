@@ -41,6 +41,10 @@ function Header() {
   }, {
     id: 'contato',
     label: 'contato'
+  }, {
+    id: 'privacidade',
+    label: 'privacidade',
+    href: 'privacidade.html'
   }];
   return /*#__PURE__*/React.createElement("header", {
     className: `fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'pt-3' : 'pt-5'}`
@@ -68,7 +72,7 @@ function Header() {
     className: "hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2"
   }, nav.map(n => /*#__PURE__*/React.createElement("a", {
     key: n.id,
-    href: `#${n.id}`,
+    href: n.href || `#${n.id}`,
     className: "text-sm text-white/65 hover:text-white px-3.5 py-2 rounded-full hover:bg-white/[0.04] transition-colors"
   }, n.label))), /*#__PURE__*/React.createElement("a", {
     href: "#contato",
