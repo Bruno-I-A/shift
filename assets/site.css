@@ -1,6 +1,6 @@
 /* ============================================================
    Shift Systems · v2 "mar aberto"
-   navy profundo + laranja-sol + dourado · logo permanece roxa
+   navy profundo + dourado-âmbar · logo permanece roxa
    sem WebGL, sem noise, sem boot screen — velocidade é a energia
    ============================================================ */
 
@@ -10,9 +10,9 @@
   --navy-2: #0E1D3A;
   --paper: #F6F5F1;
   --muted: rgba(246, 245, 241, 0.68);
-  --accent: #FF6B35;
-  --accent-deep: #E8501C;
-  --accent-glow: rgba(255, 107, 53, 0.5);
+  --accent: #F2A63D;
+  --accent-deep: #D4841A;
+  --accent-glow: rgba(242, 166, 61, 0.5);
   --gold: #FFC93D;
   --gold-glow: rgba(255, 201, 61, 0.35);
   --purple: #B56BFF;             /* reservado para a marca */
@@ -45,7 +45,7 @@ body {
   background:
     radial-gradient(1100px 700px at 80% -10%, rgba(43, 108, 209, 0.16), transparent 60%),
     radial-gradient(800px 620px at -10% 28%, rgba(23, 64, 128, 0.2), transparent 60%),
-    radial-gradient(1000px 620px at 50% 115%, rgba(255, 107, 53, 0.12), transparent 62%),
+    radial-gradient(1000px 620px at 50% 115%, rgba(242, 166, 61, 0.12), transparent 62%),
     radial-gradient(700px 420px at 78% 112%, rgba(255, 201, 61, 0.07), transparent 60%),
     var(--navy);
 }
@@ -68,8 +68,8 @@ body {
   transition: border-color 0.25s, background 0.25s, box-shadow 0.25s, transform 0.25s;
 }
 .glass:hover {
-  border-color: rgba(255, 107, 53, 0.4);
-  background: linear-gradient(180deg, rgba(255, 107, 53, 0.07), rgba(10, 20, 40, 0.6));
+  border-color: rgba(242, 166, 61, 0.4);
+  background: linear-gradient(180deg, rgba(242, 166, 61, 0.07), rgba(10, 20, 40, 0.6));
   box-shadow: 0 22px 80px rgba(2, 8, 20, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 .glass-strong {
@@ -80,7 +80,7 @@ body {
 
 /* ===== botões ===== */
 .btn-primary {
-  background: linear-gradient(135deg, #FF8A4C 0%, var(--accent) 52%, var(--accent-deep) 100%);
+  background: linear-gradient(135deg, #FFC873 0%, var(--accent) 52%, var(--accent-deep) 100%);
   color: #1A0A03;
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 12px 40px -10px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -89,7 +89,7 @@ body {
 }
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 18px 52px -10px rgba(255, 107, 53, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  box-shadow: 0 18px 52px -10px rgba(242, 166, 61, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.34);
   filter: brightness(1.05);
 }
 .btn-primary:active { transform: translateY(0) scale(0.99); }
@@ -100,7 +100,7 @@ body {
   transition: background 0.2s, border-color 0.2s, transform 0.2s;
   cursor: pointer;
 }
-.btn-ghost:hover { background: rgba(255, 107, 53, 0.09); border-color: rgba(255, 107, 53, 0.35); }
+.btn-ghost:hover { background: rgba(242, 166, 61, 0.09); border-color: rgba(242, 166, 61, 0.35); }
 .btn-ghost:active { transform: translateY(1px) scale(0.99); }
 
 /* ===== tipografia ===== */
@@ -130,7 +130,7 @@ body {
 
 .hr-grad {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.28), rgba(255, 201, 61, 0.22), transparent);
+  background: linear-gradient(90deg, transparent, rgba(242, 166, 61, 0.28), rgba(255, 201, 61, 0.22), transparent);
 }
 
 /* ===== a marca (roxa, sempre) ===== */
@@ -229,6 +229,38 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
 .stagger.in > *:nth-child(5) { transition-delay: 0.28s; }
 .stagger.in > *:nth-child(6) { transition-delay: 0.34s; }
 
+/* ===== hero "shift engine" — painel tech leve, css + poucos intervals ===== */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+.floaty-slow { animation: float-slow 7s ease-in-out infinite; }
+
+.hero-seg {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.3s;
+}
+.hero-seg.lit {
+  background: linear-gradient(90deg, var(--accent-deep), var(--accent));
+}
+
+.hero-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  background: rgba(255, 255, 255, 0.12);
+  transition: height 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hero-bar.hi { background: linear-gradient(180deg, var(--gold), var(--accent)); }
+
+@keyframes log-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.hero-log-line { animation: log-in 0.4s ease both; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
 /* ===== spotlight que segue o cursor (mantido da v1 — é bom) ===== */
 .spot { position: relative; }
 .spot::before {
@@ -236,7 +268,7 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
   position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background:
     radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 201, 61, 0.07), transparent 48%),
-    radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 107, 53, 0.14), transparent 56%);
+    radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgba(242, 166, 61, 0.14), transparent 56%);
   opacity: 0; transition: opacity 0.3s;
 }
 .spot:hover::before { opacity: 1; }
@@ -245,7 +277,7 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
 .route-line {
   position: relative;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.45), rgba(255, 201, 61, 0.45), transparent);
+  background: linear-gradient(90deg, transparent, rgba(242, 166, 61, 0.45), rgba(255, 201, 61, 0.45), transparent);
   overflow: visible;
 }
 @keyframes sail-x {
@@ -260,7 +292,7 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
   margin-top: -4px; margin-left: -4px;
   border-radius: 9999px;
   background: var(--gold);
-  box-shadow: 0 0 14px var(--gold-glow), 0 0 26px rgba(255, 107, 53, 0.4);
+  box-shadow: 0 0 14px var(--gold-glow), 0 0 26px rgba(242, 166, 61, 0.4);
   animation: sail-x 6s linear infinite;
 }
 .waypoint {
@@ -307,9 +339,9 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
   min-height: 44px;
   transition: border-color 0.2s, background 0.2s, transform 0.15s;
 }
-.quiz-option:hover { border-color: rgba(255, 107, 53, 0.45); background: rgba(255, 107, 53, 0.07); }
+.quiz-option:hover { border-color: rgba(242, 166, 61, 0.45); background: rgba(242, 166, 61, 0.07); }
 .quiz-option:active { transform: scale(0.99); }
-.quiz-option.picked { border-color: var(--accent); background: rgba(255, 107, 53, 0.12); }
+.quiz-option.picked { border-color: var(--accent); background: rgba(242, 166, 61, 0.12); }
 
 @keyframes compass-spin {
   0%   { transform: rotate(0deg); }
@@ -347,7 +379,7 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
 /* ===== respeito a quem prefere menos movimento ===== */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto !important; }
-  .sail-dot, .travel-dot, .mark-shift .slab-top, .mark-shift .slab-bottom { animation: none !important; }
+  .sail-dot, .travel-dot, .mark-shift .slab-top, .mark-shift .slab-bottom, .floaty-slow { animation: none !important; }
   .compass-spin .compass-needle { animation: none !important; }
-  .reveal, .stagger > *, .quiz-step.active { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  .reveal, .stagger > *, .quiz-step.active, .hero-log-line { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }

@@ -25,7 +25,7 @@
       extend: {
         colors: {
           navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
-          accent: { DEFAULT: '#FF6B35', deep: '#E8501C' },
+          accent: { DEFAULT: '#F2A63D', deep: '#D4841A' },
           gold: '#FFC93D',
           paper: '#F6F5F1',
           purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
@@ -74,7 +74,7 @@
 
     <div class="flex items-center gap-3">
       <a href="diagnostico.html" class="btn-primary hidden sm:inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium">
-        fazer diagnóstico
+        Fazer diagnóstico
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
       </a>
       <button id="menu-btn" class="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-white/15 cursor-pointer" aria-label="abrir menu" aria-controls="mobile-menu" aria-expanded="false">
@@ -89,48 +89,108 @@
   <a href="solucoes.html" class="nav-link">soluções</a>
   <a href="processo.html" class="nav-link">processo</a>
   <a href="contato.html" class="nav-link">contato</a>
-  <a href="diagnostico.html" class="btn-primary rounded-full px-8 py-4 text-lg font-medium mt-4">fazer diagnóstico</a>
+  <a href="diagnostico.html" class="btn-primary rounded-full px-8 py-4 text-lg font-medium mt-4">Fazer diagnóstico</a>
 </div>
 
 <main>
   <!-- ===== hero ===== -->
   <section class="relative pt-36 sm:pt-44 md:pt-52 pb-16 md:pb-24 px-6 md:px-12 lg:px-20 overflow-hidden">
     <div class="grid-overlay" aria-hidden="true"></div>
-    <div class="relative max-w-4xl mx-auto text-center">
-      <div class="reveal flex items-center justify-center gap-3 mb-8">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-        </span>
-        <span class="eyebrow">shift systems · 2026</span>
+    <div class="relative max-w-7xl mx-auto grid lg:grid-cols-12 gap-14 lg:gap-8 items-center">
+
+      <div class="lg:col-span-7 text-center lg:text-left">
+        <div class="reveal flex items-center justify-center lg:justify-start gap-3 mb-8">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+          </span>
+          <span class="eyebrow">shift systems · 2026</span>
+        </div>
+
+        <h1 class="reveal display text-[44px] sm:text-6xl lg:text-7xl xl:text-[80px] text-paper">
+          Empresas lentas<br />
+          <span class="text-white/45">perdem</span> <span class="text-accent" style="text-shadow: 0 0 44px rgba(242, 166, 61,0.4);">dinheiro.</span>
+        </h1>
+
+        <p class="reveal mt-8 text-xl md:text-2xl text-white/75 max-w-2xl mx-auto lg:mx-0">
+          Sistemas, automações e inteligência artificial para empresas que querem parar de operar no improviso.
+        </p>
+        <p class="reveal mt-4 text-base md:text-lg text-white/55 max-w-xl mx-auto lg:mx-0">
+          A Shift transforma processos manuais, atendimento desorganizado e tarefas repetitivas em tecnologia simples, inteligente e escalável.
+        </p>
+
+        <div class="reveal mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+          <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium w-full sm:w-auto">
+            Descobrir onde estou perdendo dinheiro
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+          </a>
+          <a href="solucoes.html" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto">Ver soluções</a>
+        </div>
+
+        <div class="reveal mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider text-white/40">
+          <span>tempo médio · 2–6 semanas</span>
+          <span class="hidden sm:inline text-white/20">•</span>
+          <span>stack sob medida</span>
+          <span class="hidden sm:inline text-white/20">•</span>
+          <span>resposta &lt; 24h</span>
+        </div>
       </div>
 
-      <h1 class="reveal display text-[44px] sm:text-6xl md:text-7xl lg:text-[88px] text-paper">
-        empresas lentas<br />
-        <span class="text-white/45">perdem</span> <span class="text-accent" style="text-shadow: 0 0 44px rgba(255,107,53,0.4);">dinheiro.</span>
-      </h1>
+      <!-- ===== shift engine — painel tech, leve (sem webgl, só css + alguns intervals) ===== -->
+      <div class="lg:col-span-5 reveal">
+        <div class="floaty-slow glass-strong rounded-3xl p-6 relative overflow-hidden">
+          <div class="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
 
-      <p class="reveal mt-8 text-xl md:text-2xl text-white/75 max-w-2xl mx-auto">
-        sistemas, automações e inteligência artificial para empresas que querem parar de operar no improviso.
-      </p>
-      <p class="reveal mt-4 text-base md:text-lg text-white/55 max-w-xl mx-auto">
-        a Shift transforma processos manuais, atendimento desorganizado e tarefas repetitivas em tecnologia simples, inteligente e escalável.
-      </p>
+          <div class="relative flex items-center justify-between mb-6">
+            <div class="flex items-center gap-2">
+              <svg class="mark-glow" width="16" height="16" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+                <rect x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+                <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
+                <rect x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+              </svg>
+              <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">shift engine</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent"></span>
+              </span>
+              <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">online</span>
+            </div>
+          </div>
 
-      <div class="reveal mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium w-full sm:w-auto">
-          descobrir onde estou perdendo dinheiro
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-        </a>
-        <a href="solucoes.html" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto">ver soluções</a>
-      </div>
+          <div class="relative grid grid-cols-3 gap-3 mb-6" aria-hidden="true">
+            <div class="rounded-xl border border-white/10 bg-navy-2/40 px-3 py-3">
+              <div class="font-mono text-lg text-paper"><span data-count-to="128">0</span></div>
+              <div class="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">leads hoje</div>
+            </div>
+            <div class="rounded-xl border border-white/10 bg-navy-2/40 px-3 py-3">
+              <div class="font-mono text-lg text-paper">24/7</div>
+              <div class="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">automação</div>
+            </div>
+            <div class="rounded-xl border border-white/10 bg-navy-2/40 px-3 py-3">
+              <div class="font-mono text-lg text-paper">99.9%</div>
+              <div class="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">uptime</div>
+            </div>
+          </div>
 
-      <div class="reveal mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider text-white/40">
-        <span>tempo médio · 2–6 semanas</span>
-        <span class="hidden sm:inline text-white/20">•</span>
-        <span>stack sob medida</span>
-        <span class="hidden sm:inline text-white/20">•</span>
-        <span>resposta &lt; 24h</span>
+          <div class="relative mb-6" aria-hidden="true">
+            <div class="flex items-center justify-between mb-2 font-mono text-[9px] uppercase tracking-wider text-white/40">
+              <span>Sincronizando operação</span>
+              <span id="hero-progress-pct">0%</span>
+            </div>
+            <div id="hero-progress-segments" class="flex gap-1"></div>
+          </div>
+
+          <div class="relative mb-6" aria-hidden="true">
+            <div class="font-mono text-[9px] uppercase tracking-wider text-white/40 mb-2">Atividade da semana</div>
+            <div id="hero-bars" class="flex items-end gap-1.5 h-16"></div>
+          </div>
+
+          <div class="relative rounded-xl border border-white/10 bg-navy-2/40 p-3 h-[92px] overflow-hidden" aria-hidden="true">
+            <div id="hero-log" class="space-y-2 font-mono text-[10px] text-white/40"></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -139,9 +199,9 @@
   <section class="relative px-6 md:px-12 lg:px-20 py-16 md:py-24">
     <div class="max-w-7xl mx-auto">
       <div class="reveal text-center mb-12">
-        <div class="num-tag mb-4">/ a rota</div>
-        <h2 class="display text-3xl md:text-5xl text-paper">do caos até o mar aberto<span class="text-accent">.</span></h2>
-        <p class="mt-4 text-white/55 max-w-xl mx-auto">quatro paradas. você entra sabendo onde dói e sai com a operação rodando sozinha.</p>
+        <div class="num-tag mb-4">/ A rota</div>
+        <h2 class="display text-3xl md:text-5xl text-paper">Do caos até o mar aberto<span class="text-accent">.</span></h2>
+        <p class="mt-4 text-white/55 max-w-xl mx-auto">Quatro paradas. Você entra sabendo onde dói e sai com a operação rodando sozinha.</p>
       </div>
 
       <div class="relative">
@@ -153,37 +213,37 @@
           <a href="diagnostico.html" class="glass spot rounded-2xl p-6 cursor-pointer group">
             <div class="flex items-center gap-3 mb-5">
               <span class="waypoint lit shrink-0"></span>
-              <span class="num-tag">parada 01</span>
+              <span class="num-tag">Parada 01</span>
             </div>
-            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">diagnóstico</h3>
+            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">Diagnóstico</h3>
             <p class="mt-2 text-sm text-white/55">3 minutos para descobrir onde sua operação está vazando tempo e dinheiro.</p>
           </a>
 
           <a href="solucoes.html" class="glass spot rounded-2xl p-6 cursor-pointer group">
             <div class="flex items-center gap-3 mb-5">
               <span class="waypoint shrink-0"></span>
-              <span class="num-tag">parada 02</span>
+              <span class="num-tag">Parada 02</span>
             </div>
-            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">a solução certa</h3>
-            <p class="mt-2 text-sm text-white/55">sistema, automação ou agente de IA — o que faz sentido pro seu caso, sem empurrar nada.</p>
+            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">A solução certa</h3>
+            <p class="mt-2 text-sm text-white/55">Sistema, automação, site-funil ou agente de IA — o que faz sentido pro seu caso, sem empurrar nada.</p>
           </a>
 
           <a href="processo.html" class="glass spot rounded-2xl p-6 cursor-pointer group">
             <div class="flex items-center gap-3 mb-5">
               <span class="waypoint shrink-0"></span>
-              <span class="num-tag">parada 03</span>
+              <span class="num-tag">Parada 03</span>
             </div>
-            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">construção</h3>
+            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">Construção</h3>
             <p class="mt-2 text-sm text-white/55">2 a 6 semanas, releases semanais, você acompanhando tudo de perto.</p>
           </a>
 
           <a href="contato.html" class="glass spot rounded-2xl p-6 cursor-pointer group">
             <div class="flex items-center gap-3 mb-5">
               <span class="waypoint shrink-0"></span>
-              <span class="num-tag">parada 04</span>
+              <span class="num-tag">Parada 04</span>
             </div>
-            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">mar aberto</h3>
-            <p class="mt-2 text-sm text-white/55">operação no automático, dados na tela e sua cabeça livre pra crescer o negócio.</p>
+            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">Mar aberto</h3>
+            <p class="mt-2 text-sm text-white/55">Operação no automático, dados na tela e sua cabeça livre pra crescer o negócio.</p>
           </a>
         </div>
       </div>
@@ -194,9 +254,9 @@
   <section class="relative px-6 md:px-12 lg:px-20 py-16 md:py-24">
     <div class="max-w-7xl mx-auto">
       <div class="reveal max-w-3xl mb-12">
-        <div class="num-tag mb-4">/ o custo do improviso</div>
+        <div class="num-tag mb-4">/ O custo do improviso</div>
         <h2 class="display text-3xl md:text-5xl text-paper">
-          planilha, retrabalho e WhatsApp bagunçado <span class="text-white/40">têm um preço</span><span class="text-accent">.</span>
+          Planilha, retrabalho e WhatsApp bagunçado <span class="text-white/40">têm um preço</span><span class="text-accent">.</span>
         </h2>
       </div>
 
@@ -204,31 +264,31 @@
         <div class="glass spot rounded-2xl p-7">
           <div class="flex items-start justify-between mb-6">
             <span class="num-tag">/ 01</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2 5 4-10 2 5h6" /></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2 5 4-10 2 5h6" /></svg>
           </div>
           <div class="display text-5xl text-paper"><span data-count-to="40">0</span><span class="text-accent">%</span></div>
           <div class="hr-grad my-5"></div>
-          <p class="text-white/55 text-sm">dos leads que chegam por WhatsApp <span class="text-white/80">nunca recebem retorno</span> quando o atendimento é manual.</p>
+          <p class="text-white/55 text-sm">Dos leads que chegam por WhatsApp <span class="text-white/80">nunca recebem retorno</span> quando o atendimento é manual.</p>
         </div>
 
         <div class="glass spot rounded-2xl p-7">
           <div class="flex items-start justify-between mb-6">
             <span class="num-tag">/ 02</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
           </div>
           <div class="display text-5xl text-paper"><span data-count-to="2">0</span>h<span class="text-accent">/dia</span></div>
           <div class="hr-grad my-5"></div>
-          <p class="text-white/55 text-sm">é o que um time pequeno gasta em <span class="text-white/80">copia-e-cola entre ferramentas</span> que não conversam entre si.</p>
+          <p class="text-white/55 text-sm">É o que um time pequeno gasta em <span class="text-white/80">copia-e-cola entre ferramentas</span> que não conversam entre si.</p>
         </div>
 
         <div class="glass spot rounded-2xl p-7">
           <div class="flex items-start justify-between mb-6">
             <span class="num-tag">/ 03</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" /><circle cx="12" cy="12" r="2.5" /></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" /><circle cx="12" cy="12" r="2.5" /></svg>
           </div>
-          <div class="display text-5xl text-paper">no escuro<span class="text-accent">.</span></div>
+          <div class="display text-5xl text-paper">No escuro<span class="text-accent">.</span></div>
           <div class="hr-grad my-5"></div>
-          <p class="text-white/55 text-sm">decisões tomadas no achismo porque <span class="text-white/80">nenhum número confiável</span> chega na sua mesa em tempo real.</p>
+          <p class="text-white/55 text-sm">Decisões tomadas no achismo porque <span class="text-white/80">nenhum número confiável</span> chega na sua mesa em tempo real.</p>
         </div>
       </div>
     </div>
@@ -239,11 +299,11 @@
     <div class="max-w-7xl mx-auto">
       <div class="reveal flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
         <div class="max-w-2xl">
-          <div class="num-tag mb-4">/ soluções</div>
-          <h2 class="display text-3xl md:text-5xl text-paper">tecnologia sob medida para sua empresa rodar melhor<span class="text-accent">.</span></h2>
+          <div class="num-tag mb-4">/ Soluções</div>
+          <h2 class="display text-3xl md:text-5xl text-paper">Tecnologia sob medida para sua empresa rodar melhor<span class="text-accent">.</span></h2>
         </div>
         <a href="solucoes.html" class="btn-ghost inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm shrink-0 self-start md:self-auto">
-          ver todas as soluções
+          Ver todas as soluções
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
         </a>
       </div>
@@ -251,10 +311,10 @@
       <div class="stagger grid md:grid-cols-3 gap-5">
         <a href="solucoes.html#agentes" class="glass spot rounded-2xl p-7 cursor-pointer group">
           <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z" /></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z" /></svg>
           </div>
-          <h3 class="text-2xl font-semibold text-paper">agentes de IA</h3>
-          <p class="mt-3 text-white/55 text-sm">atendimento que responde na hora, qualifica o lead e chama humano quando a conversa precisa de cuidado.</p>
+          <h3 class="text-2xl font-semibold text-paper">Agentes de IA</h3>
+          <p class="mt-3 text-white/55 text-sm">Atendimento que responde na hora, qualifica o lead e chama humano quando a conversa precisa de cuidado.</p>
           <div class="mt-5 flex flex-wrap gap-2">
             <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">atendimento</span>
             <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">vendas</span>
@@ -263,25 +323,25 @@
 
         <a href="solucoes.html#automacoes" class="glass spot rounded-2xl p-7 cursor-pointer group">
           <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h8" /><path d="M4 12h16" /><path d="M4 18h8" /><circle cx="16" cy="6" r="2" /><circle cx="8" cy="18" r="2" /></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h8" /><path d="M4 12h16" /><path d="M4 18h8" /><circle cx="16" cy="6" r="2" /><circle cx="8" cy="18" r="2" /></svg>
           </div>
-          <h3 class="text-2xl font-semibold text-paper">automações</h3>
-          <p class="mt-3 text-white/55 text-sm">tarefas repetitivas rodando sozinhas: cobrança, follow-up, relatórios e integrações entre suas ferramentas.</p>
+          <h3 class="text-2xl font-semibold text-paper">Automações</h3>
+          <p class="mt-3 text-white/55 text-sm">Tarefas repetitivas rodando sozinhas: cobrança, follow-up, relatórios e integrações entre suas ferramentas.</p>
           <div class="mt-5 flex flex-wrap gap-2">
             <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">n8n</span>
             <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">webhooks</span>
           </div>
         </a>
 
-        <a href="solucoes.html#sistemas" class="glass spot rounded-2xl p-7 cursor-pointer group">
+        <a href="solucoes.html#funil" class="glass spot rounded-2xl p-7 cursor-pointer group">
           <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5z" /><path d="M3 13l9 5 9-5" /></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16l-6.5 8.5V19l-3 2v-8.5z" /></svg>
           </div>
-          <h3 class="text-2xl font-semibold text-paper">sistemas sob medida</h3>
-          <p class="mt-3 text-white/55 text-sm">login, permissões, fluxo e relatórios — uma ferramenta feita pro jeito que a sua operação realmente funciona.</p>
+          <h3 class="text-2xl font-semibold text-paper">Sites que vendem sozinhos</h3>
+          <p class="mt-3 text-white/55 text-sm">Landing pages desenhadas como funil — cada seção empurra o visitante até virar lead qualificado no seu WhatsApp.</p>
           <div class="mt-5 flex flex-wrap gap-2">
-            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">web app</span>
-            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">dashboards</span>
+            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">landing page</span>
+            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">conversão</span>
           </div>
         </a>
       </div>
@@ -302,15 +362,15 @@
             <span class="eyebrow">vagas abertas · 2026</span>
           </div>
           <h2 class="display text-3xl md:text-6xl text-paper">
-            o manual custa mais caro<br />do que você imagina<span class="text-accent">.</span>
+            O manual custa mais caro<br />do que você imagina<span class="text-accent">.</span>
           </h2>
-          <p class="mt-6 text-white/60 max-w-xl mx-auto">responda o diagnóstico em 3 minutos e receba a rota exata: onde sua empresa perde tempo e o que construir primeiro.</p>
+          <p class="mt-6 text-white/60 max-w-xl mx-auto">Responda o diagnóstico em 3 minutos e receba a rota exata: onde sua empresa perde tempo e o que construir primeiro.</p>
           <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium w-full sm:w-auto">
-              fazer o diagnóstico
+              Fazer o diagnóstico
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
             </a>
-            <a href="https://wa.me/5554984184808?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Shift%20Systems%20e%20quero%20tirar%20minha%20empresa%20do%20modo%20manual." target="_blank" rel="noopener" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto">falar direto no WhatsApp</a>
+            <a href="https://wa.me/5554984184808?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Shift%20Systems%20e%20quero%20tirar%20minha%20empresa%20do%20modo%20manual." target="_blank" rel="noopener" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto">Falar direto no WhatsApp</a>
           </div>
           <p class="mt-6 font-mono text-xs uppercase tracking-wider text-white/40">resposta em &lt; 24h</p>
         </div>
@@ -336,7 +396,7 @@
           </span>
         </div>
         <p class="font-mono text-xs uppercase tracking-wider text-white/40 mb-4">sistemas · ia · automações</p>
-        <p class="text-white/50 text-sm max-w-sm">tecnologia sob medida para empresas que querem parar de operar no improviso e começar a crescer com sistema.</p>
+        <p class="text-white/50 text-sm max-w-sm">Tecnologia sob medida para empresas que querem parar de operar no improviso e começar a crescer com sistema.</p>
       </div>
       <div class="md:col-span-3">
         <p class="eyebrow mb-5">navegação</p>
