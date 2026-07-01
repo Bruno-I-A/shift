@@ -5,7 +5,7 @@
 <title>Política de Privacidade · Shift Systems</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="Política de Privacidade da Shift Systems — como coletamos, usamos e protegemos seus dados, em conformidade com a LGPD." />
-<meta name="theme-color" content="#08080b" />
+<meta name="theme-color" content="#0A1428" />
 <meta name="robots" content="index, follow" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="shortcut icon" href="favicon.svg" />
@@ -21,11 +21,11 @@
       theme: {
         extend: {
           colors: {
-            ink: '#08080b',
-            ink2: '#0e0e13',
-            purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC', glow: 'rgba(181,107,255,0.55)' },
-            signal: { DEFAULT: '#38F4FF', glow: 'rgba(56,244,255,0.42)' },
-            paper: '#f6f5f1',
+            navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
+            accent: { DEFAULT: '#FF6B35', deep: '#E8501C' },
+            gold: '#FFC93D',
+            purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
+            paper: '#F6F5F1',
           },
           fontFamily: {
             sans: ['Geist', 'system-ui', 'sans-serif'],
@@ -40,12 +40,13 @@
 <style>
   :root {
     color-scheme: dark;
-    --shift-ink: #08080b;
-    --shift-paper: #f6f5f1;
+    --shift-ink: #0A1428;
+    --shift-paper: #F6F5F1;
     --shift-purple: #B56BFF;
-    --shift-signal: #38F4FF;
+    --shift-accent: #FF6B35;
+    --shift-gold: #FFC93D;
     --shift-border: rgba(255,255,255,0.1);
-    --shift-focus: rgba(56,244,255,0.74);
+    --shift-focus: rgba(255,201,61,0.85);
   }
   *, *::before, *::after { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -54,32 +55,32 @@
 
   .page-bg {
     background:
-      radial-gradient(900px 560px at 82% -12%, rgba(56,244,255,0.08), transparent 58%),
-      radial-gradient(1100px 700px at 80% -10%, rgba(181,107,255,0.18), transparent 60%),
-      radial-gradient(800px 600px at -10% 30%, rgba(138,77,204,0.10), transparent 60%),
+      radial-gradient(1100px 700px at 80% -10%, rgba(43,108,209,0.16), transparent 60%),
+      radial-gradient(800px 620px at -10% 28%, rgba(23,64,128,0.2), transparent 60%),
+      radial-gradient(1000px 620px at 50% 115%, rgba(255,107,53,0.12), transparent 62%),
       var(--shift-ink);
   }
   .grid-overlay {
     position: fixed; inset: 0; pointer-events: none; z-index: 0;
     background-image:
       linear-gradient(rgba(255,255,255,0.026) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(56,244,255,0.026) 1px, transparent 1px);
+      linear-gradient(90deg, rgba(255,255,255,0.026) 1px, transparent 1px);
     background-size: 64px 64px;
     mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
     -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
   }
 
   .glass {
-    background: linear-gradient(180deg, rgba(15,15,22,0.88), rgba(8,8,11,0.74));
+    background: linear-gradient(180deg, rgba(18,32,60,0.72), rgba(10,20,40,0.55));
     border: 1px solid var(--shift-border);
-    box-shadow: 0 18px 70px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow: 0 18px 70px rgba(2,8,20,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
   }
 
   .eyebrow {
     font-family: 'Geist Mono', monospace; font-size: 11px;
     letter-spacing: 0.24em; text-transform: uppercase;
-    color: var(--shift-signal);
-    text-shadow: 0 0 22px rgba(56,244,255,0.22);
+    color: var(--shift-gold);
+    text-shadow: 0 0 22px rgba(255,201,61,0.35);
   }
   .display {
     font-family: 'Geist', sans-serif; font-weight: 600;
@@ -87,10 +88,10 @@
   }
   .hr-grad {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(181,107,255,0.2), rgba(56,244,255,0.18), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,107,53,0.28), rgba(255,201,61,0.22), transparent);
   }
 
-  .ring-glow { box-shadow: 0 0 50px 0 rgba(181,107,255,0.42), 0 0 26px -10px rgba(56,244,255,0.42); }
+  .ring-glow { box-shadow: 0 0 50px 0 rgba(181,107,255,0.42); }
 
   /* ===== legal prose ===== */
   .prose h2 {
@@ -101,7 +102,7 @@
   }
   .prose h2 .n {
     font-family: 'Geist Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em;
-    color: rgba(181,107,255,0.9); transform: translateY(-2px);
+    color: rgba(255,201,61,0.9); transform: translateY(-2px);
   }
   .prose h3 {
     font-weight: 600; font-size: 1.02rem; color: rgba(246,245,241,0.92);
@@ -116,16 +117,16 @@
   .prose li::before {
     content: ''; position: absolute; left: 0; top: 0.62em;
     width: 6px; height: 6px; border-radius: 9999px;
-    background: var(--shift-purple); box-shadow: 0 0 10px rgba(181,107,255,0.7);
+    background: var(--shift-accent); box-shadow: 0 0 10px rgba(255,107,53,0.7);
   }
   .prose strong { color: var(--shift-paper); font-weight: 600; }
-  .prose a { color: var(--shift-signal); text-decoration: none; }
+  .prose a { color: var(--shift-gold); text-decoration: none; }
   .prose a:hover { text-decoration: underline; }
 
-  ::selection { background: var(--shift-signal); color: #041013; }
+  ::selection { background: var(--shift-gold); color: #14100a; }
   :where(a, button):focus-visible {
     outline: 2px solid var(--shift-focus); outline-offset: 4px;
-    box-shadow: 0 0 0 6px rgba(56,244,255,0.12);
+    box-shadow: 0 0 0 6px rgba(255,201,61,0.12);
   }
 </style>
 </head>
@@ -136,8 +137,8 @@
 
   <!-- top bar -->
   <header class="flex items-center justify-between mb-14">
-    <a href="index.html#inicio" class="flex items-center gap-3 group">
-      <span class="ring-glow inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#0b0b10] border border-white/10">
+    <a href="index.html" class="flex items-center gap-3 group">
+      <span class="ring-glow inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#0E1D3A] border border-white/10">
         <svg viewBox="0 0 100 100" width="20" height="20">
           <rect x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
           <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" fill="none" stroke-linecap="round" />
@@ -149,7 +150,7 @@
         <span class="ml-1.5 font-mono font-normal text-[10px] tracking-[0.32em] uppercase text-white/45 -translate-y-px">Systems</span>
       </span>
     </a>
-    <a href="index.html#inicio" class="text-sm text-white/65 hover:text-white inline-flex items-center gap-2 transition-colors">
+    <a href="index.html" class="text-sm text-white/65 hover:text-white inline-flex items-center gap-2 transition-colors">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       voltar ao site
     </a>
@@ -158,7 +159,7 @@
   <!-- title -->
   <div class="mb-12">
     <div class="eyebrow mb-5">Shift / Systems · legal</div>
-    <h1 class="display text-4xl md:text-5xl">política de privacidade<span class="text-purple">.</span></h1>
+    <h1 class="display text-4xl md:text-5xl">política de privacidade<span class="text-accent">.</span></h1>
     <p class="mt-6 text-white/60 leading-relaxed">
       Esta política explica como a <strong class="text-white/85">Shift Systems</strong> coleta, utiliza, armazena e protege os
       dados pessoais de quem interage com nosso site e nossos serviços, em conformidade com a
@@ -283,7 +284,7 @@
 
   <footer class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono tracking-wider uppercase text-white/40">
     <div>© 2026 Shift Systems · todos os direitos reservados</div>
-    <a href="index.html#inicio" class="hover:text-purple transition-colors">voltar ao site →</a>
+    <a href="index.html" class="hover:text-accent transition-colors">voltar ao site →</a>
   </footer>
 
 </div>

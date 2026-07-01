@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>404 · Shift Systems</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#0A1428" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
+          accent: { DEFAULT: '#FF6B35', deep: '#E8501C' },
+          gold: '#FFC93D',
+          paper: '#F6F5F1',
+          purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
+        },
+        fontFamily: {
+          sans: ['Geist', 'system-ui', 'sans-serif'],
+          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+        },
+      }
+    }
+  };
+</script>
+<link rel="stylesheet" href="assets/site.css" />
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body class="page-bg">
+
+<main class="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="relative max-w-xl mx-auto text-center py-20">
+    <svg class="mx-auto mb-8 compass-spin" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#FFC93D" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <path class="compass-needle" d="M15.5 8.5l-2.2 5.8-4.8 1.2 2.2-5.8 4.8-1.2z" fill="rgba(255,107,53,0.35)" stroke="#FF6B35" />
+    </svg>
+    <p class="eyebrow mb-4">erro 404</p>
+    <h1 class="display text-4xl md:text-6xl text-paper">essa ilha não está na sua rota<span class="text-accent">.</span></h1>
+    <p class="mt-6 text-white/55">a página que você procura não existe — ou navegou para outro lugar. o log pose aponta de volta pro início.</p>
+    <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="index.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium w-full sm:w-auto">
+        voltar ao início
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+      </a>
+      <a href="diagnostico.html" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto">fazer o diagnóstico</a>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

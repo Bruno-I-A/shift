@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Soluções · Shift Systems</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Sistemas sob medida, automações, agentes de IA, dashboards e integrações — o que a Shift Systems constrói para tirar sua empresa do modo manual." />
+<meta name="theme-color" content="#0A1428" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Soluções · Shift Systems" />
+<meta property="og:description" content="Sistema, automação ou agente de IA — o que faz sentido pro seu caso." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
+          accent: { DEFAULT: '#FF6B35', deep: '#E8501C' },
+          gold: '#FFC93D',
+          paper: '#F6F5F1',
+          purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
+        },
+        fontFamily: {
+          sans: ['Geist', 'system-ui', 'sans-serif'],
+          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+        },
+      }
+    }
+  };
+</script>
+<link rel="stylesheet" href="assets/site.css" />
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body class="page-bg">
+
+<header class="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
+  <div id="site-header" class="mx-auto rounded-full px-5 md:px-7 py-3 flex items-center justify-between">
+    <a href="index.html" data-mark class="relative flex items-center gap-3 cursor-pointer" aria-label="Shift Systems — página inicial">
+      <span class="relative inline-block">
+        <svg class="mark-glow mark-shift" width="24" height="24" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <rect class="slab-top" x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+          <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
+          <rect class="slab-bottom" x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+        </svg>
+        <svg class="straw-hat" viewBox="0 0 48 26" aria-hidden="true">
+          <ellipse cx="24" cy="19" rx="22" ry="5.5" fill="#E8C56A" />
+          <path d="M10 19 C10 8 16 3 24 3 C32 3 38 8 38 19 Z" fill="#F2D98B" />
+          <path d="M10.4 15.5 C14 13 34 13 37.6 15.5 L37.9 18 C30 15.5 18 15.5 10.1 18 Z" fill="#C0392B" />
+        </svg>
+      </span>
+      <span class="flex items-baseline gap-2">
+        <span class="font-semibold tracking-tight text-paper">Shift<span class="text-purple">.</span></span>
+        <span class="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">Systems</span>
+      </span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2" aria-label="navegação principal">
+      <a href="index.html" class="nav-link text-sm px-4 py-2">início</a>
+      <a href="solucoes.html" class="nav-link active text-sm px-4 py-2">soluções</a>
+      <a href="processo.html" class="nav-link text-sm px-4 py-2">processo</a>
+      <a href="contato.html" class="nav-link text-sm px-4 py-2">contato</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a href="diagnostico.html" class="btn-primary hidden sm:inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium">
+        fazer diagnóstico
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+      </a>
+      <button id="menu-btn" class="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-white/15 cursor-pointer" aria-label="abrir menu" aria-controls="mobile-menu" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="mobile-menu" aria-label="menu">
+  <a href="index.html" class="nav-link">início</a>
+  <a href="solucoes.html" class="nav-link active">soluções</a>
+  <a href="processo.html" class="nav-link">processo</a>
+  <a href="contato.html" class="nav-link">contato</a>
+  <a href="diagnostico.html" class="btn-primary rounded-full px-8 py-4 text-lg font-medium mt-4">fazer diagnóstico</a>
+</div>
+
+<main>
+  <!-- ===== hero da página ===== -->
+  <section class="relative pt-36 sm:pt-44 pb-10 md:pb-16 px-6 md:px-12 lg:px-20 overflow-hidden">
+    <div class="grid-overlay" aria-hidden="true"></div>
+    <div class="relative max-w-7xl mx-auto">
+      <div class="reveal max-w-3xl">
+        <div class="num-tag mb-4">/ parada 02 — soluções</div>
+        <h1 class="display text-4xl md:text-6xl lg:text-7xl text-paper">
+          não é sobre parecer tech. é sobre colocar sua operação no <span class="text-white/40">modo automático</span><span class="text-accent">.</span>
+        </h1>
+        <p class="mt-6 text-lg text-white/60 max-w-2xl">algumas empresas precisam de um sistema inteiro. outras só precisam eliminar três tarefas que travam o dia. a Shift entra nesse ponto exato.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== builds ===== -->
+  <section class="relative px-6 md:px-12 lg:px-20 py-10 md:py-16">
+    <div class="max-w-7xl mx-auto">
+      <div class="stagger grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        <!-- vendas -->
+        <div class="glass spot rounded-2xl p-7 flex flex-col">
+          <div class="flex items-start justify-between mb-6">
+            <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2 5 4-10 2 5h6" /></svg>
+            </div>
+            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold">vendas</span>
+          </div>
+          <h2 class="text-2xl font-semibold text-paper">inbox de leads inteligente</h2>
+          <p class="mt-3 text-white/55 text-sm flex-1">captura WhatsApp, Instagram e formulário em uma fila única, qualifica o lead e manda o próximo passo pro CRM.</p>
+          <div class="hr-grad my-5"></div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-white/45">
+            <span>lead entrou</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>IA pergunta</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>CRM atualizado</span>
+          </div>
+        </div>
+
+        <!-- operação -->
+        <div class="glass spot rounded-2xl p-7 flex flex-col">
+          <div class="flex items-start justify-between mb-6">
+            <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h8" /><path d="M4 12h16" /><path d="M4 18h8" /><circle cx="16" cy="6" r="2" /><circle cx="8" cy="18" r="2" /></svg>
+            </div>
+            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold">operação</span>
+          </div>
+          <h2 class="text-2xl font-semibold text-paper">painel de execução</h2>
+          <p class="mt-3 text-white/55 text-sm flex-1">um cockpit simples para acompanhar pedidos, tarefas, prazos, responsáveis e gargalos sem depender de grupo ou áudio perdido.</p>
+          <div class="hr-grad my-5"></div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-white/45">
+            <span>pedido aberto</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>responsável definido</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>alerta de atraso</span>
+          </div>
+        </div>
+
+        <!-- financeiro / automações -->
+        <div id="automacoes" class="glass spot rounded-2xl p-7 flex flex-col">
+          <div class="flex items-start justify-between mb-6">
+            <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7" /><path d="M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7" /></svg>
+            </div>
+            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold">financeiro</span>
+          </div>
+          <h2 class="text-2xl font-semibold text-paper">cobrança automática</h2>
+          <p class="mt-3 text-white/55 text-sm flex-1">emissão, lembrete, status de pagamento e follow-up rodando sozinhos, com histórico limpo e visível.</p>
+          <div class="hr-grad my-5"></div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-white/45">
+            <span>boleto gerado</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>cliente avisado</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>baixa conferida</span>
+          </div>
+        </div>
+
+        <!-- atendimento / agentes -->
+        <div id="agentes" class="glass spot rounded-2xl p-7 flex flex-col">
+          <div class="flex items-start justify-between mb-6">
+            <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z" /></svg>
+            </div>
+            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold">atendimento</span>
+          </div>
+          <h2 class="text-2xl font-semibold text-paper">agente com memória da empresa</h2>
+          <p class="mt-3 text-white/55 text-sm flex-1">um assistente que responde no tom da marca, consulta regras internas e chama humano quando a conversa precisa de cuidado.</p>
+          <div class="hr-grad my-5"></div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-white/45">
+            <span>dúvida recebida</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>base consultada</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>resposta enviada</span>
+          </div>
+        </div>
+
+        <!-- gestão -->
+        <div class="glass spot rounded-2xl p-7 flex flex-col">
+          <div class="flex items-start justify-between mb-6">
+            <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V10" /><path d="M12 20V4" /><path d="M19 20v-7" /></svg>
+            </div>
+            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold">gestão</span>
+          </div>
+          <h2 class="text-2xl font-semibold text-paper">dashboard do dono</h2>
+          <p class="mt-3 text-white/55 text-sm flex-1">receita, conversão, canais, gargalos e metas em uma tela só. menos feeling, mais leitura do jogo.</p>
+          <div class="hr-grad my-5"></div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-white/45">
+            <span>dados puxados</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>KPI calculado</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>alerta disparado</span>
+          </div>
+        </div>
+
+        <!-- sistema interno -->
+        <div id="sistemas" class="glass spot rounded-2xl p-7 flex flex-col">
+          <div class="flex items-start justify-between mb-6">
+            <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5z" /><path d="M3 13l9 5 9-5" /></svg>
+            </div>
+            <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold">sistema interno</span>
+          </div>
+          <h2 class="text-2xl font-semibold text-paper">app sob medida</h2>
+          <p class="mt-3 text-white/55 text-sm flex-1">login, permissões, cadastro, busca, relatórios e automações internas em uma ferramenta feita para o seu fluxo real.</p>
+          <div class="hr-grad my-5"></div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-white/45">
+            <span>time acessa</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>processo roda</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            <span>relatório sai</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- integrações -->
+      <div class="reveal mt-5 glass-strong rounded-2xl p-7 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
+        <div class="flex-1">
+          <h2 class="text-2xl font-semibold text-paper">tudo isso conversando com o que você já usa</h2>
+          <p class="mt-2 text-white/55 text-sm">WhatsApp API, CRMs, ERPs, bancos de dados, planilhas e o que mais fizer parte da sua operação.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">WhatsApp API</span>
+          <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">CRM</span>
+          <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">ERP</span>
+          <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">n8n</span>
+          <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">bancos de dados</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="relative px-6 md:px-12 lg:px-20 py-16 md:py-24">
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="reveal">
+        <h2 class="display text-3xl md:text-5xl text-paper">não sabe por onde começar<span class="text-accent">?</span></h2>
+        <p class="mt-4 text-white/60">o diagnóstico aponta a próxima parada da sua rota — em 3 minutos, sem compromisso.</p>
+        <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium mt-8">
+          fazer o diagnóstico
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="relative px-6 md:px-12 lg:px-20 pt-16 pb-10">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-6">
+        <div class="flex items-center gap-3 mb-4">
+          <svg width="32" height="32" viewBox="0 0 100 100" fill="none" class="mark-glow" aria-hidden="true">
+            <rect x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+            <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
+            <rect x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+          </svg>
+          <span class="flex items-baseline gap-2">
+            <span class="font-semibold tracking-tight text-paper">Shift<span class="text-purple">.</span></span>
+            <span class="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">Systems</span>
+          </span>
+        </div>
+        <p class="font-mono text-xs uppercase tracking-wider text-white/40 mb-4">sistemas · ia · automações</p>
+        <p class="text-white/50 text-sm max-w-sm">tecnologia sob medida para empresas que querem parar de operar no improviso e começar a crescer com sistema.</p>
+      </div>
+      <div class="md:col-span-3">
+        <p class="eyebrow mb-5">navegação</p>
+        <ul class="space-y-3 text-sm">
+          <li><a href="index.html" class="text-white/55 hover:text-paper transition-colors">início</a></li>
+          <li><a href="solucoes.html" class="text-white/55 hover:text-paper transition-colors">soluções</a></li>
+          <li><a href="processo.html" class="text-white/55 hover:text-paper transition-colors">processo</a></li>
+          <li><a href="diagnostico.html" class="text-white/55 hover:text-paper transition-colors">diagnóstico</a></li>
+          <li><a href="contato.html" class="text-white/55 hover:text-paper transition-colors">contato</a></li>
+        </ul>
+      </div>
+      <div class="md:col-span-3">
+        <p class="eyebrow mb-5">contato</p>
+        <ul class="space-y-3 text-sm">
+          <li><a href="https://wa.me/5554984184808" target="_blank" rel="noopener" class="text-white/55 hover:text-paper transition-colors">WhatsApp</a></li>
+          <li><a href="https://instagram.com/shift_systemss" target="_blank" rel="noopener" class="text-white/55 hover:text-paper transition-colors">@shift_systemss</a></li>
+          <li><a href="mailto:hello@shift.systems" class="text-white/55 hover:text-paper transition-colors">hello@shift.systems</a></li>
+          <li><a href="privacidade.html" class="text-white/55 hover:text-paper transition-colors">privacidade</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="hr-grad my-8"></div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs uppercase tracking-wider text-white/40">
+      <span>© <span data-year>2026</span> shift systems</span>
+      <span>feito em mar aberto · v2.0</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/site.js" defer></script>
+</body>
+</html>

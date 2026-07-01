@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Contato · Shift Systems</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Fale com a Shift Systems — WhatsApp, Instagram ou e-mail. Resposta em menos de 24h." />
+<meta name="theme-color" content="#0A1428" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Contato · Shift Systems" />
+<meta property="og:description" content="Vamos identificar onde sua empresa está perdendo tempo. Resposta em < 24h." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
+          accent: { DEFAULT: '#FF6B35', deep: '#E8501C' },
+          gold: '#FFC93D',
+          paper: '#F6F5F1',
+          purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
+        },
+        fontFamily: {
+          sans: ['Geist', 'system-ui', 'sans-serif'],
+          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+        },
+      }
+    }
+  };
+</script>
+<link rel="stylesheet" href="assets/site.css" />
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body class="page-bg">
+
+<header class="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
+  <div id="site-header" class="mx-auto rounded-full px-5 md:px-7 py-3 flex items-center justify-between">
+    <a href="index.html" data-mark class="relative flex items-center gap-3 cursor-pointer" aria-label="Shift Systems — página inicial">
+      <span class="relative inline-block">
+        <svg class="mark-glow mark-shift" width="24" height="24" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <rect class="slab-top" x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+          <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
+          <rect class="slab-bottom" x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+        </svg>
+        <svg class="straw-hat" viewBox="0 0 48 26" aria-hidden="true">
+          <ellipse cx="24" cy="19" rx="22" ry="5.5" fill="#E8C56A" />
+          <path d="M10 19 C10 8 16 3 24 3 C32 3 38 8 38 19 Z" fill="#F2D98B" />
+          <path d="M10.4 15.5 C14 13 34 13 37.6 15.5 L37.9 18 C30 15.5 18 15.5 10.1 18 Z" fill="#C0392B" />
+        </svg>
+      </span>
+      <span class="flex items-baseline gap-2">
+        <span class="font-semibold tracking-tight text-paper">Shift<span class="text-purple">.</span></span>
+        <span class="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">Systems</span>
+      </span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2" aria-label="navegação principal">
+      <a href="index.html" class="nav-link text-sm px-4 py-2">início</a>
+      <a href="solucoes.html" class="nav-link text-sm px-4 py-2">soluções</a>
+      <a href="processo.html" class="nav-link text-sm px-4 py-2">processo</a>
+      <a href="contato.html" class="nav-link active text-sm px-4 py-2">contato</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a href="diagnostico.html" class="btn-primary hidden sm:inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium">
+        fazer diagnóstico
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+      </a>
+      <button id="menu-btn" class="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-white/15 cursor-pointer" aria-label="abrir menu" aria-controls="mobile-menu" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="mobile-menu" aria-label="menu">
+  <a href="index.html" class="nav-link">início</a>
+  <a href="solucoes.html" class="nav-link">soluções</a>
+  <a href="processo.html" class="nav-link">processo</a>
+  <a href="contato.html" class="nav-link active">contato</a>
+  <a href="diagnostico.html" class="btn-primary rounded-full px-8 py-4 text-lg font-medium mt-4">fazer diagnóstico</a>
+</div>
+
+<main>
+  <!-- ===== hero ===== -->
+  <section class="relative pt-36 sm:pt-44 pb-10 px-6 md:px-12 lg:px-20 overflow-hidden">
+    <div class="grid-overlay" aria-hidden="true"></div>
+    <div class="relative max-w-3xl mx-auto text-center">
+      <div class="reveal inline-flex items-center gap-3 rounded-full border border-white/10 px-4 py-2 mb-8">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-60"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-gold"></span>
+        </span>
+        <span class="eyebrow">vagas abertas · 2026</span>
+      </div>
+      <h1 class="reveal display text-4xl md:text-6xl text-paper">
+        o manual custa mais caro<br />do que você imagina<span class="text-accent">.</span>
+      </h1>
+      <p class="reveal mt-6 text-white/60 max-w-xl mx-auto">vamos identificar onde sua empresa está perdendo tempo e transformar isso em sistema, automação ou IA.</p>
+    </div>
+  </section>
+
+  <!-- ===== canais ===== -->
+  <section class="relative px-6 md:px-12 lg:px-20 py-10 md:py-16">
+    <div class="max-w-5xl mx-auto">
+      <div class="stagger grid md:grid-cols-3 gap-5">
+        <a href="https://wa.me/5554984184808?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Shift%20Systems%20e%20quero%20tirar%20minha%20empresa%20do%20modo%20manual." target="_blank" rel="noopener" class="glass spot rounded-2xl p-7 cursor-pointer group">
+          <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 01-12.4 7.6L3 21l1.9-5.6A8.5 8.5 0 1121 11.5z" /></svg>
+          </div>
+          <h2 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">WhatsApp</h2>
+          <p class="mt-2 text-sm text-white/55">o caminho mais rápido. mande um oi e a gente já começa a mapear.</p>
+          <p class="mt-4 font-mono text-xs uppercase tracking-wider text-gold">resposta &lt; 24h</p>
+        </a>
+
+        <a href="https://instagram.com/shift_systemss" target="_blank" rel="noopener" class="glass spot rounded-2xl p-7 cursor-pointer group">
+          <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.2" cy="6.8" r="0.8" fill="#FF6B35" /></svg>
+          </div>
+          <h2 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">Instagram</h2>
+          <p class="mt-2 text-sm text-white/55">bastidores, projetos e conteúdo sobre operação sem caos.</p>
+          <p class="mt-4 font-mono text-xs uppercase tracking-wider text-gold">@shift_systemss</p>
+        </a>
+
+        <a href="mailto:hello@shift.systems" class="glass spot rounded-2xl p-7 cursor-pointer group">
+          <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>
+          </div>
+          <h2 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">e-mail</h2>
+          <p class="mt-2 text-sm text-white/55">para propostas, parcerias e conversas mais formais.</p>
+          <p class="mt-4 font-mono text-xs uppercase tracking-wider text-gold">hello@shift.systems</p>
+        </a>
+      </div>
+
+      <div class="reveal mt-10 glass-strong rounded-2xl p-7 md:p-8 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+        <div class="flex-1">
+          <h2 class="text-xl font-semibold text-paper">ainda não sabe o que precisa?</h2>
+          <p class="mt-1 text-sm text-white/55">o diagnóstico de 3 minutos descobre por você — e já chega na conversa com a rota pronta.</p>
+        </div>
+        <a href="diagnostico.html" class="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium shrink-0">
+          fazer o diagnóstico
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="relative px-6 md:px-12 lg:px-20 pt-16 pb-10">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-6">
+        <div class="flex items-center gap-3 mb-4">
+          <svg width="32" height="32" viewBox="0 0 100 100" fill="none" class="mark-glow" aria-hidden="true">
+            <rect x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+            <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
+            <rect x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+          </svg>
+          <span class="flex items-baseline gap-2">
+            <span class="font-semibold tracking-tight text-paper">Shift<span class="text-purple">.</span></span>
+            <span class="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">Systems</span>
+          </span>
+        </div>
+        <p class="font-mono text-xs uppercase tracking-wider text-white/40 mb-4">sistemas · ia · automações</p>
+        <p class="text-white/50 text-sm max-w-sm">tecnologia sob medida para empresas que querem parar de operar no improviso e começar a crescer com sistema.</p>
+      </div>
+      <div class="md:col-span-3">
+        <p class="eyebrow mb-5">navegação</p>
+        <ul class="space-y-3 text-sm">
+          <li><a href="index.html" class="text-white/55 hover:text-paper transition-colors">início</a></li>
+          <li><a href="solucoes.html" class="text-white/55 hover:text-paper transition-colors">soluções</a></li>
+          <li><a href="processo.html" class="text-white/55 hover:text-paper transition-colors">processo</a></li>
+          <li><a href="diagnostico.html" class="text-white/55 hover:text-paper transition-colors">diagnóstico</a></li>
+          <li><a href="contato.html" class="text-white/55 hover:text-paper transition-colors">contato</a></li>
+        </ul>
+      </div>
+      <div class="md:col-span-3">
+        <p class="eyebrow mb-5">contato</p>
+        <ul class="space-y-3 text-sm">
+          <li><a href="https://wa.me/5554984184808" target="_blank" rel="noopener" class="text-white/55 hover:text-paper transition-colors">WhatsApp</a></li>
+          <li><a href="https://instagram.com/shift_systemss" target="_blank" rel="noopener" class="text-white/55 hover:text-paper transition-colors">@shift_systemss</a></li>
+          <li><a href="mailto:hello@shift.systems" class="text-white/55 hover:text-paper transition-colors">hello@shift.systems</a></li>
+          <li><a href="privacidade.html" class="text-white/55 hover:text-paper transition-colors">privacidade</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="hr-grad my-8"></div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs uppercase tracking-wider text-white/40">
+      <span>© <span data-year>2026</span> shift systems</span>
+      <span>feito em mar aberto · v2.0</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Processo · Shift Systems</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Do problema ao sistema funcionando: quatro etapas, sem mistério, cada uma com entregáveis claros e prazos definidos." />
+<meta name="theme-color" content="#0A1428" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Processo · Shift Systems" />
+<meta property="og:description" content="Quatro etapas, sem mistério. Do diagnóstico à operação rodando sozinha." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
+          accent: { DEFAULT: '#FF6B35', deep: '#E8501C' },
+          gold: '#FFC93D',
+          paper: '#F6F5F1',
+          purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
+        },
+        fontFamily: {
+          sans: ['Geist', 'system-ui', 'sans-serif'],
+          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+        },
+      }
+    }
+  };
+</script>
+<link rel="stylesheet" href="assets/site.css" />
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body class="page-bg">
+
+<header class="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
+  <div id="site-header" class="mx-auto rounded-full px-5 md:px-7 py-3 flex items-center justify-between">
+    <a href="index.html" data-mark class="relative flex items-center gap-3 cursor-pointer" aria-label="Shift Systems — página inicial">
+      <span class="relative inline-block">
+        <svg class="mark-glow mark-shift" width="24" height="24" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <rect class="slab-top" x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+          <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
+          <rect class="slab-bottom" x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+        </svg>
+        <svg class="straw-hat" viewBox="0 0 48 26" aria-hidden="true">
+          <ellipse cx="24" cy="19" rx="22" ry="5.5" fill="#E8C56A" />
+          <path d="M10 19 C10 8 16 3 24 3 C32 3 38 8 38 19 Z" fill="#F2D98B" />
+          <path d="M10.4 15.5 C14 13 34 13 37.6 15.5 L37.9 18 C30 15.5 18 15.5 10.1 18 Z" fill="#C0392B" />
+        </svg>
+      </span>
+      <span class="flex items-baseline gap-2">
+        <span class="font-semibold tracking-tight text-paper">Shift<span class="text-purple">.</span></span>
+        <span class="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">Systems</span>
+      </span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2" aria-label="navegação principal">
+      <a href="index.html" class="nav-link text-sm px-4 py-2">início</a>
+      <a href="solucoes.html" class="nav-link text-sm px-4 py-2">soluções</a>
+      <a href="processo.html" class="nav-link active text-sm px-4 py-2">processo</a>
+      <a href="contato.html" class="nav-link text-sm px-4 py-2">contato</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a href="diagnostico.html" class="btn-primary hidden sm:inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium">
+        fazer diagnóstico
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+      </a>
+      <button id="menu-btn" class="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-white/15 cursor-pointer" aria-label="abrir menu" aria-controls="mobile-menu" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="mobile-menu" aria-label="menu">
+  <a href="index.html" class="nav-link">início</a>
+  <a href="solucoes.html" class="nav-link">soluções</a>
+  <a href="processo.html" class="nav-link active">processo</a>
+  <a href="contato.html" class="nav-link">contato</a>
+  <a href="diagnostico.html" class="btn-primary rounded-full px-8 py-4 text-lg font-medium mt-4">fazer diagnóstico</a>
+</div>
+
+<main>
+  <!-- ===== hero da página ===== -->
+  <section class="relative pt-36 sm:pt-44 pb-10 md:pb-16 px-6 md:px-12 lg:px-20 overflow-hidden">
+    <div class="grid-overlay" aria-hidden="true"></div>
+    <div class="relative max-w-7xl mx-auto">
+      <div class="reveal max-w-3xl">
+        <div class="num-tag mb-4">/ parada 03 — como trabalhamos</div>
+        <h1 class="display text-4xl md:text-6xl lg:text-7xl text-paper">
+          do problema ao sistema <span class="text-white/40">funcionando</span><span class="text-accent">.</span>
+        </h1>
+        <p class="mt-6 text-lg text-white/60 max-w-2xl">quatro etapas, sem mistério. cada uma com entregáveis claros e prazos definidos.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== timeline ===== -->
+  <section class="relative px-6 md:px-12 lg:px-20 py-10 md:py-16">
+    <div class="max-w-5xl mx-auto relative">
+      <div class="absolute left-[39px] md:left-[39px] top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-accent/40 to-transparent hidden sm:block" aria-hidden="true">
+        <span class="travel-dot"></span>
+      </div>
+
+      <div class="space-y-6">
+        <!-- 01 -->
+        <div class="reveal grid sm:grid-cols-[80px_1fr] gap-5 items-start">
+          <div class="glass rounded-2xl w-20 h-20 flex items-center justify-center relative z-10">
+            <span class="font-mono text-accent text-lg">01</span>
+          </div>
+          <div class="glass spot rounded-2xl p-7">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+              <h2 class="text-2xl font-semibold text-paper">diagnóstico</h2>
+              <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent">mapa de gargalos</span>
+              <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent">ROI estimado</span>
+            </div>
+            <p class="text-white/55 text-sm">a gente entra na sua operação, entende onde o tempo e o dinheiro estão vazando e devolve um mapa claro do que atacar primeiro — com estimativa de retorno.</p>
+          </div>
+        </div>
+
+        <!-- 02 -->
+        <div class="reveal grid sm:grid-cols-[80px_1fr] gap-5 items-start">
+          <div class="glass rounded-2xl w-20 h-20 flex items-center justify-center relative z-10">
+            <span class="font-mono text-accent text-lg">02</span>
+          </div>
+          <div class="glass spot rounded-2xl p-7">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+              <h2 class="text-2xl font-semibold text-paper">mapeamento</h2>
+              <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent">blueprint técnico</span>
+              <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent">cronograma</span>
+            </div>
+            <p class="text-white/55 text-sm">desenhamos a rota: o que vai ser construído, com qual stack, integrando com o quê, em quanto tempo. você aprova antes de qualquer linha de código.</p>
+          </div>
+        </div>
+
+        <!-- 03 -->
+        <div class="reveal grid sm:grid-cols-[80px_1fr] gap-5 items-start">
+          <div class="glass rounded-2xl w-20 h-20 flex items-center justify-center relative z-10">
+            <span class="font-mono text-accent text-lg">03</span>
+          </div>
+          <div class="glass spot rounded-2xl p-7">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+              <h2 class="text-2xl font-semibold text-paper">desenvolvimento</h2>
+              <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent">releases semanais</span>
+              <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent">ambiente de teste</span>
+            </div>
+            <p class="text-white/55 text-sm">construção em ciclos curtos: toda semana algo novo funcionando no ambiente de teste, pra você validar cedo e ajustar barato.</p>
+          </div>
+        </div>
+
+        <!-- 04 -->
+        <div class="reveal grid sm:grid-cols-[80px_1fr] gap-5 items-start">
+          <div class="glass rounded-2xl w-20 h-20 flex items-center justify-center relative z-10">
+            <span class="font-mono text-accent text-lg">04</span>
+          </div>
+          <div class="glass spot rounded-2xl p-7">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+              <h2 class="text-2xl font-semibold text-paper">evolução</h2>
+              <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent">suporte</span>
+              <span class="font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent">novas features</span>
+            </div>
+            <p class="text-white/55 text-sm">sistema no ar não é o fim da rota. acompanhamos o uso, corrigimos rápido e evoluímos a ferramenta junto com o crescimento da sua operação.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== posicionamento ===== -->
+  <section class="relative px-6 md:px-12 lg:px-20 py-16 md:py-24">
+    <div class="max-w-6xl mx-auto">
+      <div class="reveal glass-strong rounded-3xl p-10 md:p-16 lg:p-20 relative overflow-hidden">
+        <svg width="380" height="380" viewBox="0 0 100 100" fill="none" class="absolute -top-20 -right-20 opacity-[0.06]" aria-hidden="true">
+          <rect x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+          <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
+          <rect x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+        </svg>
+        <div class="relative">
+          <div class="num-tag mb-6">/ posicionamento</div>
+          <h2 class="display text-3xl md:text-5xl lg:text-6xl text-paper">
+            tecnologia não precisa <span class="text-white/40 italic font-light">impressionar</span>.<br />
+            precisa <span class="text-accent">resolver</span><span class="text-accent">.</span>
+          </h2>
+          <p class="mt-8 text-white/60 max-w-2xl">nosso foco é criar soluções digitais que reduzem esforço operacional, organizam processos e ajudam empresas a crescerem com mais controle.</p>
+          <div class="hr-grad my-10"></div>
+          <p class="eyebrow mb-6">princípio</p>
+          <p class="display text-2xl md:text-4xl text-paper">
+            <span class="text-white/45">menos</span> improviso<span class="text-accent">.</span><br />
+            <span class="text-white/45">mais</span> sistema<span class="text-accent">.</span><br />
+            <span class="text-white/45">mais</span> resultado<span class="text-accent">.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="relative px-6 md:px-12 lg:px-20 py-16 md:py-24">
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="reveal">
+        <h2 class="display text-3xl md:text-5xl text-paper">a etapa 01 começa com você<span class="text-accent">.</span></h2>
+        <p class="mt-4 text-white/60">o diagnóstico online adianta o mapa de gargalos — em 3 minutos você já sai sabendo por onde começar.</p>
+        <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium mt-8">
+          fazer o diagnóstico
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="relative px-6 md:px-12 lg:px-20 pt-16 pb-10">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-6">
+        <div class="flex items-center gap-3 mb-4">
+          <svg width="32" height="32" viewBox="0 0 100 100" fill="none" class="mark-glow" aria-hidden="true">
+            <rect x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+            <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
+            <rect x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+          </svg>
+          <span class="flex items-baseline gap-2">
+            <span class="font-semibold tracking-tight text-paper">Shift<span class="text-purple">.</span></span>
+            <span class="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">Systems</span>
+          </span>
+        </div>
+        <p class="font-mono text-xs uppercase tracking-wider text-white/40 mb-4">sistemas · ia · automações</p>
+        <p class="text-white/50 text-sm max-w-sm">tecnologia sob medida para empresas que querem parar de operar no improviso e começar a crescer com sistema.</p>
+      </div>
+      <div class="md:col-span-3">
+        <p class="eyebrow mb-5">navegação</p>
+        <ul class="space-y-3 text-sm">
+          <li><a href="index.html" class="text-white/55 hover:text-paper transition-colors">início</a></li>
+          <li><a href="solucoes.html" class="text-white/55 hover:text-paper transition-colors">soluções</a></li>
+          <li><a href="processo.html" class="text-white/55 hover:text-paper transition-colors">processo</a></li>
+          <li><a href="diagnostico.html" class="text-white/55 hover:text-paper transition-colors">diagnóstico</a></li>
+          <li><a href="contato.html" class="text-white/55 hover:text-paper transition-colors">contato</a></li>
+        </ul>
+      </div>
+      <div class="md:col-span-3">
+        <p class="eyebrow mb-5">contato</p>
+        <ul class="space-y-3 text-sm">
+          <li><a href="https://wa.me/5554984184808" target="_blank" rel="noopener" class="text-white/55 hover:text-paper transition-colors">WhatsApp</a></li>
+          <li><a href="https://instagram.com/shift_systemss" target="_blank" rel="noopener" class="text-white/55 hover:text-paper transition-colors">@shift_systemss</a></li>
+          <li><a href="mailto:hello@shift.systems" class="text-white/55 hover:text-paper transition-colors">hello@shift.systems</a></li>
+          <li><a href="privacidade.html" class="text-white/55 hover:text-paper transition-colors">privacidade</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="hr-grad my-8"></div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs uppercase tracking-wider text-white/40">
+      <span>© <span data-year>2026</span> shift systems</span>
+      <span>feito em mar aberto · v2.0</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/site.js" defer></script>
+</body>
+</html>

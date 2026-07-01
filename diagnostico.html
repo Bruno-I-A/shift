@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Diagnóstico · Shift Systems</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Responda 4 perguntas e descubra onde sua empresa está perdendo tempo e dinheiro — e o que construir primeiro para resolver." />
+<meta name="theme-color" content="#0A1428" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Diagnóstico · Shift Systems" />
+<meta property="og:description" content="4 perguntas, 3 minutos. Descubra o que construir primeiro." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
+          accent: { DEFAULT: '#FF6B35', deep: '#E8501C' },
+          gold: '#FFC93D',
+          paper: '#F6F5F1',
+          purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
+        },
+        fontFamily: {
+          sans: ['Geist', 'system-ui', 'sans-serif'],
+          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+        },
+      }
+    }
+  };
+</script>
+<link rel="stylesheet" href="assets/site.css" />
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body class="page-bg">
+
+<header class="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
+  <div id="site-header" class="mx-auto rounded-full px-5 md:px-7 py-3 flex items-center justify-between">
+    <a href="index.html" data-mark class="relative flex items-center gap-3 cursor-pointer" aria-label="Shift Systems — página inicial">
+      <span class="relative inline-block">
+        <svg class="mark-glow mark-shift" width="24" height="24" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <rect class="slab-top" x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
+          <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
+          <rect class="slab-bottom" x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
+        </svg>
+        <svg class="straw-hat" viewBox="0 0 48 26" aria-hidden="true">
+          <ellipse cx="24" cy="19" rx="22" ry="5.5" fill="#E8C56A" />
+          <path d="M10 19 C10 8 16 3 24 3 C32 3 38 8 38 19 Z" fill="#F2D98B" />
+          <path d="M10.4 15.5 C14 13 34 13 37.6 15.5 L37.9 18 C30 15.5 18 15.5 10.1 18 Z" fill="#C0392B" />
+        </svg>
+      </span>
+      <span class="flex items-baseline gap-2">
+        <span class="font-semibold tracking-tight text-paper">Shift<span class="text-purple">.</span></span>
+        <span class="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">Systems</span>
+      </span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2" aria-label="navegação principal">
+      <a href="index.html" class="nav-link text-sm px-4 py-2">início</a>
+      <a href="solucoes.html" class="nav-link text-sm px-4 py-2">soluções</a>
+      <a href="processo.html" class="nav-link text-sm px-4 py-2">processo</a>
+      <a href="contato.html" class="nav-link text-sm px-4 py-2">contato</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a href="contato.html" class="btn-ghost hidden sm:inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm">falar com a Shift</a>
+      <button id="menu-btn" class="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-white/15 cursor-pointer" aria-label="abrir menu" aria-controls="mobile-menu" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="mobile-menu" aria-label="menu">
+  <a href="index.html" class="nav-link">início</a>
+  <a href="solucoes.html" class="nav-link">soluções</a>
+  <a href="processo.html" class="nav-link">processo</a>
+  <a href="contato.html" class="nav-link">contato</a>
+</div>
+
+<main>
+  <!-- ===== hero da página ===== -->
+  <section class="relative pt-36 sm:pt-44 pb-8 px-6 md:px-12 lg:px-20 overflow-hidden">
+    <div class="grid-overlay" aria-hidden="true"></div>
+    <div class="relative max-w-3xl mx-auto text-center">
+      <div class="reveal flex items-center justify-center gap-3 mb-6">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC93D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M15 9l-2 5-4 1 2-5 4-1z" /></svg>
+        <span class="eyebrow">log pose · diagnóstico</span>
+      </div>
+      <h1 class="reveal display text-4xl md:text-6xl text-paper">onde sua empresa está perdendo <span class="text-white/40">velocidade</span><span class="text-accent">?</span></h1>
+      <p class="reveal mt-5 text-white/60 max-w-xl mx-auto">4 perguntas, 3 minutos. no final você recebe a rota: o que construir primeiro e quanto tempo dá pra recuperar por semana.</p>
+    </div>
+  </section>
+
+  <!-- ===== quiz ===== -->
+  <section class="relative px-6 md:px-12 lg:px-20 pb-20 md:pb-32 pt-8">
+    <div class="max-w-3xl mx-auto">
+      <div class="reveal glass-strong rounded-3xl p-7 md:p-12 relative overflow-hidden">
+
+        <!-- progresso -->
+        <div id="quiz-progress" class="flex items-center gap-4 mb-10">
+          <span class="font-mono text-xs uppercase tracking-wider text-white/45"><span id="q-num">pergunta 1</span> de 4</span>
+          <div class="flex-1 flex items-center gap-2" aria-hidden="true">
+            <span class="waypoint lit" data-wp="1"></span>
+            <span class="flex-1 h-px bg-white/10" data-seg="1"></span>
+            <span class="waypoint" data-wp="2"></span>
+            <span class="flex-1 h-px bg-white/10" data-seg="2"></span>
+            <span class="waypoint" data-wp="3"></span>
+            <span class="flex-1 h-px bg-white/10" data-seg="3"></span>
+            <span class="waypoint" data-wp="4"></span>
+          </div>
+        </div>
+
+        <!-- pergunta 1 -->
+        <div class="quiz-step active" data-step="1">
+          <h2 class="text-2xl md:text-3xl font-semibold text-paper mb-8">qual área está mais caótica hoje?</h2>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <button class="quiz-option glass rounded-2xl p-5" data-q="area" data-value="atendimento">
+              <span class="block font-semibold text-paper">atendimento</span>
+              <span class="block mt-1 text-sm text-white/50">mensagens espalhadas, lead sem dono, resposta atrasada</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="area" data-value="vendas">
+              <span class="block font-semibold text-paper">vendas</span>
+              <span class="block mt-1 text-sm text-white/50">follow-up de memória, proposta perdida, lead esfriando</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="area" data-value="financeiro">
+              <span class="block font-semibold text-paper">financeiro</span>
+              <span class="block mt-1 text-sm text-white/50">cobrança manual, conferência chata, dinheiro parado invisível</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="area" data-value="operacao">
+              <span class="block font-semibold text-paper">operação</span>
+              <span class="block mt-1 text-sm text-white/50">tarefa no grupo, planilha paralela, status que ninguém sabe</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- pergunta 2 -->
+        <div class="quiz-step" data-step="2">
+          <h2 class="text-2xl md:text-3xl font-semibold text-paper mb-8">quanta gente toca a operação?</h2>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <button class="quiz-option glass rounded-2xl p-5" data-q="team" data-value="solo">
+              <span class="block font-semibold text-paper">só eu</span>
+              <span class="block mt-1 text-sm text-white/50">eu vendo, eu entrego, eu cobro</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="team" data-value="2-5">
+              <span class="block font-semibold text-paper">2 a 5 pessoas</span>
+              <span class="block mt-1 text-sm text-white/50">time pequeno, todo mundo faz de tudo</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="team" data-value="6-15">
+              <span class="block font-semibold text-paper">6 a 15 pessoas</span>
+              <span class="block mt-1 text-sm text-white/50">áreas começando a se separar</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="team" data-value="16+">
+              <span class="block font-semibold text-paper">16 ou mais</span>
+              <span class="block mt-1 text-sm text-white/50">operação grande, caos escala junto</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- pergunta 3 -->
+        <div class="quiz-step" data-step="3">
+          <h2 class="text-2xl md:text-3xl font-semibold text-paper mb-8">como o trabalho é controlado hoje?</h2>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <button class="quiz-option glass rounded-2xl p-5" data-q="control" data-value="whatsapp">
+              <span class="block font-semibold text-paper">WhatsApp e memória</span>
+              <span class="block mt-1 text-sm text-white/50">o grupo é o sistema</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="control" data-value="planilhas">
+              <span class="block font-semibold text-paper">planilhas</span>
+              <span class="block mt-1 text-sm text-white/50">várias versões, ninguém sabe qual é a certa</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="control" data-value="sistema-isolado">
+              <span class="block font-semibold text-paper">sistema que não conversa</span>
+              <span class="block mt-1 text-sm text-white/50">tem ferramenta, mas cada uma é uma ilha</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="control" data-value="quase-la">
+              <span class="block font-semibold text-paper">quase lá</span>
+              <span class="block mt-1 text-sm text-white/50">ferramentas ok, falta integração e IA</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- pergunta 4 -->
+        <div class="quiz-step" data-step="4">
+          <h2 class="text-2xl md:text-3xl font-semibold text-paper mb-8">o que mais te incomoda no dia a dia?</h2>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <button class="quiz-option glass rounded-2xl p-5" data-q="pain" data-value="lead esquecido sem resposta">
+              <span class="block font-semibold text-paper">lead esquecido</span>
+              <span class="block mt-1 text-sm text-white/50">cliente chega e ninguém responde a tempo</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="pain" data-value="tarefa repetitiva manual">
+              <span class="block font-semibold text-paper">retrabalho manual</span>
+              <span class="block mt-1 text-sm text-white/50">a mesma tarefa chata, todo santo dia</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="pain" data-value="falta de visão dos números">
+              <span class="block font-semibold text-paper">decidir no escuro</span>
+              <span class="block mt-1 text-sm text-white/50">nenhum número confiável na mesa</span>
+            </button>
+            <button class="quiz-option glass rounded-2xl p-5" data-q="pain" data-value="cobrança e follow-up manuais">
+              <span class="block font-semibold text-paper">correr atrás de gente</span>
+              <span class="block mt-1 text-sm text-white/50">cobrança e follow-up na base da insistência</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- calculando -->
+        <div class="quiz-step text-center py-10" data-step="5">
+          <svg id="compass" class="mx-auto mb-6" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#FFC93D" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path class="compass-needle" d="M15.5 8.5l-2.2 5.8-4.8 1.2 2.2-5.8 4.8-1.2z" fill="rgba(255,107,53,0.35)" stroke="#FF6B35" />
+          </svg>
+          <p class="font-mono text-xs uppercase tracking-[0.24em] text-white/50">calibrando o log pose…</p>
+        </div>
+
+        <!-- resultado -->
+        <div class="quiz-step" data-step="6">
+          <p class="eyebrow mb-6">sua rota está pronta</p>
+          <h2 class="display text-3xl md:text-5xl text-paper">
+            seu tesouro: <span class="treasure-num">~<span id="treasure-hours">0</span>h</span><span class="text-white/45"> por semana de volta.</span>
+          </h2>
+          <p class="mt-4 text-white/55 text-sm">estimativa com base nas suas respostas — o número exato sai no diagnóstico completo, de graça, direto com a gente.</p>
+
+          <div class="hr-grad my-8"></div>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40 mb-2">onde dói</p>
+              <p id="result-pain" class="text-white/70 text-sm"></p>
+            </div>
+            <div>
+              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40 mb-2">o que construir primeiro</p>
+              <p id="result-build" class="text-white/70 text-sm"></p>
+            </div>
+          </div>
+
+          <div class="mt-8">
+            <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40 mb-3">stack provável</p>
+            <div id="result-stack" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <div class="mt-10 flex flex-col sm:flex-row items-center gap-4">
+            <a id="result-wa" href="#" target="_blank" rel="noopener" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium w-full sm:w-auto">
+              ver a rota completa no WhatsApp
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+            </a>
+            <button id="quiz-restart" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto cursor-pointer">refazer a rota</button>
+          </div>
+          <p class="mt-5 font-mono text-xs uppercase tracking-wider text-white/40">resposta em &lt; 24h · sem compromisso</p>
+        </div>
+
+        <!-- voltar -->
+        <div id="quiz-back-row" class="mt-8">
+          <button id="quiz-back" class="text-sm text-white/45 hover:text-paper transition-colors cursor-pointer hidden">← voltar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="relative px-6 md:px-12 lg:px-20 pt-16 pb-10">
+  <div class="max-w-7xl mx-auto">
+    <div class="hr-grad mb-8"></div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs uppercase tracking-wider text-white/40">
+      <span>© <span data-year>2026</span> shift systems</span>
+      <a href="privacidade.html" class="hover:text-paper transition-colors">privacidade</a>
+      <span>feito em mar aberto · v2.0</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/site.js" defer></script>
+<script>
+/* ===== log pose · lógica do quiz ===== */
+(function () {
+  'use strict';
+
+  var tracks = {
+    atendimento: {
+      label: 'atendimento',
+      base: 12,
+      pain: 'mensagens espalhadas, lead sem dono e resposta dependendo de quem viu primeiro.',
+      build: 'triagem automática, fila única, respostas com contexto e passagem inteligente para humano.',
+      stack: ['WhatsApp API', 'agente IA', 'CRM', 'dashboard']
+    },
+    vendas: {
+      label: 'vendas',
+      base: 10,
+      pain: 'follow-up feito na memória, proposta perdida e oportunidade esfriando sem alerta.',
+      build: 'pipeline visual, alertas, automações de follow-up e resumo automático de cada negociação.',
+      stack: ['CRM leve', 'webhooks', 'IA SDR', 'notificações']
+    },
+    financeiro: {
+      label: 'financeiro',
+      base: 8,
+      pain: 'cobrança manual, conferência chata e pouca visibilidade de dinheiro parado.',
+      build: 'emissão, lembrete, baixa, conciliação simples e painel de pendências por cliente.',
+      stack: ['ERP', 'banco de dados', 'notas', 'relatórios']
+    },
+    operacao: {
+      label: 'operação',
+      base: 14,
+      pain: 'tarefas no WhatsApp, planilhas diferentes e ninguém sabendo exatamente o status real.',
+      build: 'sistema interno com etapas, responsáveis, prazos, alertas e visão de gargalo.',
+      stack: ['web app', 'permissões', 'alertas', 'BI']
+    }
+  };
+  var teamFactor = { 'solo': 0.6, '2-5': 1, '6-15': 1.6, '16+': 2.2 };
+  var teamLabel = { 'solo': 'só eu', '2-5': '2 a 5 pessoas', '6-15': '6 a 15 pessoas', '16+': '16+ pessoas' };
+  var controlBonus = { 'whatsapp': 4, 'planilhas': 3, 'sistema-isolado': 2, 'quase-la': 2 };
+  var controlLabel = {
+    'whatsapp': 'WhatsApp e memória',
+    'planilhas': 'planilhas',
+    'sistema-isolado': 'sistemas que não conversam',
+    'quase-la': 'ferramentas ok, falta integração e IA'
+  };
+
+  var answers = {};
+  var current = 1;
+  var TOTAL = 4;
+
+  var steps = document.querySelectorAll('.quiz-step');
+  var qNum = document.getElementById('q-num');
+  var backBtn = document.getElementById('quiz-back');
+
+  function show(step) {
+    current = step;
+    steps.forEach(function (el) {
+      el.classList.toggle('active', parseInt(el.getAttribute('data-step'), 10) === step);
+    });
+    if (step <= TOTAL) {
+      qNum.textContent = 'pergunta ' + step;
+      document.querySelectorAll('[data-wp]').forEach(function (wp) {
+        wp.classList.toggle('lit', parseInt(wp.getAttribute('data-wp'), 10) <= step);
+      });
+      document.querySelectorAll('[data-seg]').forEach(function (seg) {
+        seg.style.background = parseInt(seg.getAttribute('data-seg'), 10) < step
+          ? 'linear-gradient(90deg, rgba(255,107,53,0.5), rgba(255,201,61,0.5))'
+          : 'rgba(255,255,255,0.1)';
+      });
+    }
+    backBtn.classList.toggle('hidden', step === 1 || step > TOTAL);
+    document.getElementById('quiz-progress').style.visibility = step > TOTAL ? 'hidden' : 'visible';
+  }
+
+  document.querySelectorAll('.quiz-option').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var q = btn.getAttribute('data-q');
+      answers[q] = btn.getAttribute('data-value');
+      btn.parentElement.querySelectorAll('.quiz-option').forEach(function (b) { b.classList.remove('picked'); });
+      btn.classList.add('picked');
+      setTimeout(function () {
+        if (current < TOTAL) { show(current + 1); }
+        else { finish(); }
+      }, 260);
+    });
+  });
+
+  backBtn.addEventListener('click', function () { if (current > 1) show(current - 1); });
+
+  function finish() {
+    show(5);
+    var compass = document.getElementById('compass');
+    compass.parentElement.classList.add('compass-spin');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(showResult, reduced ? 150 : 1400);
+  }
+
+  function showResult() {
+    var t = tracks[answers.area] || tracks.operacao;
+    var hours = Math.round((t.base + (controlBonus[answers.control] || 2)) * (teamFactor[answers.team] || 1));
+
+    document.getElementById('result-pain').textContent = t.pain;
+    document.getElementById('result-build').textContent = t.build;
+
+    var stackEl = document.getElementById('result-stack');
+    stackEl.innerHTML = '';
+    t.stack.forEach(function (s) {
+      var chip = document.createElement('span');
+      chip.className = 'font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold';
+      chip.textContent = s;
+      stackEl.appendChild(chip);
+    });
+
+    var msg = 'Olá! Fiz o diagnóstico no site da Shift Systems.\n'
+      + '• área mais caótica: ' + t.label + '\n'
+      + '• time: ' + (teamLabel[answers.team] || '-') + '\n'
+      + '• controle hoje: ' + (controlLabel[answers.control] || '-') + '\n'
+      + '• maior dor: ' + (answers.pain || '-') + '\n'
+      + 'Quero ver a rota completa!';
+    document.getElementById('result-wa').href =
+      'https://wa.me/5554984184808?text=' + encodeURIComponent(msg);
+
+    show(6);
+
+    /* contador do tesouro */
+    var el = document.getElementById('treasure-hours');
+    var dur = 1200, t0 = performance.now();
+    var tick = function (now) {
+      var p = Math.min(1, (now - t0) / dur);
+      el.textContent = Math.round(hours * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  document.getElementById('quiz-restart').addEventListener('click', function () {
+    answers = {};
+    document.querySelectorAll('.quiz-option').forEach(function (b) { b.classList.remove('picked'); });
+    document.querySelector('[data-step="5"]').classList.remove('compass-spin');
+    show(1);
+  });
+})();
+</script>
+</body>
+</html>
