@@ -160,6 +160,37 @@ html.op-mode .btn-primary {
   box-shadow: 0 12px 40px -10px rgba(255, 213, 74, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
+/* ===== entrada do site — uma vez por load, só transform/opacity ===== */
+@keyframes header-drop {
+  from { transform: translateY(-18px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+body > header { animation: header-drop 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+
+/* varredura de luz — o sol passando pelo convés ao abrir a página */
+@keyframes dawn { to { transform: translateX(120%); } }
+.dawn-sweep {
+  position: fixed; inset: 0; z-index: 80; pointer-events: none;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 201, 61, 0.05) 48%, rgba(242, 166, 61, 0.09) 52%, transparent 58%);
+  transform: translateX(-120%);
+  animation: dawn 1.2s ease-out 0.15s forwards;
+}
+
+/* coreografia de entrada: delays incrementais pros reveals do hero */
+html.js .reveal.d1 { transition-delay: 0.05s; }
+html.js .reveal.d2 { transition-delay: 0.12s; }
+html.js .reveal.d3 { transition-delay: 0.2s; }
+html.js .reveal.d4 { transition-delay: 0.28s; }
+html.js .reveal.d5 { transition-delay: 0.36s; }
+html.js .reveal.d6 { transition-delay: 0.44s; }
+
+/* ===== barra de progresso de leitura ===== */
+#scroll-progress {
+  position: fixed; top: 0; left: 0; height: 2px; width: 0%; z-index: 90;
+  background: linear-gradient(90deg, var(--accent-deep), var(--accent), var(--gold));
+  box-shadow: 0 0 10px rgba(242, 166, 61, 0.55);
+}
+
 /* ===== header ===== */
 #site-header {
   max-width: 80rem;
@@ -280,21 +311,26 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
   background: linear-gradient(90deg, transparent, rgba(242, 166, 61, 0.45), rgba(255, 201, 61, 0.45), transparent);
   overflow: visible;
 }
+/* a linha se desenha quando entra na tela (fail-open sem JS) */
+html.js [data-draw] { transform: scaleX(0); transform-origin: left center; transition: transform 1.4s cubic-bezier(0.2, 0.7, 0.3, 1); }
+html.js [data-draw].in { transform: scaleX(1); }
+
 @keyframes sail-x {
   0%   { left: 0%; opacity: 0; }
   8%   { opacity: 1; }
   92%  { opacity: 1; }
   100% { left: 100%; opacity: 0; }
 }
-.sail-dot {
+/* barquinho dourado velejando a rota (quem sabe, sabe) */
+.sail-ship {
   position: absolute; top: 50%;
-  width: 8px; height: 8px;
-  margin-top: -4px; margin-left: -4px;
-  border-radius: 9999px;
-  background: var(--gold);
-  box-shadow: 0 0 14px var(--gold-glow), 0 0 26px rgba(242, 166, 61, 0.4);
-  animation: sail-x 6s linear infinite;
+  width: 20px; height: 15px;
+  margin-top: -13px; margin-left: -10px;
+  color: var(--gold);
+  filter: drop-shadow(0 0 8px rgba(255, 201, 61, 0.55));
+  animation: sail-x 9s linear infinite;
 }
+html.js [data-draw]:not(.in) .sail-ship { visibility: hidden; animation-play-state: paused; }
 .waypoint {
   width: 12px; height: 12px;
   border-radius: 9999px;
@@ -379,7 +415,10 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
 /* ===== respeito a quem prefere menos movimento ===== */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto !important; }
-  .sail-dot, .travel-dot, .mark-shift .slab-top, .mark-shift .slab-bottom, .floaty-slow { animation: none !important; }
+  .sail-ship, .travel-dot, .mark-shift .slab-top, .mark-shift .slab-bottom, .floaty-slow { animation: none !important; visibility: visible !important; }
   .compass-spin .compass-needle { animation: none !important; }
-  .reveal, .stagger > *, .quiz-step.active, .hero-log-line { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  .dawn-sweep { display: none !important; }
+  body > header { animation: none !important; }
+  html.js [data-draw] { transform: none !important; }
+  .reveal, .stagger > *, .quiz-step.active, .hero-log-line { transition-duration: 0.01ms !important; transition-delay: 0s !important; animation-duration: 0.01ms !important; }
 }

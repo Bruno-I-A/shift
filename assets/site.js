@@ -41,7 +41,26 @@
       }
     });
   }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal, .stagger').forEach(function (el) { io.observe(el); });
+  document.querySelectorAll('.reveal, .stagger, [data-draw]').forEach(function (el) { io.observe(el); });
+
+  /* ===== barra de progresso de leitura ===== */
+  var prog = document.getElementById('scroll-progress');
+  if (prog) {
+    var progTicking = false;
+    var updateProg = function () {
+      progTicking = false;
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      prog.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+    };
+    window.addEventListener('scroll', function () {
+      if (!progTicking) { progTicking = true; requestAnimationFrame(updateProg); }
+    }, { passive: true });
+    updateProg();
+  }
+
+  /* ===== varredura de luz da entrada: remove a camada depois que termina ===== */
+  var dawn = document.querySelector('.dawn-sweep');
+  if (dawn) setTimeout(function () { dawn.remove(); }, 2500);
 
   /* ===== contadores animados ===== */
   var cio = new IntersectionObserver(function (entries) {
@@ -72,11 +91,21 @@
     });
   });
 
-  /* ===== easter egg: 5 cliques na marca ⇒ modo chapéu de palha (6s) =====
-     quem conhece, sorri. quem não conhece, nunca vai ver.
+  /* ===== easter eggs: modo chapéu de palha =====
+     quem conhece, sorri. quem não conhece, nunca vai ver. */
+  var opTimer = null;
+  function raiseFlag(ms) {
+    document.documentElement.classList.add('op-mode');
+    clearTimeout(opTimer);
+    opTimer = setTimeout(function () {
+      document.documentElement.classList.remove('op-mode');
+    }, ms || 6000);
+  }
+
+  /* gatilho 1: 5 cliques rápidos na marca.
      a navegação do logo espera 350ms: clique único navega normal;
      cliques rápidos acumulam pro egg sem sair da página. */
-  var clicks = 0, lastClick = 0, opTimer = null, navTimer = null;
+  var clicks = 0, lastClick = 0, navTimer = null;
   document.querySelectorAll('[data-mark]').forEach(function (mark) {
     mark.addEventListener('click', function (e) {
       e.preventDefault();
@@ -87,11 +116,7 @@
       clearTimeout(navTimer);
       if (clicks >= 5) {
         clicks = 0;
-        document.documentElement.classList.add('op-mode');
-        clearTimeout(opTimer);
-        opTimer = setTimeout(function () {
-          document.documentElement.classList.remove('op-mode');
-        }, 6000);
+        raiseFlag(6000);
       } else {
         var href = mark.getAttribute('href');
         navTimer = setTimeout(function () {
@@ -100,6 +125,21 @@
       }
     });
   });
+
+  /* gatilho 2: digitar "nakama" em qualquer página */
+  var keyBuf = '';
+  document.addEventListener('keydown', function (e) {
+    if (!e.key || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    keyBuf = (keyBuf + e.key.toLowerCase()).slice(-6);
+    if (keyBuf === 'nakama') { keyBuf = ''; raiseFlag(10000); }
+  });
+
+  /* recado no console pra quem abre o capô */
+  try {
+    console.log('%c⚓ Shift Systems', 'color:#B56BFF;font-weight:bold;font-size:14px;');
+    console.log('%cProcura-se: operação manual. Recompensa: suas horas de volta.\nDica de tripulação: digite "nakama" nesta página.', 'color:#FFC93D;');
+  } catch (err) { /* console indisponível — segue o jogo */ }
 
   /* ===== hero "shift engine" — leve, sem libs, só pra dar vida ===== */
   (function () {
@@ -156,6 +196,7 @@
         'webhook → CRM atualizado · 200 OK',
         'cobrança → boleto emitido',
         'atendimento → resposta enviada em 4s',
+        'log pose → rota recalibrada',
         'dashboard → KPI recalculado',
         'automação → follow-up disparado'
       ];

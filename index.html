@@ -42,6 +42,8 @@
 <script>document.documentElement.classList.add('js');</script>
 </head>
 <body class="page-bg">
+<div id="scroll-progress" aria-hidden="true"></div>
+<div class="dawn-sweep" aria-hidden="true"></div>
 
 <!-- ===== header ===== -->
 <header class="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
@@ -99,7 +101,7 @@
     <div class="relative max-w-7xl mx-auto grid lg:grid-cols-12 gap-14 lg:gap-8 items-center">
 
       <div class="lg:col-span-7 text-center lg:text-left">
-        <div class="reveal flex items-center justify-center lg:justify-start gap-3 mb-8">
+        <div class="reveal d1 flex items-center justify-center lg:justify-start gap-3 mb-8">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
@@ -107,19 +109,19 @@
           <span class="eyebrow">shift systems · 2026</span>
         </div>
 
-        <h1 class="reveal display text-[44px] sm:text-6xl lg:text-7xl xl:text-[80px] text-paper">
+        <h1 class="reveal d2 display text-[44px] sm:text-6xl lg:text-7xl xl:text-[80px] text-paper">
           Operação manual<br />
           <span class="text-white/45">trava</span> <span class="text-accent" style="text-shadow: 0 0 44px rgba(242, 166, 61,0.4);">crescimento.</span>
         </h1>
 
-        <p class="reveal mt-8 text-xl md:text-2xl text-white/75 max-w-2xl mx-auto lg:mx-0">
+        <p class="reveal d3 mt-8 text-xl md:text-2xl text-white/75 max-w-2xl mx-auto lg:mx-0">
           Sistemas, automações e inteligência artificial para empresas que querem parar de operar no improviso.
         </p>
-        <p class="reveal mt-4 text-base md:text-lg text-white/55 max-w-xl mx-auto lg:mx-0">
+        <p class="reveal d4 mt-4 text-base md:text-lg text-white/55 max-w-xl mx-auto lg:mx-0">
           A Shift transforma processos manuais, atendimento desorganizado e tarefas repetitivas em tecnologia simples, inteligente e escalável.
         </p>
 
-        <div class="reveal mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+        <div class="reveal d5 mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
           <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium w-full sm:w-auto">
             Encontrar meu gargalo operacional
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
@@ -127,7 +129,7 @@
           <a href="solucoes.html" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto">Ver soluções</a>
         </div>
 
-        <div class="reveal mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider text-white/40">
+        <div class="reveal d6 mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider text-white/40">
           <span>tempo médio · 2–6 semanas</span>
           <span class="hidden sm:inline text-white/20">•</span>
           <span>stack sob medida</span>
@@ -137,7 +139,7 @@
       </div>
 
       <!-- ===== shift engine — painel tech, leve (sem webgl, só css + alguns intervals) ===== -->
-      <div class="lg:col-span-5 reveal">
+      <div class="lg:col-span-5 reveal d3">
         <div class="floaty-slow glass-strong rounded-3xl p-6 relative overflow-hidden">
           <div class="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
 
@@ -205,8 +207,12 @@
       </div>
 
       <div class="relative">
-        <div class="route-line absolute top-[26px] left-[8%] right-[8%] hidden md:block" aria-hidden="true">
-          <span class="sail-dot"></span>
+        <div class="route-line absolute top-[26px] left-[8%] right-[8%] hidden md:block" data-draw aria-hidden="true">
+          <svg class="sail-ship" viewBox="0 0 24 16" fill="none" aria-hidden="true">
+            <path d="M3 11h18l-3 4H6l-3-4z" fill="currentColor" opacity="0.9" />
+            <path d="M12 1v9" stroke="currentColor" stroke-width="1.2" />
+            <path d="M12 2c4 2 5 5 4 8h-4z" fill="currentColor" opacity="0.75" />
+          </svg>
         </div>
 
         <div class="stagger grid md:grid-cols-4 gap-5 relative">

@@ -67,22 +67,29 @@ O lead segue paradas numeradas, exibidas na home como uma linha de navegação c
 ## Easter eggs (One Piece, minimalistas)
 
 - **5 cliques na logo** (janela de 2,5s) → um chapéu de palha aparece sobre o S e os CTAs/eyebrows ficam dourados por 6s (`html.op-mode`).
+- **Digitar "nakama"** em qualquer página → mesmo modo chapéu de palha, por 10s.
+- **Console do navegador**: recado "Procura-se: operação manual. Recompensa: suas horas de volta." + a dica do nakama.
 - Quiz chama-se **log pose** (eyebrow + bússola no estado "calibrando").
 - Resultado do quiz: **"Seu tesouro: ~Xh por semana de volta"**.
-- **404**: "Essa ilha não está na sua rota."
+- **Barquinho dourado** veleja a linha da rota na home (substituiu o ponto).
+- Log do shift engine ocasionalmente mostra `log pose → rota recalibrada`.
+- **404**: "Essa ilha não está na sua rota." + "recompensa pela captura: 0 berries".
 - Rodapé: "feito em mar aberto".
 
 Regra: nenhuma referência explícita em navegação ou etapas do processo — o cliente B2B não deve perceber nada além de um tema náutico sutil.
 
 ## Interações
 
+- **Entrada do site** (uma vez por load, só transform/opacity): header desce (`header-drop`, 550ms), varredura de luz dourada cruza a tela (`.dawn-sweep`, 1.2s, removida do DOM após 2,5s) e o hero revela em coreografia (classes `d1`–`d6`, delays de 50–440ms).
 - **Reveal**: IntersectionObserver, 400ms, translateY(20px) → 0. `.stagger` com delays de 40–340ms.
+- **Rota que se desenha**: `[data-draw]` escala de 0 → 1 (1.4s) quando entra na tela; o barquinho só aparece depois que a linha desenha.
+- **Barra de progresso de leitura**: `#scroll-progress` fixa no topo (gradiente âmbar→dourado), atualizada via rAF.
 - **Contadores**: `[data-count-to]`, easing cúbico, 1400ms, disparo em threshold 0.5.
 - **Shift engine**: painel leve no hero da home, com segmentos de progresso, barras e log de eventos gerados em JS vanilla.
 - **Spotlight**: `.spot` segue o cursor via `--mx/--my` (dourado + âmbar).
 - **Header**: pílula com blur ao rolar > 24px (max-w 80rem → 64rem).
 - **Menu mobile**: overlay full-screen, fecha por link, backdrop ou Esc. Alvos de toque ≥ 44px.
-- `prefers-reduced-motion` desativa todas as animações.
+- `prefers-reduced-motion` desativa todas as animações (inclusive entrada, barquinho e rota desenhada).
 
 ## Produção (se for portar para um framework)
 
