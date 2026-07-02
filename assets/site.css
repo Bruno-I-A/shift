@@ -394,6 +394,32 @@ html.js [data-draw]:not(.in) .sail-ship { visibility: hidden; animation-play-sta
   text-shadow: 0 0 34px var(--gold-glow);
 }
 
+/* ===== banner de cookies (desativado por padrão — ver site.js) ===== */
+@keyframes banner-up {
+  from { transform: translateY(18px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+#cookie-banner {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 95;
+  max-width: 600px; margin: 0 auto;
+  background: var(--glass-strong);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: 0 24px 90px rgba(2, 8, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: banner-up 0.45s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+#cookie-banner p { color: rgba(246, 245, 241, 0.72); font-size: 14px; line-height: 1.6; margin: 0 0 14px; }
+#cookie-banner a { color: var(--gold); text-decoration: none; }
+#cookie-banner a:hover { text-decoration: underline; }
+#cookie-banner .cb-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+#cookie-banner button { min-height: 44px; }
+@media (prefers-reduced-motion: reduce) {
+  #cookie-banner { animation: none; }
+}
+
 /* ===== foco visível (teclado) ===== */
 :where(a, button, [role="button"], input, textarea, select):focus-visible {
   outline: 2px solid var(--focus);

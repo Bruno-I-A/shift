@@ -22,7 +22,8 @@ Há referências mínimas a One Piece (tema "rota/navegação"), desenhadas para
 | `diagnostico.html` | **Centro do funil** — quiz "log pose": 4 perguntas → tesouro (horas/semana) + rota + CTA WhatsApp pré-preenchido |
 | `contato.html`     | WhatsApp / Instagram / e-mail + ponte de volta pro diagnóstico          |
 | `404.html`         | "Essa ilha não está na sua rota."                                       |
-| `privacidade.html` | LGPD (recolorida para a nova paleta)                                    |
+| `privacidade.html` | LGPD — inclui nota de que o quiz roda só no navegador                   |
+| `termos.html`      | Termos de uso (site institucional, diagnóstico ilustrativo, PI, foro)   |
 
 Assets compartilhados: `assets/site.css` (tokens + componentes) e `assets/site.js` (header, menu mobile, reveal, contadores, spotlight, painel "shift engine", easter egg). Header e footer são duplicados por página (protótipo estático, sem build step).
 
@@ -90,6 +91,13 @@ Regra: nenhuma referência explícita em navegação ou etapas do processo — o
 - **Header**: pílula com blur ao rolar > 24px (max-w 80rem → 64rem).
 - **Menu mobile**: overlay full-screen, fecha por link, backdrop ou Esc. Alvos de toque ≥ 44px.
 - `prefers-reduced-motion` desativa todas as animações (inclusive entrada, barquinho e rota desenhada).
+
+## Legal / cookies
+
+- **Privacidade** (`privacidade.html`): LGPD completa. A seção 06 declara que o site **não usa cookies de rastreamento hoje** — manter fiel à realidade.
+- **Termos de uso** (`termos.html`): institucional; deixa claro que o diagnóstico é estimativa ilustrativa, não proposta vinculante.
+- **Quiz**: linha de transparência abaixo do card ("Suas respostas não são salvas…") — as respostas rodam 100% no navegador.
+- **Banner de cookies**: pronto porém **desativado** em `site.js`. Para ligar (quando adicionar GA/Meta Pixel), inclua antes do site.js: `<script>window.SHIFT_ENABLE_COOKIE_BANNER = true;</script>` e carregue os scripts de medição apenas se `window.shiftConsent() === 'all'`. A escolha persiste em `localStorage['shift-consent']` e dispara o evento `shift:consent`. Alternativa sem banner: Vercel Analytics (cookieless).
 
 ## Produção (se for portar para um framework)
 

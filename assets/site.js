@@ -214,6 +214,42 @@
     }
   })();
 
+  /* ===== banner de cookies — DESATIVADO por padrão =====
+     o site hoje não usa cookies de rastreamento, então não há banner.
+     no dia que adicionar analytics/pixel, ligue com UMA linha antes do site.js:
+       <script>window.SHIFT_ENABLE_COOKIE_BANNER = true;</script>
+     e carregue os scripts de medição apenas se window.shiftConsent() === 'all'. */
+  (function () {
+    if (window.SHIFT_ENABLE_COOKIE_BANNER !== true) return;
+    var KEY = 'shift-consent';
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (err) { /* storage bloqueado */ }
+    window.shiftConsent = function () { return saved; };
+    if (saved) return;
+
+    var el = document.createElement('div');
+    el.id = 'cookie-banner';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-label', 'Aviso de cookies');
+    el.innerHTML =
+      '<p>A gente usa cookies só para medir o que funciona no site e melhorar sua experiência. ' +
+      'Você decide: <a href="privacidade.html">política de privacidade</a>.</p>' +
+      '<div class="cb-actions">' +
+      '<button data-consent="all" class="btn-primary rounded-full px-6 py-2.5 text-sm font-medium">Aceitar cookies</button>' +
+      '<button data-consent="essential" class="btn-ghost rounded-full px-6 py-2.5 text-sm">Só o essencial</button>' +
+      '</div>';
+    document.body.appendChild(el);
+
+    function choose(v) {
+      saved = v;
+      try { localStorage.setItem(KEY, v); } catch (err) { /* storage bloqueado */ }
+      el.remove();
+      window.dispatchEvent(new CustomEvent('shift:consent', { detail: v }));
+    }
+    el.querySelector('[data-consent="all"]').addEventListener('click', function () { choose('all'); });
+    el.querySelector('[data-consent="essential"]').addEventListener('click', function () { choose('essential'); });
+  })();
+
   /* ===== ano do rodapé ===== */
   document.querySelectorAll('[data-year]').forEach(function (el) {
     el.textContent = new Date().getFullYear();
