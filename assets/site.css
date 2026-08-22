@@ -227,15 +227,13 @@ body > header { animation: header-drop 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both
   transition: opacity 0.35s ease;
 }
 .hero-visual.hero-visual-ready .hero-static-fallback { opacity: 0; }
-.hero-static-fallback img {
-  width: 136px;
-  filter: drop-shadow(0 0 34px rgba(181, 107, 255, 0.36));
-}
 .hero-static-chaos,
 .hero-static-system {
   display: block;
   height: 150px;
 }
+.hero-static-chaos { grid-column: 1; }
+.hero-static-system { grid-column: 3; }
 .hero-static-chaos {
   background:
     radial-gradient(circle at 12% 22%, rgba(168, 196, 240, 0.55) 0 2px, transparent 3px),
@@ -362,7 +360,6 @@ body > header { animation: header-drop 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both
     mask-image: radial-gradient(ellipse at center, #000 48%, transparent 96%);
   }
   .hero-static-fallback { grid-template-columns: 1fr 82px 1fr; gap: 12px; padding: 0 3%; }
-  .hero-static-fallback img { width: 82px; }
   .hero-visual-legend { right: 22px; bottom: 20px; left: 22px; font-size: 8px; letter-spacing: 0.13em; }
   .hero-legend-center { padding: 5px 7px; }
   .hero-title { font-size: clamp(2.25rem, 10.5vw, 3rem); }
