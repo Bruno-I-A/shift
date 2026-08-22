@@ -101,8 +101,10 @@
       var onMove = (event) => {
         rect = canvas.getBoundingClientRect();
         if (!rect.width || !rect.height) return;
-        tx = clamp(((event.clientX - rect.left) / rect.width) * 2 - 1, -1, 1);
-        ty = clamp(((event.clientY - rect.top) / rect.height) * 2 - 1, -1, 1);
+        // O cursor só inclina a peça alguns graus; o fluxo continua sendo o
+        // protagonista e não acompanha cada tremor do ponteiro.
+        tx = clamp(((event.clientX - rect.left) / rect.width) * 2 - 1, -0.62, 0.62);
+        ty = clamp(((event.clientY - rect.top) / rect.height) * 2 - 1, -0.62, 0.62);
         active = 1;
       };
       var onLeave = () => {
@@ -118,11 +120,14 @@
       // Geometria da marca existente, normalizada a partir do favicon.
       var normalize = (x, y) => [(x - 50) / 50, (50 - y) / 50];
       var polygon = (points) => points.map((point) => normalize(point[0], point[1]));
-      var shapes = [
-        polygon([[24, 16], [86, 16], [86, 31], [24, 31]]),
-        polygon([[30, 25], [46, 25], [70, 75], [54, 75]]),
-        polygon([[14, 69], [76, 69], [76, 84], [14, 84]])
-      ];
+      // Silhueta única da marca. Antes os três pedaços eram extrudados e
+      // contornados separadamente; em perspectiva as arestas internas
+      // apareciam como rachaduras e a peça deixava de ler como um S.
+      var silhouette = polygon([
+        [24, 16], [86, 16], [86, 31], [48.88, 31],
+        [67.12, 69], [76, 69], [76, 84], [14, 84],
+        [14, 69], [44.08, 69], [31.92, 31], [24, 31]
+      ]);
       var depth = 0.2;
       var FRONT = [122, 66, 196];
       var SIDE = [72, 34, 124];
@@ -149,8 +154,8 @@
         ctx.clearRect(0, 0, w, h);
 
         var scale = Math.min(h * 0.36, w * 0.24);
-        var cx = w * 0.5 + mx * scale * 0.12;
-        var cy = h * 0.5 + my * scale * 0.08;
+        var cx = w * 0.5 + mx * scale * 0.055;
+        var cy = h * 0.5 + my * scale * 0.035;
         var project = (point) => {
           var k = 3.4 / (3.4 - point[2]);
           return [cx + point[0] * scale * k, cy - point[1] * scale * k, k];
@@ -199,12 +204,12 @@
         parts.forEach((part) => {
           var order = smoothstep(-0.62, 0.5, part.x);
           var chaos = 1 - order;
-          var pointerPull = active * smoothstep(-2.7, -0.15, part.x) * (1 - smoothstep(-0.15, 0.4, part.x));
-          part.x += part.speed * (1 + 0.4 * active * Math.max(0, mx)) * dt;
+          var pointerPull = active * 0.42 * smoothstep(-2.7, -0.15, part.x) * (1 - smoothstep(-0.15, 0.4, part.x));
+          part.x += part.speed * (1 + 0.15 * active * Math.max(0, mx)) * dt;
           part.y += Math.sin(time * part.frequency + part.phase) * part.drift * chaos * dt;
           part.z += Math.cos(time * (part.frequency * 0.78) + part.phase * 1.7) * part.drift * 0.74 * chaos * dt;
-          part.y += (-my * 0.92 - part.y) * 1.35 * pointerPull * dt;
-          part.z += (mx * 0.62 - part.z) * 0.86 * pointerPull * dt;
+          part.y += (-my * 0.42 - part.y) * 1.1 * pointerPull * dt;
+          part.z += (mx * 0.24 - part.z) * 0.72 * pointerPull * dt;
 
           var align = (1.2 + 4.8 * order) * order;
           part.y += (part.lane - part.y) * Math.min(1, align * dt);
@@ -243,8 +248,8 @@
         // Marca extrudada em 3D com entrada suave e resposta limitada ao ponteiro.
         var intro = 1 - Math.pow(1 - clamp(time / 1.15, 0, 1), 3);
         var markScale = 0.9 + intro * 0.1;
-        var ay = 0.3 + Math.sin(time * 0.26) * 0.2 + mx * 0.26;
-        var ax = -0.14 + Math.sin(time * 0.17) * 0.045 - my * 0.17;
+        var ay = 0.3 + Math.sin(time * 0.26) * 0.14 + mx * 0.12;
+        var ax = -0.14 + Math.sin(time * 0.17) * 0.035 - my * 0.08;
         var cosY = Math.cos(ay);
         var sinY = Math.sin(ay);
         var cosX = Math.cos(ax);
@@ -258,16 +263,14 @@
           return [x1, y * cosX - z1 * sinX, y * sinX + z1 * cosX];
         };
         var faces = [];
-        shapes.forEach((shape) => {
-          var front = shape.map((point) => rotate(point[0], point[1], depth));
-          var back = shape.map((point) => rotate(point[0], point[1], -depth));
-          faces.push({ points: front, kind: 'front' });
-          faces.push({ points: back.slice().reverse(), kind: 'back' });
-          for (var i = 0; i < shape.length; i++) {
-            var next = (i + 1) % shape.length;
-            faces.push({ points: [front[i], front[next], back[next], back[i]], kind: 'side' });
-          }
-        });
+        var front = silhouette.map((point) => rotate(point[0], point[1], depth));
+        var back = silhouette.map((point) => rotate(point[0], point[1], -depth));
+        faces.push({ points: front, kind: 'front' });
+        faces.push({ points: back.slice().reverse(), kind: 'back' });
+        for (var i = 0; i < silhouette.length; i++) {
+          var next = (i + 1) % silhouette.length;
+          faces.push({ points: [front[i], front[next], back[next], back[i]], kind: 'side' });
+        }
         faces.forEach((face) => {
           face.z = face.points.reduce((total, point) => total + point[2], 0) / face.points.length;
           var a = face.points[0];
@@ -283,7 +286,15 @@
           var length = Math.hypot.apply(null, normal) || 1;
           face.light = Math.max(0, (normal[0] * light[0] + normal[1] * light[1] + normal[2] * light[2]) / length);
         });
-        faces.sort((a, b) => a.z - b.z);
+        // A face frontal única sempre fecha a peça por último. Ordenar apenas
+        // pela média de profundidade fazia uma lateral passar por cima dela
+        // em certos ângulos, criando os “quebres” que apareciam ao mover o
+        // cursor.
+        faces.sort((a, b) => {
+          if (a.kind === 'front' && b.kind !== 'front') return 1;
+          if (b.kind === 'front' && a.kind !== 'front') return -1;
+          return a.z - b.z;
+        });
 
         faces.forEach((face) => {
           var points = face.points.map(project);
@@ -367,6 +378,7 @@
       if ('IntersectionObserver' in window) {
         this._io = new IntersectionObserver((entries) => {
           visible = entries[0] ? entries[0].isIntersecting : true;
+          if (!visible) onLeave();
           syncPlayback();
         }, { rootMargin: '120px 0px' });
         this._io.observe(this);
