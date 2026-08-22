@@ -41,13 +41,12 @@
 </head>
 <body class="page-bg">
 <div id="scroll-progress" aria-hidden="true"></div>
-<div class="dawn-sweep" aria-hidden="true"></div>
 
 <header class="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
   <div id="site-header" class="mx-auto rounded-full px-5 md:px-7 py-3 flex items-center justify-between">
     <a href="index.html" data-mark class="relative flex items-center gap-3 cursor-pointer" aria-label="Shift Systems — página inicial">
       <span class="relative inline-block">
-        <svg class="mark-glow mark-shift" width="24" height="24" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <svg class="mark-glow" width="24" height="24" viewBox="0 0 100 100" fill="none" aria-hidden="true">
           <rect class="slab-top" x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF" />
           <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
           <rect class="slab-bottom" x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
@@ -60,7 +59,7 @@
       </span>
       <span class="flex items-baseline gap-2">
         <span class="font-semibold tracking-tight text-paper">Shift<span class="text-purple">.</span></span>
-        <span class="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">Systems</span>
+        <span class="font-mono text-[11px] tracking-[0.2em] uppercase text-white/55">Systems</span>
       </span>
     </a>
 
@@ -96,7 +95,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC93D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M15 9l-2 5-4 1 2-5 4-1z" /></svg>
         <span class="eyebrow">log pose · diagnóstico</span>
       </div>
-      <h1 class="reveal d2 display text-4xl md:text-6xl text-paper">Onde sua empresa está perdendo <span class="text-white/40">velocidade</span><span class="text-accent">?</span></h1>
+      <h1 class="reveal d2 display text-4xl md:text-6xl text-paper"><span class="text-white/55">Onde sua empresa está perdendo</span> <span class="text-accent">velocidade</span>?</h1>
       <p class="reveal d3 mt-5 text-white/60 max-w-xl mx-auto">4 perguntas, 3 minutos. No final você recebe a rota: o que construir primeiro e quanto tempo dá pra recuperar por semana.</p>
     </div>
   </section>
@@ -108,7 +107,7 @@
 
         <!-- progresso -->
         <div id="quiz-progress" class="flex items-center gap-4 mb-10">
-          <span class="font-mono text-xs uppercase tracking-wider text-white/45"><span id="q-num">pergunta 1</span> de 4</span>
+          <span class="font-mono text-xs uppercase tracking-wider text-white/55"><span id="q-num">pergunta 1</span> de 4</span>
           <div class="flex-1 flex items-center gap-2" aria-hidden="true">
             <span class="waypoint lit" data-wp="1"></span>
             <span class="flex-1 h-px bg-white/10" data-seg="1"></span>
@@ -225,26 +224,26 @@
         <div class="quiz-step" data-step="6">
           <p class="eyebrow mb-6">Sua rota está pronta</p>
           <h2 class="display text-3xl md:text-5xl text-paper">
-            Seu tesouro: <span class="treasure-num">~<span id="treasure-hours">0</span>h</span><span class="text-white/45"> por semana de volta.</span>
+            <span class="text-white/55">Seu tesouro:</span> <span class="treasure-num"><span id="treasure-lo">0</span> a <span id="treasure-hi">0</span>h</span> <span class="text-white/55">por semana de volta.</span>
           </h2>
-          <p class="mt-4 text-white/55 text-sm">Estimativa com base nas suas respostas — o número exato sai no diagnóstico completo, de graça, direto com a gente.</p>
-          <p id="result-urgency" class="mt-4 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 text-accent"></p>
+          <p class="mt-4 text-white/70 text-sm">Faixa estimada a partir das suas 4 respostas. O número real depende de como sua operação está montada hoje — isso a gente vê junto no diagnóstico completo, de graça.</p>
+          <p id="result-urgency" class="mt-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 text-accent"></p>
 
           <div class="hr-grad my-8"></div>
 
           <div class="grid md:grid-cols-2 gap-6">
             <div>
-              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40 mb-2">Onde dói</p>
+              <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-white/55 mb-2">Onde dói</p>
               <p id="result-pain" class="text-white/70 text-sm"></p>
             </div>
             <div>
-              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40 mb-2">O que construir primeiro</p>
+              <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-white/55 mb-2">O que construir primeiro</p>
               <p id="result-build" class="text-white/70 text-sm"></p>
             </div>
           </div>
 
           <div class="mt-8">
-            <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40 mb-3">Stack provável</p>
+            <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-white/55 mb-3">Stack provável</p>
             <div id="result-stack" class="flex flex-wrap gap-2"></div>
           </div>
 
@@ -255,16 +254,21 @@
             </a>
             <button id="quiz-restart" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto cursor-pointer">Refazer a rota</button>
           </div>
-          <p class="mt-5 font-mono text-xs uppercase tracking-wider text-white/40">resposta em &lt; 24h · sem compromisso</p>
+          <p class="mt-5 text-sm text-white/70">
+            O botão abre o WhatsApp com a mensagem já escrita — você lê e edita antes de enviar. Resposta em menos de 24h, sem compromisso.
+          </p>
+          <p class="mt-2 text-sm text-white/55">
+            Prefere e-mail? <a href="mailto:hello@shift.systems" class="text-gold hover:underline">hello@shift.systems</a>
+          </p>
         </div>
 
         <!-- voltar -->
         <div id="quiz-back-row" class="mt-8">
-          <button id="quiz-back" class="text-sm text-white/45 hover:text-paper transition-colors cursor-pointer hidden">← Voltar</button>
+          <button id="quiz-back" class="text-sm text-white/70 hover:text-paper transition-colors cursor-pointer hidden">← Voltar</button>
         </div>
       </div>
 
-      <p class="reveal mt-6 text-center font-mono text-[11px] uppercase tracking-wider text-white/35">
+      <p class="reveal mt-6 text-center font-mono text-[11px] uppercase tracking-wider text-white/75">
         <svg class="inline-block -translate-y-px mr-1.5" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></svg>
         Suas respostas não são salvas — só seguem com você se clicar no botão do WhatsApp.
       </p>
@@ -275,7 +279,7 @@
 <footer class="relative px-6 md:px-12 lg:px-20 pt-16 pb-10">
   <div class="max-w-7xl mx-auto">
     <div class="hr-grad mb-8"></div>
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs uppercase tracking-wider text-white/40">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs uppercase tracking-wider text-white/55">
       <span>© <span data-year>2026</span> shift systems</span>
       <span class="flex items-center gap-5">
         <a href="privacidade.html" class="hover:text-paper transition-colors">privacidade</a>
@@ -401,7 +405,7 @@
     stackEl.innerHTML = '';
     t.stack.forEach(function (s) {
       var chip = document.createElement('span');
-      chip.className = 'font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold';
+      chip.className = 'font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold';
       chip.textContent = s;
       stackEl.appendChild(chip);
     });
@@ -417,13 +421,19 @@
 
     show(6);
 
-    /* contador do tesouro */
-    var el = document.getElementById('treasure-hours');
+    /* contador do tesouro — faixa, porque a conta nao tem precisao de unidade */
+    var lo = Math.max(2, Math.round(hours * 0.8));
+    var hi = Math.round(hours * 1.15);
+    var elLo = document.getElementById('treasure-lo');
+    var elHi = document.getElementById('treasure-hi');
     var dur = 1200, t0 = performance.now();
     var tick = function (now) {
       var p = Math.min(1, (now - t0) / dur);
-      el.textContent = Math.round(hours * (1 - Math.pow(1 - p, 3)));
+      var eased = 1 - Math.pow(1 - p, 3);
+      elLo.textContent = Math.round(lo * eased);
+      elHi.textContent = Math.round(hi * eased);
       if (p < 1) requestAnimationFrame(tick);
+      else { elLo.textContent = lo; elHi.textContent = hi; }
     };
     requestAnimationFrame(tick);
   }

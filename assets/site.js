@@ -58,9 +58,6 @@
     updateProg();
   }
 
-  /* ===== varredura de luz da entrada: remove a camada depois que termina ===== */
-  var dawn = document.querySelector('.dawn-sweep');
-  if (dawn) setTimeout(function () { dawn.remove(); }, 2500);
 
   /* ===== contadores animados ===== */
   var cio = new IntersectionObserver(function (entries) {
@@ -141,76 +138,79 @@
     console.log('%cProcura-se: operação manual. Recompensa: suas horas de volta.\nDica de tripulação: digite "nakama" nesta página.', 'color:#FFC93D;');
   } catch (err) { /* console indisponível — segue o jogo */ }
 
-  /* ===== hero "shift engine" — leve, sem libs, só pra dar vida ===== */
+  /* ===== hero "shift engine" — painel de exemplo, estático =====
+     Nada aqui roda em loop de propósito. Uma barra de progresso que volta
+     a zero a cada 3,6s e um gráfico que se reembaralha a cada 1,6s leem
+     como integração quebrada, e o desconto de credibilidade contamina os
+     números reais da página. Preenche uma vez, quando o painel revela. */
   (function () {
+    var panel = document.querySelector('.reveal.d-panel');
     var segsWrap = document.getElementById('hero-progress-segments');
     var pct = document.getElementById('hero-progress-pct');
     var barsWrap = document.getElementById('hero-bars');
     var log = document.getElementById('hero-log');
     if (!segsWrap && !barsWrap && !log) return;
 
-    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (segsWrap && pct) {
-      var N = 12, i = 0, segEls = [];
+    var N = 12, segEls = [];
+    if (segsWrap) {
       for (var s = 0; s < N; s++) {
         var seg = document.createElement('span');
         seg.className = 'hero-seg';
         segsWrap.appendChild(seg);
         segEls.push(seg);
       }
-      if (reduced) {
-        segEls.forEach(function (el) { el.classList.add('lit'); });
-        pct.textContent = '100%';
-      } else {
-        setInterval(function () {
-          i = (i + 1) % (N + 1);
-          segEls.forEach(function (el, idx) { el.classList.toggle('lit', idx < i); });
-          pct.textContent = Math.round((i / N) * 100) + '%';
-        }, 280);
-      }
     }
 
+    var barEls = [];
+    /* semana de exemplo, fixa — dado que muda sozinho não é dado */
+    var week = [38, 52, 45, 68, 61, 29, 74];
     if (barsWrap) {
-      var barEls = [];
-      for (var b = 0; b < 7; b++) {
+      for (var b = 0; b < week.length; b++) {
         var bar = document.createElement('div');
         bar.className = 'hero-bar';
         barsWrap.appendChild(bar);
         barEls.push(bar);
       }
-      var randomizeBars = function () {
-        barEls.forEach(function (el, idx) {
-          var v = Math.round(25 + Math.random() * 70);
-          el.style.height = v + '%';
-          el.classList.toggle('hi', idx === barEls.length - 1 || v > 70);
-        });
-      };
-      randomizeBars();
-      if (!reduced) setInterval(randomizeBars, 1600);
     }
 
-    if (log) {
-      var events = [
-        'agente-vendas → lead qualificado',
-        'webhook → CRM atualizado · 200 OK',
-        'cobrança → boleto emitido',
-        'atendimento → resposta enviada em 4s',
-        'log pose → rota recalibrada',
-        'dashboard → KPI recalculado',
-        'automação → follow-up disparado'
-      ];
-      var idx = 0;
-      var pushLog = function () {
-        var line = document.createElement('div');
-        line.className = 'hero-log-line';
-        line.textContent = '· ' + events[idx % events.length];
-        idx++;
-        log.appendChild(line);
-        while (log.children.length > 4) log.removeChild(log.firstChild);
-      };
-      pushLog(); pushLog(); pushLog();
-      if (!reduced) setInterval(pushLog, 2200);
+    var events = [
+      'agente-vendas → lead qualificado',
+      'webhook → CRM atualizado · 200 OK',
+      'cobrança → boleto emitido',
+      'atendimento → resposta enviada em 4s'
+    ];
+
+    var filled = false;
+    var fill = function () {
+      if (filled) return;
+      filled = true;
+      segEls.forEach(function (el) { el.classList.add('lit'); });
+      if (pct) pct.textContent = '100%';
+      barEls.forEach(function (el, idx) {
+        el.style.height = week[idx] + '%';
+        el.classList.toggle('hi', week[idx] > 65);
+      });
+      if (log) {
+        events.forEach(function (txt) {
+          var line = document.createElement('div');
+          line.className = 'hero-log-line';
+          line.textContent = '· ' + txt;
+          log.appendChild(line);
+        });
+      }
+    };
+
+    if (panel && 'IntersectionObserver' in window) {
+      var pio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          pio.unobserve(en.target);
+          setTimeout(fill, 320);
+        });
+      }, { threshold: 0.2 });
+      pio.observe(panel);
+    } else {
+      fill();
     }
   })();
 
