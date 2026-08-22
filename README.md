@@ -8,7 +8,7 @@ A v2 é um redesign completo sobre três decisões:
 
 1. **Multi-página com funil.** A v1 tinha 11 seções em uma página só, com conteúdo duplicado. A v2 separa em páginas e desenha um **caminho para o lead**: home → diagnóstico (quiz) → resultado → WhatsApp. Cada página tem um único CTA primário, sempre apontando para o diagnóstico.
 2. **Paleta "mar aberto".** Sai o roxo neon + preto (padrão saturado do nicho); entra navy oceânico profundo + dourado-âmbar. **A logo permanece roxa** (`#B56BFF`) — é o único elemento roxo do site, o que a destaca ainda mais.
-3. **Zero efeitos pesados.** Sem WebGL/three.js, sem GSAP/Lenis, sem React, sem boot screen, sem cursor customizado, sem noise/scan-lines. O fundo é gradiente CSS estático. Animações são transform/opacity de 200–400ms. A energia vem da velocidade. **Sem exceções** — ver *Interações · o que já foi tentado e cortado*.
+3. **Efeitos são bem-vindos, desde que sirvam a marca.** *(Revisado em 2026-08-22.)* A regra original era "zero efeitos pesados: sem WebGL/three.js, sem GSAP/Lenis, sem boot screen" — o Bruno decidiu abrir mão dela porque quer presença visual mais forte no hero, incluindo animação 3D. WebGL/three.js e bibliotecas de animação estão liberados a partir daqui. O que continua valendo, porque é sobre execução e não sobre efeito vs. sem efeito: não pode bloquear a leitura do conteúdo (ver as lições da ignição cortada em *Interações · o que já foi tentado e cortado*), tem que funcionar bem no celular — onde chega a maior parte do tráfego de Instagram — e a metáfora visual tem que ser a da marca (mar aberto/navegação, decisão 2), não importada de outro lugar.
 
 Há referências mínimas a One Piece (tema "rota/navegação"), desenhadas para serem invisíveis a quem não conhece — ver seção **Easter eggs**.
 
@@ -140,6 +140,10 @@ que fica sobre a luz começa a reprovar em AA — a 30% mais forte, o meta row d
 do hero está em `/75` justamente porque fica sobre a parte mais clara. Se aumentar a luz, recalcule.
 
 ### O que já foi tentado e cortado
+
+Registro de execuções que não funcionaram. As lições abaixo são sobre *como* construir um efeito, não sobre
+*se* construir um — a decisão 3 mudou, mas os motivos pelos quais a ignição falhou continuam valendo pra
+qualquer efeito novo, 3D incluído.
 
 **Ignição / singularidade (2026-08-22) — construída, medida, removida.** Uma coreografia de entrada de ~2,2s
 só na home: um ponto de luz pulsava, colapsava e detonava; a onda abria um véu navy; um grafo de nós se

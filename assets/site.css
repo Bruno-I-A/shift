@@ -106,12 +106,6 @@ body {
 .btn-ghost:active { transform: translateY(1px) scale(0.99); }
 
 /* ===== tipografia ===== */
-/* o h1 do hero mede a COLUNA em que vive, não a viewport.
-   Dimensionar por viewport fazia o tipo subir pra 80px enquanto a coluna
-   ainda tinha 631px — e "trava crescimento." precisa de 662px. Daí a escada
-   de 3 linhas em 1280 e de 4 linhas em 1100. */
-.hero-col { container-type: inline-size; }
-.hero-title { font-size: clamp(2.5rem, 10.9cqi, 5rem); }
 
 .display {
   font-family: 'Geist', sans-serif;
@@ -172,6 +166,213 @@ html.op-mode .btn-primary {
   to   { transform: none; opacity: 1; }
 }
 body > header { animation: header-drop 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+
+/* ============================================================
+   HERO · o improviso entra, o sistema sai
+   ============================================================ */
+.hero-home {
+  position: relative;
+  min-height: 900px;
+  padding: 104px 0 88px;
+  overflow: hidden;
+  background:
+    radial-gradient(1100px 700px at 80% -10%, rgba(43, 108, 209, 0.16), transparent 60%),
+    radial-gradient(800px 620px at -10% 28%, rgba(23, 64, 128, 0.2), transparent 60%),
+    radial-gradient(1000px 620px at 50% 115%, rgba(242, 166, 61, 0.12), transparent 62%),
+    var(--navy);
+}
+.hero-home::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(242, 166, 61, 0.22), rgba(255, 238, 183, 0.55), rgba(242, 166, 61, 0.22), transparent);
+}
+.hero-home > .grid-overlay { opacity: 0.82; }
+
+.hero-visual {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 460px;
+  isolation: isolate;
+  -webkit-mask-image: radial-gradient(closest-side ellipse at 50% 50%, #000 56%, transparent 100%);
+  mask-image: radial-gradient(closest-side ellipse at 50% 50%, #000 56%, transparent 100%);
+}
+.hero-visual hero-shift,
+.hero-static-fallback {
+  position: absolute;
+  inset: 0;
+}
+.hero-visual hero-shift {
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.55s var(--ease-out-cubic);
+  touch-action: pan-y;
+}
+.hero-visual.hero-visual-ready hero-shift { opacity: 1; }
+
+/* Quadro estático imediato e fallback caso canvas/JS não esteja disponível. */
+.hero-static-fallback {
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 136px minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  padding: 0 8%;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+.hero-visual.hero-visual-ready .hero-static-fallback { opacity: 0; }
+.hero-static-fallback img {
+  width: 136px;
+  filter: drop-shadow(0 0 34px rgba(181, 107, 255, 0.36));
+}
+.hero-static-chaos,
+.hero-static-system {
+  display: block;
+  height: 150px;
+}
+.hero-static-chaos {
+  background:
+    radial-gradient(circle at 12% 22%, rgba(168, 196, 240, 0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 25% 68%, rgba(168, 196, 240, 0.42) 0 2px, transparent 3px),
+    radial-gradient(circle at 43% 38%, rgba(168, 196, 240, 0.5) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 65% 78%, rgba(168, 196, 240, 0.42) 0 2px, transparent 3px),
+    radial-gradient(circle at 82% 45%, rgba(168, 196, 240, 0.5) 0 2px, transparent 3px);
+}
+.hero-static-system {
+  background:
+    linear-gradient(rgba(255, 201, 61, 0.2), rgba(255, 201, 61, 0.2)) 0 18% / 100% 1px no-repeat,
+    linear-gradient(rgba(255, 201, 61, 0.18), rgba(255, 201, 61, 0.18)) 0 34% / 100% 1px no-repeat,
+    linear-gradient(rgba(255, 201, 61, 0.22), rgba(255, 201, 61, 0.22)) 0 50% / 100% 1px no-repeat,
+    linear-gradient(rgba(255, 201, 61, 0.18), rgba(255, 201, 61, 0.18)) 0 66% / 100% 1px no-repeat,
+    linear-gradient(rgba(255, 201, 61, 0.2), rgba(255, 201, 61, 0.2)) 0 82% / 100% 1px no-repeat;
+}
+
+.hero-visual-legend {
+  position: absolute;
+  z-index: 3;
+  right: max(7vw, 64px);
+  bottom: 34px;
+  left: max(7vw, 64px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(246, 245, 241, 0.42);
+  pointer-events: none;
+}
+.hero-visual-legend span:last-child { text-align: right; color: rgba(255, 201, 61, 0.64); }
+.hero-legend-center {
+  padding: 6px 10px;
+  border: 1px solid rgba(181, 107, 255, 0.18);
+  border-radius: 999px;
+  color: rgba(205, 172, 255, 0.62);
+  background: rgba(10, 20, 40, 0.5);
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 80px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.hero-eyebrow-dot {
+  display: inline-flex;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 18px rgba(242, 166, 61, 0.4);
+}
+.hero-title {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(3.25rem, 5vw, 4rem);
+  line-height: 1.04;
+}
+.hero-title > span:last-child { display: inline; }
+.hero-lead {
+  max-width: 720px;
+  margin-top: 28px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 21px;
+  line-height: 1.5;
+}
+.hero-support {
+  max-width: 620px;
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 16px;
+  line-height: 1.6;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 36px;
+}
+.hero-meta {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 36px;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hero-meta-separator { color: rgba(255, 255, 255, 0.4); }
+
+@media (max-width: 1023px) {
+  .hero-home { min-height: 0; padding: 92px 0 72px; }
+  .hero-visual { height: 340px; }
+  .hero-copy { padding: 0 24px; }
+  .hero-title { max-width: 780px; font-size: clamp(2.5rem, 7vw, 3.25rem); }
+  .hero-visual-legend { right: 32px; bottom: 25px; left: 32px; }
+}
+
+@media (max-width: 640px) {
+  .hero-home { padding-top: 80px; padding-bottom: 60px; }
+  .hero-visual {
+    height: 300px;
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 48%, transparent 96%);
+    mask-image: radial-gradient(ellipse at center, #000 48%, transparent 96%);
+  }
+  .hero-static-fallback { grid-template-columns: 1fr 82px 1fr; gap: 12px; padding: 0 3%; }
+  .hero-static-fallback img { width: 82px; }
+  .hero-visual-legend { right: 22px; bottom: 20px; left: 22px; font-size: 8px; letter-spacing: 0.13em; }
+  .hero-legend-center { padding: 5px 7px; }
+  .hero-title { font-size: clamp(2.25rem, 10.5vw, 3rem); }
+  .hero-lead { margin-top: 24px; font-size: 18px; }
+  .hero-support { font-size: 15px; }
+  .hero-actions { width: 100%; margin-top: 32px; }
+  .hero-actions a { width: 100%; min-height: 52px; }
+  .hero-meta { gap: 10px 18px; margin-top: 30px; font-size: 10px; }
+  .hero-meta-separator { display: none; }
+}
 
 /* ============================================================
    O MAR · amanhecer no hero
@@ -376,33 +577,6 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
 .stagger.in > *:nth-child(5) { transition-delay: 0.28s; }
 .stagger.in > *:nth-child(6) { transition-delay: 0.34s; }
 
-/* ===== hero "shift engine" — painel tech leve, css + poucos intervals ===== */
-
-.hero-seg {
-  height: 4px;
-  flex: 1;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  transition: background 0.3s;
-}
-.hero-seg.lit {
-  background: linear-gradient(90deg, var(--accent-deep), var(--accent));
-}
-
-.hero-bar {
-  flex: 1;
-  border-radius: 3px 3px 0 0;
-  background: rgba(255, 255, 255, 0.12);
-  transition: height 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.hero-bar.hi { background: linear-gradient(180deg, var(--gold), var(--accent)); }
-
-@keyframes log-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: none; }
-}
-.hero-log-line { animation: log-in 0.4s ease both; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
 /* ===== spotlight que segue o cursor (mantido da v1 — é bom) ===== */
 .spot { position: relative; }
 .spot::before {
@@ -559,27 +733,6 @@ html.js [data-draw]:not(.in) .sail-ship { visibility: hidden; animation-play-sta
   .grid-overlay { opacity: 0.5; background-size: 52px 52px; }
 }
 
-/* ===== o painel da engine monta peça por peça =====
-   pendurado no reveal normal, não no load: assim funciona igual no
-   desktop (visível de cara) e no celular (o painel está abaixo da dobra). */
-html.js .reveal.d-panel .boot,
-html.js .reveal.d-panel .boot-cascade > * { opacity: 0; }
-html.js .reveal.d-panel.in .boot,
-html.js .reveal.d-panel.in .boot-cascade > * {
-  animation: boot-in 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-}
-@keyframes boot-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: none; }
-}
-html.js .reveal.d-panel.in .boot.b1 { animation-delay: 0.20s; }
-html.js .reveal.d-panel.in .boot-cascade > *:nth-child(1) { animation-delay: 0.26s; }
-html.js .reveal.d-panel.in .boot-cascade > *:nth-child(2) { animation-delay: 0.31s; }
-html.js .reveal.d-panel.in .boot-cascade > *:nth-child(3) { animation-delay: 0.36s; }
-html.js .reveal.d-panel.in .boot.b2 { animation-delay: 0.42s; }
-html.js .reveal.d-panel.in .boot.b3 { animation-delay: 0.50s; }
-html.js .reveal.d-panel.in .boot.b4 { animation-delay: 0.58s; }
-
 /* ===== respeito a quem prefere menos movimento ===== */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto !important; }
@@ -589,12 +742,11 @@ html.js .reveal.d-panel.in .boot.b4 { animation-delay: 0.58s; }
   .sea-line { animation: none !important; opacity: 1 !important; transform: none !important; }
   .sea-band { animation: none !important; }
   html.js .hero-title { animation: none !important; clip-path: none !important; }
-  html.js .reveal.d-panel .boot,
-  html.js .reveal.d-panel .boot-cascade > * { animation: none !important; opacity: 1 !important; }
   .animate-ping { animation: none !important; }
-  .hero-bar { transition: none !important; }
+  .hero-visual hero-shift,
+  .hero-static-fallback { transition: none !important; }
   html.js [data-draw] { transition: none !important; }
   body > header { animation: none !important; }
   html.js [data-draw] { transform: none !important; }
-  .reveal, .stagger > *, .quiz-step.active, .hero-log-line { transition-duration: 0.01ms !important; transition-delay: 0s !important; animation-duration: 0.01ms !important; }
+  .reveal, .stagger > *, .quiz-step.active { transition-duration: 0.01ms !important; transition-delay: 0s !important; animation-duration: 0.01ms !important; }
 }
