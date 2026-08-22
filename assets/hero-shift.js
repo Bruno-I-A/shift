@@ -117,21 +117,48 @@
       this.addEventListener('pointermove', onMove, { passive: true });
       this.addEventListener('pointerleave', onLeave, { passive: true });
 
-      // Geometria da marca existente, normalizada a partir do favicon.
+      // Geometria da marca existente, normalizada diretamente do favicon.
       var normalize = (x, y) => [(x - 50) / 50, (50 - y) / 50];
       var polygon = (points) => points.map((point) => normalize(point[0], point[1]));
-      // Silhueta única da marca. Antes os três pedaços eram extrudados e
-      // contornados separadamente; em perspectiva as arestas internas
-      // apareciam como rachaduras e a peça deixava de ler como um S.
-      var silhouette = polygon([
-        [24, 16], [86, 16], [86, 31], [48.88, 31],
-        [67.12, 69], [76, 69], [76, 84], [14, 84],
-        [14, 69], [44.08, 69], [31.92, 31], [24, 31]
-      ]);
-      var depth = 0.2;
-      var FRONT = [122, 66, 196];
-      var SIDE = [72, 34, 124];
-      var BACK = [44, 20, 78];
+      var roundedRect = (x, y, width, height, radius) => {
+        var points = [];
+        var arc = (cx, cy, start, end) => {
+          for (var step = 0; step <= 3; step++) {
+            var angle = start + (end - start) * (step / 3);
+            points.push([cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius]);
+          }
+        };
+        arc(x + width - radius, y + radius, -Math.PI / 2, 0);
+        arc(x + width - radius, y + height - radius, 0, Math.PI / 2);
+        arc(x + radius, y + height - radius, Math.PI / 2, Math.PI);
+        arc(x + radius, y + radius, Math.PI, Math.PI * 1.5);
+        return points;
+      };
+      var strokeSegment = (x1, y1, x2, y2, width) => {
+        var dx = x2 - x1;
+        var dy = y2 - y1;
+        var length = Math.hypot(dx, dy) || 1;
+        var ox = -dy / length * width * 0.5;
+        var oy = dx / length * width * 0.5;
+        return [
+          [x1 + ox, y1 + oy],
+          [x2 + ox, y2 + oy],
+          [x2 - ox, y2 - oy],
+          [x1 - ox, y1 - oy]
+        ];
+      };
+      // Mesmas três peças, dimensões e pequenos raios do favicon original.
+      // Elas permanecem independentes visualmente, mas compartilham uma única
+      // transformação, luz e inércia — o conjunto se move como um só objeto.
+      var shapes = [
+        polygon(roundedRect(26, 18, 60, 14, 2)),
+        polygon(strokeSegment(38, 32, 62, 68, 14)),
+        polygon(roundedRect(14, 68, 60, 14, 2))
+      ];
+      var depth = 0.17;
+      var FRONT = [181, 107, 255];
+      var SIDE = [91, 48, 147];
+      var BACK = [48, 23, 82];
       var COOL = [168, 196, 240];
       var WARM = [255, 214, 120];
       var channel = (value) => clamp(Math.round(value), 0, 255);
@@ -248,8 +275,9 @@
         // Marca extrudada em 3D com entrada suave e resposta limitada ao ponteiro.
         var intro = 1 - Math.pow(1 - clamp(time / 1.15, 0, 1), 3);
         var markScale = 0.9 + intro * 0.1;
-        var ay = 0.3 + Math.sin(time * 0.26) * 0.14 + mx * 0.12;
-        var ax = -0.14 + Math.sin(time * 0.17) * 0.035 - my * 0.08;
+        var ay = 0.22 + Math.sin(time * 0.26) * 0.045 + mx * 0.09;
+        var ax = -0.1 + Math.sin(time * 0.17) * 0.025 - my * 0.06;
+        var groupLift = Math.sin(time * 0.62) * 0.018;
         var cosY = Math.cos(ay);
         var sinY = Math.sin(ay);
         var cosX = Math.cos(ax);
@@ -260,17 +288,19 @@
           z *= markScale;
           var x1 = x * cosY + z * sinY;
           var z1 = -x * sinY + z * cosY;
-          return [x1, y * cosX - z1 * sinX, y * sinX + z1 * cosX];
+          return [x1, y * cosX - z1 * sinX + groupLift, y * sinX + z1 * cosX];
         };
         var faces = [];
-        var front = silhouette.map((point) => rotate(point[0], point[1], depth));
-        var back = silhouette.map((point) => rotate(point[0], point[1], -depth));
-        faces.push({ points: front, kind: 'front' });
-        faces.push({ points: back.slice().reverse(), kind: 'back' });
-        for (var i = 0; i < silhouette.length; i++) {
-          var next = (i + 1) % silhouette.length;
-          faces.push({ points: [front[i], front[next], back[next], back[i]], kind: 'side' });
-        }
+        shapes.forEach((shape, piece) => {
+          var front = shape.map((point) => rotate(point[0], point[1], depth));
+          var back = shape.map((point) => rotate(point[0], point[1], -depth));
+          faces.push({ points: front, kind: 'front', piece: piece });
+          faces.push({ points: back.slice().reverse(), kind: 'back', piece: piece });
+          for (var i = 0; i < shape.length; i++) {
+            var next = (i + 1) % shape.length;
+            faces.push({ points: [front[i], front[next], back[next], back[i]], kind: 'side', piece: piece });
+          }
+        });
         faces.forEach((face) => {
           face.z = face.points.reduce((total, point) => total + point[2], 0) / face.points.length;
           var a = face.points[0];
@@ -286,17 +316,29 @@
           var length = Math.hypot.apply(null, normal) || 1;
           face.light = Math.max(0, (normal[0] * light[0] + normal[1] * light[1] + normal[2] * light[2]) / length);
         });
-        // A face frontal única sempre fecha a peça por último. Ordenar apenas
-        // pela média de profundidade fazia uma lateral passar por cima dela
-        // em certos ângulos, criando os “quebres” que apareciam ao mover o
-        // cursor.
-        faces.sort((a, b) => {
-          if (a.kind === 'front' && b.kind !== 'front') return 1;
-          if (b.kind === 'front' && a.kind !== 'front') return -1;
-          return a.z - b.z;
-        });
+        // Laterais e fundos respeitam a profundidade; as três faces frontais
+        // fecham o conjunto juntas e na mesma ordem do SVG original. Assim
+        // nenhuma lateral atravessa outra peça durante o movimento.
+        var frontFaces = faces
+          .filter((face) => face.kind === 'front')
+          .sort((a, b) => a.piece - b.piece);
+        var orderedFaces = faces
+          .filter((face) => face.kind !== 'front')
+          .sort((a, b) => a.z - b.z)
+          .concat(frontFaces);
+        var frontPoints = frontFaces.reduce((all, face) => all.concat(face.points.map(project)), []);
+        var frontXs = frontPoints.map((point) => point[0]);
+        var frontYs = frontPoints.map((point) => point[1]);
+        var frontGradient = ctx.createLinearGradient(
+          Math.min.apply(null, frontXs),
+          Math.min.apply(null, frontYs),
+          Math.max.apply(null, frontXs),
+          Math.max.apply(null, frontYs)
+        );
+        frontGradient.addColorStop(0, rgba(FRONT, 1.08, 1));
+        frontGradient.addColorStop(1, rgba(FRONT, 0.86, 1));
 
-        faces.forEach((face) => {
+        orderedFaces.forEach((face) => {
           var points = face.points.map(project);
           ctx.save();
           ctx.globalAlpha = intro;
@@ -310,20 +352,16 @@
           var base = face.kind === 'front' ? FRONT : face.kind === 'side' ? SIDE : BACK;
           var multiplier = 0.62 + 0.72 * face.light;
           if (face.kind === 'front') {
-            var xs = points.map((point) => point[0]);
-            var ys = points.map((point) => point[1]);
-            var faceGradient = ctx.createLinearGradient(Math.min.apply(null, xs), Math.min.apply(null, ys), Math.max.apply(null, xs), Math.max.apply(null, ys));
-            faceGradient.addColorStop(0, rgba(base, multiplier * 1.22, 1));
-            faceGradient.addColorStop(1, rgba(base, multiplier * 0.78, 1));
-            ctx.fillStyle = faceGradient;
-            ctx.shadowColor = 'rgba(181,107,255,0.22)';
-            ctx.shadowBlur = 18;
+            // Um único gradiente atravessa as três peças e reforça que a
+            // animação pertence à marca inteira, não a blocos independentes.
+            ctx.fillStyle = frontGradient;
           } else {
             ctx.fillStyle = rgba(base, multiplier, face.kind === 'back' ? 0.9 : 1);
           }
           ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.strokeStyle = 'rgba(196,150,255,' + (0.1 + 0.34 * face.light) + ')';
+          ctx.strokeStyle = face.kind === 'front'
+            ? 'rgba(226,202,255,0.2)'
+            : 'rgba(196,150,255,' + (0.08 + 0.28 * face.light) + ')';
           ctx.lineWidth = 1;
           ctx.stroke();
           ctx.restore();
