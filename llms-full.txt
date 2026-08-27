@@ -1,0 +1,83 @@
+# Shift Systems — conteúdo completo
+
+> Sistemas sob medida, automações e agentes de IA para empresas que querem sair do improviso operacional.
+
+Fonte: https://shiftsys.com.br · CNPJ 66.982.894/0001-70 (SHIFT SYSTEMS LTDA.) · Atendimento remoto em todo o Brasil
+
+Conteúdo livre para citação, desde que atribuído a Shift Systems com link para https://shiftsys.com.br.
+
+## Posicionamento
+
+Não é sobre parecer tech — é sobre colocar a operação no modo automático. Algumas empresas precisam de um sistema inteiro; outras só precisam eliminar três tarefas que travam o dia. A Shift entra nesse ponto exato. Não é sobre ter mais ferramentas: é sobre a operação andar. Sistemas, automações e agentes de IA para tirar trabalho manual do caminho — menos cobrança no grupo, menos planilha paralela, menos lead esquecido e mais controle para decidir rápido.
+
+## Soluções
+
+Página: https://shiftsys.com.br/solucoes.html
+
+### Sites que vendem sozinhos (aquisição)
+
+Landing pages e sites institucionais desenhados como funil: cada seção empurra o visitante pra próxima etapa até ele virar lead qualificado direto no WhatsApp. Inclui landing page, quiz/diagnóstico, otimização para conversão e analytics.
+
+### Inbox de leads inteligente (vendas)
+
+Captura WhatsApp, Instagram e formulário em uma fila única, qualifica o lead com IA e manda o próximo passo pro CRM.
+
+### Painel de execução (operação)
+
+Um cockpit simples para acompanhar pedidos, tarefas, prazos, responsáveis e gargalos sem depender de grupo ou áudio perdido.
+
+### Cobrança automática (financeiro)
+
+Emissão, lembrete, status de pagamento e follow-up rodando sozinhos, com histórico limpo e visível.
+
+### Agente com memória da empresa (atendimento)
+
+Um assistente de IA que responde no tom da marca, consulta regras internas e chama humano quando a conversa precisa de cuidado.
+
+### Dashboard do dono (gestão)
+
+Receita, conversão, canais, gargalos e metas em uma tela só. Menos feeling, mais leitura do jogo.
+
+### App sob medida (sistema interno)
+
+Login, permissões, cadastro, busca, relatórios e automações internas em uma ferramenta feita para o fluxo real da empresa.
+
+### Integrações
+
+Tudo isso conversando com o que a empresa já usa: WhatsApp API, CRM, ERP, n8n e bancos de dados.
+
+## Processo
+
+Página: https://shiftsys.com.br/processo.html
+
+### 01 · Diagnóstico
+
+Mapeamos onde tempo, dinheiro e oportunidades escapam: mensagens sem dono, tarefas repetidas, planilhas paralelas e decisões sem número confiável. Saída: mapa de gargalos e ROI estimado.
+
+### 02 · Mapeamento
+
+Transformamos o diagnóstico em blueprint: o que construir primeiro, quais integrações entram, quanto tempo leva e qual impacto esperar de cada entrega. Saída: blueprint técnico e cronograma.
+
+### 03 · Desenvolvimento
+
+Toda semana tem avanço visível: tela, fluxo, automação ou agente funcionando em ambiente de teste para validar cedo e ajustar sem desperdício. Saída: releases semanais em ambiente de teste.
+
+### 04 · Evolução
+
+Depois do go-live, acompanhamos uso real, corrigimos rápido e evoluímos o sistema conforme novos gargalos aparecem. Saída: suporte contínuo e novas features.
+
+## Diagnóstico
+
+Página: https://shiftsys.com.br/diagnostico.html
+
+Quiz de 4 perguntas (área caótica → tamanho do time → controle atual → urgência), uma por tela. Ao final, estima o "tesouro" (horas por semana recuperáveis), aponta a prioridade, o que construir primeiro e a stack provável — com um botão que leva direto ao WhatsApp com a mensagem já preenchida. As respostas são processadas só no navegador: nada é enviado a servidor, a não ser que a pessoa escolha compartilhar clicando no WhatsApp.
+
+## Contato
+
+Página: https://shiftsys.com.br/contato.html
+
+- WhatsApp: +55 54 98418-4808 — https://wa.me/5554984184808
+- Instagram: @shift_systemss — https://instagram.com/shift_systemss
+- E-mail: hello@shift.systems
+
+Resposta em menos de 24h.

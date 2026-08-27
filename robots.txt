@@ -1,0 +1,27 @@
+User-Agent: *
+Allow: /
+
+User-Agent: OAI-SearchBot
+User-Agent: ChatGPT-User
+User-Agent: GPTBot
+User-Agent: ClaudeBot
+User-Agent: Claude-User
+User-Agent: Claude-SearchBot
+User-Agent: anthropic-ai
+User-Agent: PerplexityBot
+User-Agent: Perplexity-User
+User-Agent: Google-Extended
+User-Agent: Applebot
+User-Agent: Applebot-Extended
+User-Agent: DuckAssistBot
+User-Agent: MistralAI-User
+User-Agent: cohere-ai
+User-Agent: meta-externalagent
+User-Agent: Amazonbot
+User-Agent: Bytespider
+User-Agent: CCBot
+User-Agent: YouBot
+Allow: /
+
+Sitemap: https://shiftsys.com.br/sitemap.xml
+Host: https://shiftsys.com.br/

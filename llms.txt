@@ -1,0 +1,40 @@
+# Shift Systems
+
+> Sistemas sob medida, automações e agentes de IA para empresas que querem sair do improviso operacional. Sites que vendem sozinhos, inbox de leads, cobrança automática, dashboards e sistemas internos — tudo conectado ao que a empresa já usa.
+
+Empresa brasileira, CNPJ 66.982.894/0001-70 (SHIFT SYSTEMS LTDA.). Atendimento remoto para empresas em todo o Brasil. Site: https://shiftsys.com.br
+
+A Shift constrói, sob medida, conforme o gargalo de cada empresa:
+
+- **Sites que vendem sozinhos** — landing pages e sites institucionais desenhados como funil, do primeiro clique ao lead qualificado no WhatsApp.
+- **Inbox de leads inteligente** (vendas) — capta WhatsApp, Instagram e formulário numa fila única, qualifica o lead e atualiza o CRM.
+- **Painel de execução** (operação) — cockpit de pedidos, tarefas, prazos e responsáveis, sem depender de grupo ou áudio perdido.
+- **Cobrança automática** (financeiro) — emissão, lembrete, status de pagamento e follow-up rodando sozinhos.
+- **Agente com memória da empresa** (atendimento) — assistente de IA que responde no tom da marca, consulta regras internas e chama humano quando precisa.
+- **Dashboard do dono** (gestão) — receita, conversão, canais e metas numa tela só.
+- **App sob medida** (sistema interno) — login, permissões, cadastro, busca e relatórios feitos para o fluxo real da empresa.
+
+Todo trabalho segue quatro etapas: diagnóstico (mapa de gargalos e ROI estimado), mapeamento (blueprint técnico e cronograma), desenvolvimento (entregas semanais em ambiente de teste) e evolução (suporte e novas features após o go-live).
+
+Contato:
+
+- WhatsApp: +55 54 98418-4808 — https://wa.me/5554984184808?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Shift%20Systems%20e%20quero%20tirar%20minha%20empresa%20do%20modo%20manual.
+- Instagram: @shift_systemss — https://instagram.com/shift_systemss
+- E-mail: hello@shift.systems
+- Diagnóstico gratuito (4 perguntas, ~3 min): https://shiftsys.com.br/diagnostico.html
+
+## Páginas
+
+- [Início](https://shiftsys.com.br/): Visão geral — o que a Shift constrói, a rota do funil e os três destaques da operação.
+- [Soluções](https://shiftsys.com.br/solucoes.html): As sete frentes de construção (site-funil, vendas, operação, financeiro, atendimento, gestão, sistema interno) e as integrações suportadas.
+- [Processo](https://shiftsys.com.br/processo.html): As quatro etapas do trabalho, do diagnóstico à evolução contínua pós-entrega.
+- [Diagnóstico](https://shiftsys.com.br/diagnostico.html): Quiz de 4 perguntas que estima as horas por semana recuperáveis e aponta o que construir primeiro.
+- [Contato](https://shiftsys.com.br/contato.html): WhatsApp, Instagram e e-mail, com resposta em menos de 24h.
+
+## Opcional
+
+- [Conteúdo completo em markdown](https://shiftsys.com.br/llms-full.txt): todas as páginas em texto plano, sem navegação.
+- [Política de Privacidade](https://shiftsys.com.br/privacidade.html): tratamento de dados pessoais no site — o diagnóstico roda só no navegador, nada é enviado a servidores sem o usuário optar por enviar via WhatsApp.
+- [Termos de Uso](https://shiftsys.com.br/termos.html): regras de uso do site.
+
+Conteúdo livre para citação, desde que atribuído a Shift Systems com link para https://shiftsys.com.br.
