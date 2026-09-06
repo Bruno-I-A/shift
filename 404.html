@@ -8,36 +8,16 @@
 <meta name="theme-color" content="#0A1428" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
-          accent: { DEFAULT: '#F2A63D', deep: '#D4841A' },
-          gold: '#FFC93D',
-          paper: '#F6F5F1',
-          purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
-        },
-        fontFamily: {
-          sans: ['Geist', 'system-ui', 'sans-serif'],
-          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
-        },
-      }
-    }
-  };
-</script>
+<link rel="stylesheet" href="assets/fonts.css" />
+<link rel="preload" as="font" href="assets/fonts/geist.woff2" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="assets/utilities.css" />
 <link rel="stylesheet" href="assets/site.css" />
-<script>document.documentElement.classList.add('js');</script>
+<link rel="stylesheet" href="assets/cinema.css" />
+<script>document.documentElement.classList.add('js'); setTimeout(function(){ if(!window.shiftReady) document.documentElement.classList.remove('js'); }, 2000);</script>
 </head>
-<body class="page-bg">
+<body class="page-bg cinema-inner">
 
-<main class="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+<main id="main-content" class="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
   <div class="grid-overlay" aria-hidden="true"></div>
   <div class="relative max-w-xl mx-auto text-center py-20">
     <svg class="mx-auto mb-8 compass-spin" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#FFC93D" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -59,5 +39,7 @@
 </main>
 
 <script src="assets/site.js" defer></script>
+<script src="assets/cinema.js" defer></script>
+<button type="button" id="motion-toggle" class="motion-toggle" aria-label="Pausar animações" aria-pressed="false"><span class="motion-symbol" aria-hidden="true">Ⅱ</span><span class="motion-text">Pausar movimento</span></button>
 </body>
 </html>

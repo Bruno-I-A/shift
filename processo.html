@@ -25,32 +25,12 @@
 <meta name="twitter:description" content="Do diagnóstico à operação rodando com mais controle, menos retrabalho e entregas semanais." />
 <meta name="twitter:image" content="https://shiftsys.com.br/og-image.png" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
-          accent: { DEFAULT: '#F2A63D', deep: '#D4841A' },
-          gold: '#FFC93D',
-          paper: '#F6F5F1',
-          purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
-        },
-        fontFamily: {
-          sans: ['Geist', 'system-ui', 'sans-serif'],
-          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
-        },
-      }
-    }
-  };
-</script>
+<link rel="stylesheet" href="assets/fonts.css" />
+<link rel="preload" as="font" href="assets/fonts/geist.woff2" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="assets/utilities.css" />
 <link rel="stylesheet" href="assets/site.css" />
-<script>document.documentElement.classList.add('js');</script>
+<link rel="stylesheet" href="assets/cinema.css" />
+<script>document.documentElement.classList.add('js'); setTimeout(function(){ if(!window.shiftReady) document.documentElement.classList.remove('js'); }, 2000);</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -128,7 +108,8 @@
 }
 </script>
 </head>
-<body class="page-bg">
+<body class="page-bg cinema-inner">
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 <div id="scroll-progress" aria-hidden="true"></div>
 
 <header class="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
@@ -179,7 +160,7 @@
   <a href="diagnostico.html" class="btn-primary rounded-full px-8 py-4 text-lg font-medium mt-4">Fazer diagnóstico</a>
 </div>
 
-<main>
+<main id="main-content">
   <!-- ===== hero da página ===== -->
   <section class="relative pt-36 sm:pt-44 pb-10 md:pb-16 px-6 md:px-12 lg:px-20 overflow-hidden">
     <div class="grid-overlay" aria-hidden="true"></div>
@@ -351,11 +332,13 @@
     <div class="hr-grad my-8"></div>
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs uppercase tracking-wider text-white/55">
       <span>© <span data-year>2026</span> shift systems</span>
-      <span>feito em mar aberto · v2.0</span>
+      <span>feito em mar aberto · uma nova direção</span>
     </div>
   </div>
 </footer>
 
 <script src="assets/site.js" defer></script>
+<script src="assets/cinema.js" defer></script>
+<button type="button" id="motion-toggle" class="motion-toggle" aria-label="Pausar animações" aria-pressed="false"><span class="motion-symbol" aria-hidden="true">Ⅱ</span><span class="motion-text">Pausar movimento</span></button>
 </body>
 </html>

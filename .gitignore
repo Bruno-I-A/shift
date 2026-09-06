@@ -2,8 +2,7 @@
 Thumbs.db
 *.log
 node_modules/
-package.json
-package-lock.json
+dist/
 babelcheck.js
 probe-*.png
 promo/

@@ -15,9 +15,13 @@
       Object.assign(canvas.style, { display: 'block', width: '100%', height: '100%' });
       this.appendChild(canvas);
 
+      // .hero-visual-ready mora em .hero-visual, não no pai direto: a legenda
+      // precisou sair da máscara do canvas e ficou uma casa acima na árvore.
+      var heroVisual = this.closest('.hero-visual');
+
       var ctx = canvas.getContext('2d');
       if (!ctx) {
-        this.parentElement && this.parentElement.classList.add('hero-visual-ready');
+        heroVisual && heroVisual.classList.add('hero-visual-ready');
         return;
       }
 
@@ -30,7 +34,7 @@
       var markReady = () => {
         if (ready) return;
         ready = true;
-        this.parentElement && this.parentElement.classList.add('hero-visual-ready');
+        heroVisual && heroVisual.classList.add('hero-visual-ready');
       };
 
       // Gerador determinístico: o primeiro quadro não muda a cada carregamento.
@@ -371,7 +375,7 @@
         markReady();
       };
 
-      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('motion-paused');
       var last = performance.now();
       var time = reduced ? 4.5 : 0;
       var running = false;
@@ -390,6 +394,7 @@
       };
       var start = () => {
         if (reduced) {
+          time = Math.max(time, 4.5);
           draw(time, 0);
           return;
         }
@@ -412,6 +417,12 @@
         syncPlayback();
       };
       document.addEventListener('visibilitychange', this._onVisibility);
+      this._onMotion = (event) => {
+        reduced = event.detail.paused;
+        stop();
+        syncPlayback();
+      };
+      window.addEventListener('shift:motion', this._onMotion);
 
       if ('IntersectionObserver' in window) {
         this._io = new IntersectionObserver((entries) => {
@@ -434,6 +445,7 @@
       this.removeEventListener('pointerleave', this._onLeave);
       this._onResize && window.removeEventListener('resize', this._onResize);
       this._onVisibility && document.removeEventListener('visibilitychange', this._onVisibility);
+      this._onMotion && window.removeEventListener('shift:motion', this._onMotion);
     }
   }
 

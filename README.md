@@ -1,4 +1,30 @@
-# Handoff: Shift Systems — Site v2 "mar aberto"
+# Shift Systems — experiência cinematográfica v3
+
+## Atualização · 06/09/2026
+
+A home agora conduz uma narrativa pela rolagem: marca 3D e fluxos de dados,
+manifesto progressivo, carta de navegação com quatro etapas, transformação da
+operação, soluções e chamada final. A paisagem de mar e barco da primeira prévia
+foi retirada por feedback de Bruno: tecnologia é o assunto principal; One Piece
+fica na bússola, rota, tripulação e easter eggs.
+
+As oito páginas usam `assets/cinema.css` e `assets/cinema.js`. A estrutura estática,
+os contatos e o diagnóstico foram preservados. As fontes são locais, com suas
+licenças em `assets/fonts/`. Tailwind agora é compilado, sem compilador CDN no
+navegador. `npm run build` produz `dist/`; `npm run dev` serve a prévia na porta
+4173. `node scripts/check.mjs` verifica links, âncoras, arquivos e metadados.
+
+O movimento usa CSS, IntersectionObserver e um quadro por evento de scroll. O
+canvas da marca pausa fora da tela e quando a aba fica oculta. O botão de pausa
+persiste apenas na sessão, e a preferência do sistema por movimento reduzido é
+respeitada. Nenhum vídeo, biblioteca 3D ou pacote de animação é carregado.
+
+A configuração `.openai/hosting.json` aponta para uma prévia privada no Sites;
+ela não muda o domínio `shiftsys.com.br` nem a hospedagem pública existente.
+
+---
+
+# Referência anterior: Site v2 "mar aberto"
 
 ## Overview
 

@@ -26,32 +26,12 @@
 <meta name="twitter:description" content="Sistemas, automações e IA sob medida. Menos improviso. Mais sistema. Mais resultado." />
 <meta name="twitter:image" content="https://shiftsys.com.br/og-image.png" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          navy: { DEFAULT: '#0A1428', 2: '#0E1D3A' },
-          accent: { DEFAULT: '#F2A63D', deep: '#D4841A' },
-          gold: '#FFC93D',
-          paper: '#F6F5F1',
-          purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' },
-        },
-        fontFamily: {
-          sans: ['Geist', 'system-ui', 'sans-serif'],
-          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
-        },
-      }
-    }
-  };
-</script>
+<link rel="stylesheet" href="assets/fonts.css" />
+<link rel="preload" as="font" href="assets/fonts/geist.woff2" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="assets/utilities.css" />
 <link rel="stylesheet" href="assets/site.css" />
-<script>document.documentElement.classList.add('js');</script>
+<link rel="stylesheet" href="assets/cinema.css" />
+<script>document.documentElement.classList.add('js'); setTimeout(function(){ if(!window.shiftReady) document.documentElement.classList.remove('js'); }, 2000);</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -121,7 +101,8 @@
 }
 </script>
 </head>
-<body class="page-bg">
+<body class="page-bg cinema-home">
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 <div id="scroll-progress" aria-hidden="true"></div>
 
 <!-- ===== header ===== -->
@@ -173,247 +154,92 @@
   <a href="diagnostico.html" class="btn-primary rounded-full px-8 py-4 text-lg font-medium mt-4">Fazer diagnóstico</a>
 </div>
 
-<main>
-  <!-- ===== hero: o improviso entra, o sistema sai ===== -->
-  <section class="hero-home" aria-labelledby="hero-title">
-    <div class="grid-overlay" aria-hidden="true"></div>
-
-    <div class="hero-visual">
-      <div class="hero-static-fallback" aria-hidden="true">
-        <span class="hero-static-chaos"></span>
-        <span class="hero-static-system"></span>
+<main id="main-content">
+  <section class="opening" id="horizonte" aria-labelledby="hero-title" data-chapter="01">
+    <div class="opening-frame">
+      <div class="brand-grid" aria-hidden="true"></div>
+      <div class="brand-shot">
+        <svg class="brand-orbit" viewBox="0 0 600 600" fill="none" aria-hidden="true"><circle cx="300" cy="300" r="224"/><circle cx="300" cy="300" r="266" stroke-dasharray="1 14"/><path d="M300 18v22m0 520v22M18 300h22m520 0h22"/><circle class="orbit-index" cx="300" cy="76" r="4"/></svg>
+        <div class="hero-visual"><div class="hero-visual-canvas"><hero-shift role="img" aria-label="A tecnologia da Shift transforma fluxos dispersos em uma operação conectada"><img src="favicon.svg" width="130" height="130" alt="" /></hero-shift></div></div>
+        <div class="brand-caption" aria-hidden="true"><span>IDEIAS → SISTEMAS</span><span>SHIFT / ENGINE</span></div>
       </div>
-      <hero-shift role="img" aria-label="O improviso entra disperso, atravessa a marca Shift e sai organizado em um sistema"></hero-shift>
-      <div class="hero-visual-legend" aria-hidden="true">
-        <span>improviso</span>
-        <span class="hero-legend-center">shift</span>
-        <span>sistema</span>
+      <div class="opening-shade" aria-hidden="true"></div>
+      <div class="film-topline"><span>EST. BRASIL · 2026</span><span>SISTEMAS / IA / AUTOMAÇÕES</span></div>
+      <div class="opening-copy">
+        <p class="film-label"><span class="status-light"></span> Tecnologia para ir além</p>
+        <h1 id="hero-title">Seu negócio.<br>Um novo<br><em>horizonte.</em></h1>
+        <p class="opening-description">Tire sua empresa do improviso.<br>Sistemas, automações e IA sob medida<br class="desktop-break"> para você crescer em mar aberto.</p>
+        <a class="cinema-button" href="diagnostico.html"><span>Descobrir minha rota</span><span class="button-arrow" aria-hidden="true">↗</span></a>
       </div>
+      <div class="opening-bottom"><a href="#manifesto" class="scroll-cue"><span class="scroll-line" aria-hidden="true"></span>Role para explorar</a><span class="film-coordinate">01 / O HORIZONTE</span><span class="opening-response">Feito sob medida. De verdade.</span></div>
     </div>
+  </section>
 
-    <div class="hero-copy">
-      <div class="reveal d1 hero-eyebrow">
-        <span class="hero-eyebrow-dot"></span>
-        <span class="eyebrow">shift systems · 2026</span>
-      </div>
-
-      <h1 id="hero-title" class="display hero-title text-paper">
-        Tecnologia <span class="text-accent">sob medida</span>
-        <span class="text-white/55">para a sua operação.</span>
-      </h1>
-
-      <p class="reveal d3 hero-lead">
-        Sistemas, automações e inteligência artificial para empresas que querem parar de operar no improviso.
-      </p>
-      <p class="reveal d4 hero-support">
-        A Shift transforma processos manuais, atendimento desorganizado e tarefas repetitivas em tecnologia simples, inteligente e escalável.
-      </p>
-
-      <div class="reveal d5 hero-actions">
-        <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium">
-          Fazer diagnóstico
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-        </a>
-        <a href="solucoes.html" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base">Ver soluções</a>
-      </div>
-
-      <div class="reveal d6 hero-meta">
-        <span>tempo médio · 2–6 semanas</span>
-        <span class="hero-meta-separator">•</span>
-        <span>stack sob medida</span>
-        <span class="hero-meta-separator">•</span>
-        <span>resposta &lt; 24h</span>
+  <section id="manifesto" class="manifesto cinema-section" data-chapter="02" aria-labelledby="manifesto-title">
+    <div class="section-kicker reveal"><span>01 — O ponto de partida</span><span>MENOS RUÍDO. MAIS DIREÇÃO.</span></div>
+    <div class="manifesto-layout">
+      <div class="manifesto-margin reveal"><span class="index-display">01</span><p>O seu tempo é<br>o verdadeiro tesouro.</p></div>
+      <div>
+        <h2 id="manifesto-title" class="manifesto-statement" data-ink>Quem sonha grande não nasceu para passar o dia apagando incêndios.</h2>
+        <div class="manifesto-detail reveal"><span class="small-rule" aria-hidden="true"></span><p>Uma mensagem esquecida. A mesma informação em três planilhas. Mais uma decisão no escuro. O improviso ocupa o espaço que deveria ser do próximo passo.</p></div>
+        <p class="manifesto-turn reveal">Está na hora de mudar a rota. <span aria-hidden="true">↘</span></p>
       </div>
     </div>
   </section>
 
-  <!-- ===== a rota (o caminho do lead) ===== -->
-  <section class="relative px-6 md:px-12 lg:px-20 py-16 md:py-24">
-    <div class="max-w-7xl mx-auto">
-      <div class="reveal text-center mb-12">
-        <div class="num-tag mb-4">/ A rota</div>
-        <h2 class="display text-3xl md:text-5xl text-paper">Do caos até o mar aberto<span class="text-accent">.</span></h2>
-        <p class="mt-4 text-white/55 max-w-xl mx-auto">Quatro paradas. Você entra sabendo onde dói e sai com a operação rodando sozinha.</p>
-      </div>
-
-      <div class="relative">
-        <div class="route-line absolute top-[26px] left-[8%] right-[8%] hidden md:block" data-draw aria-hidden="true">
-          <svg class="sail-ship" viewBox="0 0 24 16" fill="none" aria-hidden="true">
-            <path d="M3 11h18l-3 4H6l-3-4z" fill="currentColor" opacity="0.9" />
-            <path d="M12 1v9" stroke="currentColor" stroke-width="1.2" />
-            <path d="M12 2c4 2 5 5 4 8h-4z" fill="currentColor" opacity="0.75" />
+  <section id="rota" class="voyage cinema-section" data-chapter="03" aria-labelledby="route-title">
+    <div class="section-kicker reveal"><span>02 — A travessia</span><span>UM NORTE. QUATRO PARADAS.</span></div>
+    <div class="voyage-layout">
+      <div class="chart-sticky">
+        <h2 id="route-title" class="section-title">Grandes destinos<br>começam com<br><em>uma boa rota.</em></h2>
+        <div class="navigation-chart" role="img" aria-label="Carta de navegação com quatro etapas: diagnóstico, solução, construção e mar aberto">
+          <div class="chart-coordinates" aria-hidden="true"><span>N</span><span>LOG POSE / SHIFT</span></div>
+          <svg class="route-chart" viewBox="0 0 520 360" fill="none" aria-hidden="true">
+            <defs><pattern id="chart-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" stroke="#94babc" stroke-opacity=".10"/></pattern></defs>
+            <rect width="520" height="360" fill="url(#chart-grid)"/>
+            <g class="chart-rings" stroke="#94babc" stroke-opacity=".16"><circle cx="260" cy="180" r="155"/><circle cx="260" cy="180" r="110"/><circle cx="260" cy="180" r="60"/><path d="M260 12V348M80 180H440"/><path d="M150 70L370 290M150 290L370 70" stroke-dasharray="3 7"/></g>
+            <path class="route-track" d="M65 275C190 290 95 75 215 95S295 290 360 230S410 100 465 65" stroke="#c4ac79" stroke-opacity=".25" stroke-width="1.5" stroke-dasharray="4 7"/>
+            <path id="voyage-path" d="M65 275C190 290 95 75 215 95S295 290 360 230S410 100 465 65" stroke="#edbc75" stroke-width="2" pathLength="1"/>
+            <g class="chart-point is-active" data-waypoint="0"><circle cx="65" cy="275" r="14"/><circle cx="65" cy="275" r="4"/><text x="42" y="313">01</text></g>
+            <g class="chart-point" data-waypoint="1"><circle cx="215" cy="95" r="14"/><circle cx="215" cy="95" r="4"/><text x="195" y="61">02</text></g>
+            <g class="chart-point" data-waypoint="2"><circle cx="360" cy="230" r="14"/><circle cx="360" cy="230" r="4"/><text x="340" y="270">03</text></g>
+            <g class="chart-point" data-waypoint="3"><circle cx="465" cy="65" r="14"/><circle cx="465" cy="65" r="4"/><text x="443" y="31">04</text></g>
+            <g id="route-vessel" transform="translate(65 275)"><circle r="9" fill="#edbc75" fill-opacity=".15"/><path d="M0 -8L5 5L0 2L-5 5Z" fill="#f6d69a"/></g>
           </svg>
+          <div class="chart-caption"><span class="chart-status"><i></i> <span id="chart-current">01 / Diagnóstico</span></span><span>DESTINO: MAR ABERTO</span></div>
         </div>
-
-        <div class="stagger grid md:grid-cols-4 gap-5 relative">
-          <a href="diagnostico.html" class="glass spot rounded-2xl p-6 cursor-pointer group">
-            <div class="flex items-center gap-3 mb-5">
-              <span class="waypoint lit shrink-0"></span>
-              <span class="num-tag">Parada 01</span>
-            </div>
-            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">Diagnóstico</h3>
-            <p class="mt-2 text-sm text-white/55">3 minutos para descobrir onde sua operação está vazando tempo e dinheiro.</p>
-          </a>
-
-          <a href="solucoes.html" class="glass spot rounded-2xl p-6 cursor-pointer group">
-            <div class="flex items-center gap-3 mb-5">
-              <span class="waypoint shrink-0"></span>
-              <span class="num-tag">Parada 02</span>
-            </div>
-            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">A solução certa</h3>
-            <p class="mt-2 text-sm text-white/55">Sistema, automação, site-funil ou agente de IA — o que faz sentido pro seu caso, sem empurrar nada.</p>
-          </a>
-
-          <a href="processo.html" class="glass spot rounded-2xl p-6 cursor-pointer group">
-            <div class="flex items-center gap-3 mb-5">
-              <span class="waypoint shrink-0"></span>
-              <span class="num-tag">Parada 03</span>
-            </div>
-            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">Construção</h3>
-            <p class="mt-2 text-sm text-white/55">2 a 6 semanas, releases semanais, você acompanhando tudo de perto.</p>
-          </a>
-
-          <a href="contato.html" class="glass spot rounded-2xl p-6 cursor-pointer group">
-            <div class="flex items-center gap-3 mb-5">
-              <span class="waypoint shrink-0"></span>
-              <span class="num-tag">Parada 04</span>
-            </div>
-            <h3 class="text-xl font-semibold text-paper group-hover:text-accent transition-colors">Mar aberto</h3>
-            <p class="mt-2 text-sm text-white/55">Operação no automático, dados na tela e sua cabeça livre pra crescer o negócio.</p>
-          </a>
-        </div>
+      </div>
+      <div class="voyage-legs">
+        <article class="voyage-leg" data-leg="0"><span class="leg-number">01 / ENCONTRAR O NORTE</span><h3>Antes de construir,<br>a gente escuta.</h3><p>Onde o tempo se perde? O que trava o crescimento? O diagnóstico encontra o problema que realmente vale resolver.</p><a href="diagnostico.html" class="text-link">Começar meu diagnóstico <span aria-hidden="true">↗</span></a></article>
+        <article class="voyage-leg" data-leg="1"><span class="leg-number">02 / TRAÇAR A ROTA</span><h3>A solução certa.<br>Sem excesso de bagagem.</h3><p>Sistema, automação, site ou agente de IA. A tecnologia vem depois de entender sua operação — e só entra o que faz sentido.</p><a href="solucoes.html" class="text-link">Conhecer as soluções <span aria-hidden="true">↗</span></a></article>
+        <article class="voyage-leg" data-leg="2"><span class="leg-number">03 / CONSTRUIR JUNTOS</span><h3>Você acompanha.<br>A gente faz acontecer.</h3><p>Entregas semanais, conversa direta e tecnologia funcionando desde cedo. Em geral, de 2 a 6 semanas da ideia à operação.</p><a href="processo.html" class="text-link">Ver como trabalhamos <span aria-hidden="true">↗</span></a></article>
+        <article class="voyage-leg" data-leg="3"><span class="leg-number">04 / GANHAR O MUNDO</span><h3>A operação flui.<br>Você olha adiante.</h3><p>Ferramentas conectadas, tarefas no automático e dados para decidir. Mais espaço na sua semana para fazer o negócio crescer.</p><a href="contato.html" class="text-link">Conversar com a Shift <span aria-hidden="true">↗</span></a></article>
       </div>
     </div>
   </section>
 
-  <!-- ===== o problema (compacto) ===== -->
-  <section class="relative px-6 md:px-12 lg:px-20 py-16 md:py-24">
-    <div class="max-w-7xl mx-auto">
-      <div class="reveal max-w-3xl mb-12">
-        <div class="num-tag mb-4">/ O custo do improviso</div>
-        <h2 class="display text-3xl md:text-5xl text-paper">
-          <span class="text-white/55">Planilha, retrabalho e WhatsApp bagunçado</span> têm um <span class="text-accent">preço</span>.
-        </h2>
-      </div>
-
-      <div class="stagger grid md:grid-cols-3 gap-5">
-        <div class="glass spot rounded-2xl p-7">
-          <div class="flex items-start justify-between mb-6">
-            <span class="num-tag">/ 01</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2 5 4-10 2 5h6" /></svg>
-          </div>
-          <div class="display text-5xl text-paper"><span data-count-to="40">0</span><span class="text-accent">%</span></div>
-          <div class="hr-grad my-5"></div>
-          <p class="text-white/55 text-sm">Dos leads que chegam por WhatsApp <span class="text-white/80">nunca recebem retorno</span> quando o atendimento é manual.</p>
-        </div>
-
-        <div class="glass spot rounded-2xl p-7">
-          <div class="flex items-start justify-between mb-6">
-            <span class="num-tag">/ 02</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
-          </div>
-          <div class="display text-5xl text-paper"><span data-count-to="2">0</span>h<span class="text-accent">/dia</span></div>
-          <div class="hr-grad my-5"></div>
-          <p class="text-white/55 text-sm">É o que um time pequeno gasta em <span class="text-white/80">copia-e-cola entre ferramentas</span> que não conversam entre si.</p>
-        </div>
-
-        <div class="glass spot rounded-2xl p-7">
-          <div class="flex items-start justify-between mb-6">
-            <span class="num-tag">/ 03</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" /><circle cx="12" cy="12" r="2.5" /></svg>
-          </div>
-          <div class="display text-5xl text-paper">No escuro<span class="text-accent">.</span></div>
-          <div class="hr-grad my-5"></div>
-          <p class="text-white/55 text-sm">Decisões tomadas no achismo porque <span class="text-white/80">nenhum número confiável</span> chega na sua mesa em tempo real.</p>
-        </div>
-      </div>
-    </div>
+  <section class="engine-scene cinema-section" id="tecnologia" data-chapter="04" aria-labelledby="engine-title">
+    <div class="section-kicker reveal"><span>03 — A mudança acontece aqui</span><span>FEITO PARA A SUA OPERAÇÃO</span></div>
+    <div class="engine-heading reveal"><h2 id="engine-title" class="section-title">O caos encontra<br><em>direção.</em></h2><p>Conectamos o que estava solto.<br>Automatizamos o que tomava tempo.<br>Construímos o que faltava.</p></div>
+    <div class="engine-cinema reveal"><div class="engine-labels" aria-hidden="true"><span>IMPROVISO</span><span class="engine-brand">A MUDANÇA É SHIFT.</span><span>SISTEMA</span></div><div class="hero-visual"><div class="hero-visual-canvas"><hero-shift role="img" aria-label="Ilustração: fluxos dispersos atravessam o monograma roxo da Shift e se organizam em linhas douradas"><img src="favicon.svg" width="130" height="130" alt="" /></hero-shift></div></div><span class="simulation-label">VISUALIZAÇÃO CONCEITUAL</span></div>
+    <div class="engine-footnote reveal"><span>MENOS TRABALHO REPETIDO.</span><span>MAIS TEMPO PARA O QUE IMPORTA.</span></div>
   </section>
 
-  <!-- ===== destaques de solução ===== -->
-  <section class="relative px-6 md:px-12 lg:px-20 py-16 md:py-24">
-    <div class="max-w-7xl mx-auto">
-      <div class="reveal flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
-        <div class="max-w-2xl">
-          <div class="num-tag mb-4">/ Soluções</div>
-          <h2 class="display text-3xl md:text-5xl text-paper">Tecnologia sob medida para sua empresa rodar melhor<span class="text-accent">.</span></h2>
-        </div>
-        <a href="solucoes.html" class="btn-ghost inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm shrink-0 self-start md:self-auto">
-          Ver todas as soluções
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-        </a>
-      </div>
-
-      <div class="stagger grid md:grid-cols-3 gap-5">
-        <a href="solucoes.html#agentes" class="glass spot rounded-2xl p-7 cursor-pointer group">
-          <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z" /></svg>
-          </div>
-          <h3 class="text-2xl font-semibold text-paper">Agentes de IA</h3>
-          <p class="mt-3 text-white/55 text-sm">Atendimento que responde na hora, qualifica o lead e chama humano quando a conversa precisa de cuidado.</p>
-          <div class="mt-5 flex flex-wrap gap-2">
-            <span class="font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">atendimento</span>
-            <span class="font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">vendas</span>
-          </div>
-        </a>
-
-        <a href="solucoes.html#automacoes" class="glass spot rounded-2xl p-7 cursor-pointer group">
-          <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h8" /><path d="M4 12h16" /><path d="M4 18h8" /><circle cx="16" cy="6" r="2" /><circle cx="8" cy="18" r="2" /></svg>
-          </div>
-          <h3 class="text-2xl font-semibold text-paper">Automações</h3>
-          <p class="mt-3 text-white/55 text-sm">Tarefas repetitivas rodando sozinhas: cobrança, follow-up, relatórios e integrações entre suas ferramentas.</p>
-          <div class="mt-5 flex flex-wrap gap-2">
-            <span class="font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">n8n</span>
-            <span class="font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">webhooks</span>
-          </div>
-        </a>
-
-        <a href="solucoes.html#funil" class="glass spot rounded-2xl p-7 cursor-pointer group">
-          <div class="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16l-6.5 8.5V19l-3 2v-8.5z" /></svg>
-          </div>
-          <h3 class="text-2xl font-semibold text-paper">Sites que vendem sozinhos</h3>
-          <p class="mt-3 text-white/55 text-sm">Landing pages desenhadas como funil — cada seção empurra o visitante até virar lead qualificado no seu WhatsApp.</p>
-          <div class="mt-5 flex flex-wrap gap-2">
-            <span class="font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">landing page</span>
-            <span class="font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 text-white/50">conversão</span>
-          </div>
-        </a>
-      </div>
-    </div>
+  <section class="solutions-scene cinema-section" id="solucoes" data-chapter="05" aria-labelledby="solutions-title">
+    <div class="section-kicker reveal"><span>04 — O que vai a bordo</span><span>TECNOLOGIA COM UM PORQUÊ</span></div>
+    <div class="solutions-heading reveal"><h2 id="solutions-title" class="section-title">Sua ambição.<br><em>Nossa engenharia.</em></h2><a href="solucoes.html" class="text-link">Todas as soluções <span aria-hidden="true">↗</span></a></div>
+    <a class="solution-row" href="solucoes.html#agentes"><span class="solution-index">01</span><div class="solution-copy"><span class="film-label">INTELIGÊNCIA ARTIFICIAL</span><h3>Conversa que<br>vira oportunidade.</h3><p>Agentes que atendem, qualificam e sabem a hora de chamar uma pessoa.</p></div><div class="solution-visual conversation-demo" aria-hidden="true"><span class="demo-caption">ATENDIMENTO, NO TEMPO CERTO.</span><div class="demo-message">Olá! Quero conhecer as soluções.</div><div class="demo-message reply"><span class="reply-dot"></span> Vamos encontrar a sua rota.</div><div class="demo-result"><span>CONVERSA</span><i></i><span>OPORTUNIDADE</span></div></div><span class="solution-arrow" aria-hidden="true">↗</span></a>
+    <a class="solution-row" href="solucoes.html#automacoes"><span class="solution-index">02</span><div class="solution-copy"><span class="film-label">SISTEMAS & AUTOMAÇÕES</span><h3>O trabalho anda.<br>Sem você empurrar.</h3><p>Cobrança, follow-up, relatórios e ferramentas conectadas. Tudo no mesmo fluxo.</p></div><div class="solution-visual workflow-demo" aria-hidden="true"><span class="demo-caption">CADA ETAPA ENCONTRA A PRÓXIMA.</span><div class="workflow"><span>Pedido</span><i></i><span>Processo</span><i></i><span>Entrega</span></div><div class="workflow-meta"><span class="status-light"></span> OPERAÇÃO CONECTADA</div></div><span class="solution-arrow" aria-hidden="true">↗</span></a>
+    <a class="solution-row" href="solucoes.html#funil"><span class="solution-index">03</span><div class="solution-copy"><span class="film-label">SITES & EXPERIÊNCIAS DIGITAIS</span><h3>Presença que marca.<br>Caminho que converte.</h3><p>Sites feitos para transformar atenção em interesse e interesse em conversa.</p></div><div class="solution-visual funnel-demo" aria-hidden="true"><span class="demo-caption">DO PRIMEIRO OLHAR AO PRÓXIMO PASSO.</span><div class="funnel-track"><span>Descoberta</span><span>Interesse</span><span>Conversa <b>↗</b></span></div></div><span class="solution-arrow" aria-hidden="true">↗</span></a>
   </section>
 
-  <!-- ===== CTA final ===== -->
-  <section class="relative px-6 md:px-12 lg:px-20 py-20 md:py-32">
-    <div class="max-w-5xl mx-auto">
-      <div class="reveal glass-strong rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
-        <div class="grid-overlay" aria-hidden="true"></div>
-        <div class="relative">
-          <div class="inline-flex items-center gap-3 rounded-full border border-white/10 px-4 py-2 mb-8">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-60"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-gold"></span>
-            </span>
-            <span class="eyebrow">vagas abertas · 2026</span>
-          </div>
-          <h2 class="display text-3xl md:text-6xl text-paper">
-            O manual custa mais caro<br />do que você imagina<span class="text-accent">.</span>
-          </h2>
-          <p class="mt-6 text-white/60 max-w-xl mx-auto">Responda o diagnóstico em 3 minutos e receba a rota exata: onde sua empresa perde tempo e o que construir primeiro.</p>
-          <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium w-full sm:w-auto">
-              Fazer o diagnóstico
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-            </a>
-            <a href="https://wa.me/5554984184808?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Shift%20Systems%20e%20quero%20tirar%20minha%20empresa%20do%20modo%20manual." target="_blank" rel="noopener" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto">Falar direto no WhatsApp</a>
-          </div>
-          <p class="mt-6 font-mono text-xs uppercase tracking-wider text-white/55">resposta em &lt; 24h</p>
-        </div>
-      </div>
-    </div>
+  <section class="arrival" id="mar-aberto" data-chapter="06" aria-labelledby="arrival-title">
+    <div class="arrival-art" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><rect x="26" y="18" width="60" height="14" rx="2"/><path d="M38 32L62 68"/><rect x="14" y="68" width="60" height="14" rx="2"/></svg></div><div class="arrival-shade" aria-hidden="true"></div>
+    <div class="arrival-copy"><p class="film-label reveal"><span class="status-light"></span> A próxima história pode ser a sua</p><h2 id="arrival-title" class="reveal">Sua próxima fase<br>começa <em>aqui.</em></h2><p class="reveal arrival-description">Descubra o que construir primeiro.<br>Quatro perguntas. Uma nova direção.</p><div class="arrival-actions reveal"><a href="diagnostico.html" class="cinema-button"><span>Descobrir minha rota</span><span class="button-arrow" aria-hidden="true">↗</span></a><a href="https://wa.me/5554984184808?text=Ol%C3%A1!%20Quero%20conversar%20sobre%20uma%20nova%20rota%20para%20minha%20empresa." target="_blank" rel="noopener noreferrer" class="text-link">Prefiro conversar <span aria-hidden="true">↗</span></a></div><p class="arrival-meta reveal">SEM COMPROMISSO · RESPOSTA EM ATÉ 24H</p></div>
+    <div class="arrival-bottom"><span>FEITO EM MAR ABERTO.</span><span class="crew-message">Toda grande jornada começa com uma boa tripulação.</span><a href="#horizonte" aria-label="Voltar ao início">↑</a></div>
   </section>
 </main>
+
 
 <!-- ===== footer ===== -->
 <footer class="relative px-6 md:px-12 lg:px-20 pt-16 pb-10">
@@ -459,12 +285,14 @@
     <div class="hr-grad my-8"></div>
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs uppercase tracking-wider text-white/55">
       <span>© <span data-year>2026</span> shift systems</span>
-      <span>feito em mar aberto · v2.0</span>
+      <span>feito em mar aberto · uma nova direção</span>
     </div>
   </div>
 </footer>
 
 <script src="assets/hero-shift.js" defer></script>
 <script src="assets/site.js" defer></script>
+<script src="assets/cinema.js" defer></script>
+<button type="button" id="motion-toggle" class="motion-toggle" aria-label="Pausar animações" aria-pressed="false"><span class="motion-symbol" aria-hidden="true">Ⅱ</span><span class="motion-text">Pausar movimento</span></button>
 </body>
 </html>
