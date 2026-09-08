@@ -46,6 +46,29 @@ Login, permissões, cadastro, busca, relatórios e automações internas em uma 
 
 Tudo isso conversando com o que a empresa já usa: WhatsApp API, CRM, ERP, n8n e bancos de dados.
 
+## Sites
+
+Página: https://shiftsys.com.br/sites.html
+
+O site é tratado como a primeira etapa do funil, não como cartão de visita digital.
+
+### Planejamento
+
+O site começa numa conversa sobre o negócio, e a estrutura sai dessa conversa antes de qualquer tela ser desenhada. Quatro perguntas guiam o mapa de seções: o que a empresa vende na palavra do dono; quem precisa disso agora e o que já tentou antes; a objeção que aparece antes do preço; e qual ação feita no site já vale um lead. A resposta da última vira o botão principal da página.
+
+### Decisões de conversão
+
+Uma decisão por tela — cada seção pede uma coisa só, porque quando tudo tem o mesmo peso nada chama. Prova antes do pedido — o visitante vê caso, número ou detalhe concreto antes de ser convidado a falar. O caminho mais curto até o contato — sem formulário de sete campos: o botão abre o WhatsApp com a mensagem já escrita.
+
+### O que acompanha a entrega
+
+Todo site sai com robots.txt (o que o buscador pode indexar), sitemap.xml (a lista completa de páginas, para indexação em dias e não em meses), llms.txt (o site em texto limpo, legível por ChatGPT, Claude, Gemini e Perplexity) e dados estruturados em JSON-LD (CNPJ, endereço, telefone, serviços e casos em código que o buscador entende). Sem cobrança à parte.
+
+### Sites publicados
+
+- Tailine Giacometti — Nutricionista (https://tailinegiacometti.shiftsys.com.br): site institucional com agendamento, quatro áreas de atendimento explicadas uma a uma, o método antes do pedido de contato e o botão de marcar consulta em toda dobra. Publicado com sitemap.xml, robots.txt e dados estruturados.
+- SmartControl: segundo site entregue, aguardando publicação no domínio definitivo.
+
 ## Processo
 
 Página: https://shiftsys.com.br/processo.html

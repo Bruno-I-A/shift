@@ -6,7 +6,7 @@ Empresa brasileira, CNPJ 66.982.894/0001-70 (SHIFT SYSTEMS LTDA.). Sede em Getú
 
 A Shift constrói, sob medida, conforme o gargalo de cada empresa:
 
-- **Sites que vendem sozinhos** — landing pages e sites institucionais desenhados como funil, do primeiro clique ao lead qualificado no WhatsApp.
+- **Sites que vendem sozinhos** — landing pages e sites institucionais desenhados como funil, do primeiro clique ao lead qualificado no WhatsApp. Detalhes e casos publicados: https://shiftsys.com.br/sites.html
 - **Inbox de leads inteligente** (vendas) — capta WhatsApp, Instagram e formulário numa fila única, qualifica o lead e atualiza o CRM.
 - **Painel de execução** (operação) — cockpit de pedidos, tarefas, prazos e responsáveis, sem depender de grupo ou áudio perdido.
 - **Cobrança automática** (financeiro) — emissão, lembrete, status de pagamento e follow-up rodando sozinhos.
@@ -27,6 +27,7 @@ Contato:
 
 - [Início](https://shiftsys.com.br/): Visão geral — o que a Shift constrói, a rota do funil e os três destaques da operação.
 - [Soluções](https://shiftsys.com.br/solucoes.html): As sete frentes de construção (site-funil, vendas, operação, financeiro, atendimento, gestão, sistema interno) e as integrações suportadas.
+- [Sites](https://shiftsys.com.br/sites.html): Como a Shift planeja, desenha e entrega sites — as quatro perguntas do planejamento, as três decisões de conversão, os arquivos técnicos que acompanham a entrega (robots.txt, sitemap.xml, llms.txt e dados estruturados em JSON-LD) e os sites já no ar.
 - [Processo](https://shiftsys.com.br/processo.html): As quatro etapas do trabalho, do diagnóstico à evolução contínua pós-entrega.
 - [Diagnóstico](https://shiftsys.com.br/diagnostico.html): Quiz de 4 perguntas que estima as horas por semana recuperáveis e aponta o que construir primeiro.
 - [Contato](https://shiftsys.com.br/contato.html): WhatsApp, Instagram e e-mail, com resposta em menos de 24h.
