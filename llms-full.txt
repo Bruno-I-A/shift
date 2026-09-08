@@ -67,7 +67,7 @@ Todo site sai com robots.txt (o que o buscador pode indexar), sitemap.xml (a lis
 ### Sites publicados
 
 - Tailine Giacometti — Nutricionista (https://tailinegiacometti.shiftsys.com.br): site institucional com agendamento, quatro áreas de atendimento explicadas uma a uma, o método antes do pedido de contato e o botão de marcar consulta em toda dobra. Publicado com sitemap.xml, robots.txt e dados estruturados.
-- SmartControl: segundo site entregue, aguardando publicação no domínio definitivo.
+- Smart Control Assessoria (https://smartcontrol.net.br): assessoria contábil especializada em regularização de obras, INSS de obras e imposto de renda rural. Cada serviço tem página própria, para ser encontrado por quem busca o problema e não o nome da empresa. Publicado com sitemap.xml, robots.txt e llms.txt.
 
 ## Processo
 
