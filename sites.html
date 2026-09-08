@@ -208,6 +208,34 @@
                 letter-spacing: .08em; text-transform: uppercase; fill: #a6b8c2; }
   .prova-seta { fill: rgba(242,166,61,.55); }
 
+  /* No celular a tela é estreita e alta: a rota desce em vez de atravessar.
+     Não é o mesmo desenho redimensionado — é outra composição, com o texto
+     de volta ao tamanho de leitura em vez dos ~8px que a versão larga daria. */
+  /* As quatro perguntas eram quatro blocos soltos de texto: a linha as
+     transforma numa rota curta, com a última parada acesa porque é ela que
+     vira o botão da página. Sem SVG de propósito — o traço tem que seguir a
+     altura do texto, que muda com a largura da tela. */
+  .perguntas { position: relative; padding-left: 26px; }
+  .perguntas::before {
+    content: ''; position: absolute; left: 5px; top: 10px; bottom: 10px; width: 1px;
+    background: linear-gradient(180deg, rgba(242,166,61,.55), rgba(242,166,61,.12));
+  }
+  .perguntas li { position: relative; }
+  .perguntas li::before {
+    content: ''; position: absolute; left: -25.5px; top: 6px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #071522; border: 1.5px solid rgba(242,166,61,.5);
+  }
+  .perguntas li:last-child::before { border-color: #FFC93D; background: #FFC93D; }
+
+  /* trava a largura: o SVG escala com o contêiner, e sem teto a versão
+     vertical virava um desenho gigante de texto a 30px no tablet */
+  .rota--v { max-width: 400px; margin-inline: auto; }
+  .rota--v .rota-rotulo { font-size: 15px; letter-spacing: .06em; }
+  .rota--v .prova-titulo { font-size: 17px; }
+  .rota--v .prova-arquivo { font-size: 15px; }
+  .rota--v .prova-nota { font-size: 14px; }
+
   /* pausar movimento: sem pulso viajando, e a linha já nasce inteira
      (o transition:none global do .motion-paused faz o salto) */
   html.motion-paused .rota-pulso { opacity: 0 !important; }
@@ -309,7 +337,7 @@
         </div>
         <div class="relative">
           <p class="eyebrow mb-5">as quatro perguntas</p>
-          <ol class="space-y-4">
+          <ol class="perguntas space-y-4">
             <li class="flex gap-4 items-baseline">
               <span class="font-mono text-[11px] text-accent shrink-0">01</span>
               <span class="text-white/60 text-sm">O que você vende — na sua palavra, não na do mercado.</span>
@@ -378,15 +406,34 @@
         </svg>
       </div>
 
-      <!-- no celular o SVG deixaria o texto minúsculo: mesma rota, em texto -->
-      <div class="reveal lg:hidden flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-wider text-white/55 mb-8">
-        <span>visita chegou</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-        <span>entende em 5 segundos</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-        <span>uma ação clara</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-        <span class="text-gold">lead no seu WhatsApp</span>
+      <!-- mesma rota, composta pra tela estreita: desce em vez de atravessar -->
+      <div class="reveal lg:hidden mb-8">
+        <svg class="rota rota--v" viewBox="0 0 340 336" role="img"
+             aria-label="A rota do lead: a visita chega, entende a oferta em cinco segundos, encontra uma ação clara e vira lead no seu WhatsApp.">
+          <path class="rota-trilho" pathLength="100" d="M26 30 C26 68 34 84 34 122 C34 160 26 176 26 214 C26 252 34 268 34 306" />
+          <path class="rota-traco" pathLength="100" d="M26 30 C26 68 34 84 34 122 C34 160 26 176 26 214 C26 252 34 268 34 306" />
+          <path class="rota-pulso" pathLength="100" d="M26 30 C26 68 34 84 34 122 C34 160 26 176 26 214 C26 252 34 268 34 306" />
+            <g class="rota-no">
+              <circle class="rota-anel" cx="26" cy="30" r="9" style="transition-delay:.5s" />
+              <circle class="rota-nucleo" cx="26" cy="30" r="3.4" style="transition-delay:.5s" />
+              <text class="rota-rotulo" x="58" y="30" dominant-baseline="middle">visita chegou</text>
+            </g>
+            <g class="rota-no">
+              <circle class="rota-anel" cx="34" cy="122" r="9" style="transition-delay:1.0s" />
+              <circle class="rota-nucleo" cx="34" cy="122" r="3.4" style="transition-delay:1.0s" />
+              <text class="rota-rotulo" x="58" y="122" dominant-baseline="middle">entende em 5 segundos</text>
+            </g>
+            <g class="rota-no">
+              <circle class="rota-anel" cx="26" cy="214" r="9" style="transition-delay:1.5s" />
+              <circle class="rota-nucleo" cx="26" cy="214" r="3.4" style="transition-delay:1.5s" />
+              <text class="rota-rotulo" x="58" y="214" dominant-baseline="middle">uma ação clara</text>
+            </g>
+            <g class="rota-no rota-no--fim">
+              <circle class="rota-anel" cx="34" cy="306" r="9" style="transition-delay:2.0s" />
+              <circle class="rota-nucleo" cx="34" cy="306" r="3.4" style="transition-delay:2.0s" />
+              <text class="rota-rotulo rota-rotulo--fim" x="58" y="306" dominant-baseline="middle">lead no seu whatsapp</text>
+            </g>
+        </svg>
       </div>
 
       <div class="stagger grid md:grid-cols-3 gap-5">
@@ -456,12 +503,33 @@
         </svg>
       </div>
 
-      <div class="reveal lg:hidden flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-wider text-white/55 mb-8">
-        <span>alguém pergunta pra máquina</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-        <span>seus arquivos respondem</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F2A63D" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-        <span class="text-gold">a pessoa chega no seu site</span>
+      <!-- o mesmo mecanismo, empilhado: o pulso desce, some atrás da caixa do meio e reaparece -->
+      <div class="reveal lg:hidden mb-8">
+        <svg class="rota rota--v" viewBox="0 0 340 486" role="img"
+             aria-label="Alguém pergunta ao Google ou a uma IA; os arquivos robots.txt, sitemap.xml e llms.txt respondem; a pessoa chega no seu site.">
+          <path class="rota-trilho" pathLength="100" d="M170 120 V362" />
+          <path class="rota-traco" pathLength="100" d="M170 120 V362" />
+          <path class="rota-pulso" pathLength="100" style="stroke-dasharray:5 100" d="M170 120 V362" />
+
+          <rect class="prova-caixa" x="8" y="8" width="324" height="112" rx="4" />
+          <text class="prova-titulo" x="170" y="46" text-anchor="middle">alguém pergunta</text>
+          <text class="prova-titulo" x="170" y="68" text-anchor="middle">pra máquina</text>
+          <text class="prova-nota" x="170" y="96" text-anchor="middle">google · chatgpt · claude</text>
+
+          <rect class="prova-caixa prova-caixa--centro" x="8" y="156" width="324" height="170" rx="4" />
+          <text class="prova-titulo" x="170" y="192" text-anchor="middle">seus arquivos respondem</text>
+          <text class="prova-arquivo" x="170" y="234" text-anchor="middle">robots.txt</text>
+          <text class="prova-arquivo" x="170" y="266" text-anchor="middle">sitemap.xml</text>
+          <text class="prova-arquivo" x="170" y="298" text-anchor="middle">llms.txt</text>
+
+          <rect class="prova-caixa" x="8" y="362" width="324" height="112" rx="4" />
+          <text class="prova-titulo" x="170" y="400" text-anchor="middle">a pessoa chega</text>
+          <text class="prova-titulo" x="170" y="422" text-anchor="middle">no seu site</text>
+          <text class="prova-nota" x="170" y="450" text-anchor="middle">sem escala no concorrente</text>
+
+          <path class="prova-seta" d="M170 152 l-5 -9 h10 z" />
+          <path class="prova-seta" d="M170 358 l-5 -9 h10 z" />
+        </svg>
       </div>
 
       <div class="stagger grid md:grid-cols-2 gap-5">
