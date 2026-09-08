@@ -46,11 +46,22 @@
     if (opening && !paused) {
       const rect = opening.getBoundingClientRect();
       if (rect.bottom > 0 && rect.top < height) {
-        const progress = clamp(-rect.top / Math.max(1, rect.height - height));
+        /* O curso é a seção inteira, não só o trecho grudado. Dividir por
+           (altura - viewport) fazia o parallax terminar no fim do trecho grudado: a
+           cópia caía pra opacidade .1 nos primeiros ~350px e sobravam ~700px
+           de hero parado saindo de cena — e, no fim do curso, o rótulo que
+           sobe batia no "EST. BRASIL · 2026" e a legenda da marca, descendo,
+           batia na barra de baixo. Espalhado pelo curso todo, o texto ainda
+           está legível quando o quadro se solta e nada se encontra em tela. */
+        const progress = clamp(-rect.top / Math.max(1, rect.height));
         image.style.setProperty('--brand-y', `${progress * 65}px`);
         image.style.setProperty('--brand-scale', `${1 + progress * .12}`);
         copy.style.setProperty('--copy-y', `${-progress * (small ? 20 : 48)}px`);
         copy.style.setProperty('--copy-opacity', `${1 - progress * .9}`);
+        /* "Role para explorar" deixa de fazer sentido no instante em que a
+           pessoa rola. Some junto com o quadro grudado — e, de quebra, tira
+           a barra do caminho da legenda da marca, que desce 65px. */
+        opening.style.setProperty('--opening-cue', `${clamp(1 - progress / .32)}`);
       }
     }
     if (statement) {
