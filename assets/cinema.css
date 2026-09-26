@@ -186,6 +186,8 @@ html.js .stagger>*{transition:opacity .65s var(--film-ease),transform .65s var(-
 html:not(.js) .reveal,html:not(.js) .stagger>*{opacity:1!important;transform:none!important}
 html.motion-paused *,html.motion-paused *:before,html.motion-paused *:after{animation-play-state:paused!important;scroll-behavior:auto!important;transition:none!important}
 html.motion-paused .reveal,html.motion-paused .stagger>*{opacity:1!important;transform:none!important}
+/* pausar congela a animação no quadro zero; quem entra do zero precisa sair da animação, senão fica invisível */
+html.motion-paused .quiz-step.active,html.motion-paused #mobile-menu.open .nav-link{animation:none!important;opacity:1;transform:none}
 html.motion-paused .opening-copy{opacity:1;transform:none}
 html.motion-paused .opening-bottom{opacity:1}
 html.motion-paused .ocean-shot{transform:none}
