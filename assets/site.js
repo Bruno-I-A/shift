@@ -51,7 +51,7 @@
         else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
       }
     });
-    window.matchMedia('(min-width: 768px)').addEventListener('change', function (e) {
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', function (e) {
       if (e.matches && mobileMenu.classList.contains('open')) setMenu(false);
     });
   }
@@ -112,56 +112,6 @@
       card.style.setProperty('--my', (e.clientY - r.top) + 'px');
     });
   });
-
-  /* ===== easter eggs: modo chapéu de palha =====
-     quem conhece, sorri. quem não conhece, nunca vai ver. */
-  var opTimer = null;
-  function raiseFlag(ms) {
-    document.documentElement.classList.add('op-mode');
-    clearTimeout(opTimer);
-    opTimer = setTimeout(function () {
-      document.documentElement.classList.remove('op-mode');
-    }, ms || 6000);
-  }
-
-  /* gatilho 1: 5 cliques rápidos na marca.
-     a navegação do logo espera 350ms: clique único navega normal;
-     cliques rápidos acumulam pro egg sem sair da página. */
-  var clicks = 0, lastClick = 0, navTimer = null;
-  document.querySelectorAll('[data-mark]').forEach(function (mark) {
-    mark.addEventListener('click', function (e) {
-      e.preventDefault();
-      var now = Date.now();
-      if (now - lastClick > 2500) clicks = 0;
-      lastClick = now;
-      clicks++;
-      clearTimeout(navTimer);
-      if (clicks >= 5) {
-        clicks = 0;
-        raiseFlag(6000);
-      } else {
-        var href = mark.getAttribute('href');
-        navTimer = setTimeout(function () {
-          if (href) window.location.href = href;
-        }, 350);
-      }
-    });
-  });
-
-  /* gatilho 2: digitar "nakama" em qualquer página */
-  var keyBuf = '';
-  document.addEventListener('keydown', function (e) {
-    if (!e.key || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
-    keyBuf = (keyBuf + e.key.toLowerCase()).slice(-6);
-    if (keyBuf === 'nakama') { keyBuf = ''; raiseFlag(10000); }
-  });
-
-  /* recado no console pra quem abre o capô */
-  try {
-    console.log('%c⚓ Shift Systems', 'color:#B56BFF;font-weight:bold;font-size:14px;');
-    console.log('%cProcura-se: operação manual. Recompensa: suas horas de volta.\nDica de tripulação: digite "nakama" nesta página.', 'color:#FFC93D;');
-  } catch (err) { /* console indisponível — segue o jogo */ }
 
   /* ===== banner de cookies — DESATIVADO por padrão =====
      o site hoje não usa cookies de rastreamento, então não há banner.

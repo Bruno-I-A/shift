@@ -1,106 +1,151 @@
 # Shift Systems — conteúdo completo
 
-> Sistemas sob medida, automações e agentes de IA para empresas que querem sair do improviso operacional.
+> Transformamos empresas de todos os setores em AI-first: IA que gerencia processos, organiza equipes e apoia decisões.
 
-Fonte: https://shiftsys.com.br · CNPJ 66.982.894/0001-70 (SHIFT SYSTEMS LTDA.) · Getúlio Vargas — RS · Atendimento remoto em todo o Brasil
-
-Conteúdo livre para citação, desde que atribuído a Shift Systems com link para https://shiftsys.com.br.
+Fonte: https://shiftsys.com.br · SHIFT SYSTEMS LTDA. · Getúlio Vargas/RS · Atendimento em todo o Brasil
 
 ## Posicionamento
 
-Não é sobre parecer tech — é sobre colocar a operação no modo automático. Algumas empresas precisam de um sistema inteiro; outras só precisam eliminar três tarefas que travam o dia. A Shift entra nesse ponto exato. Não é sobre ter mais ferramentas: é sobre a operação andar. Sistemas, automações e agentes de IA para tirar trabalho manual do caminho — menos cobrança no grupo, menos planilha paralela, menos lead esquecido e mais controle para decidir rápido.
+A Shift Systems transforma pequenas e médias empresas de qualquer setor em empresas AI-first. A IA passa a gerenciar processos, organizar o trabalho das equipes, acompanhar a operação e apoiar decisões da diretoria, e não apenas a digitar documentos. A Shift aproveita os sistemas que funcionam, integra IA quando eles permitem e constrói a estrutura que falta quando não há integração ou quando a operação depende de planilhas e WhatsApp.
 
-## Soluções
+Na visão da Shift, empresas que colocam IA na operação passam a responder mais rápido, errar menos e decidir com dados, e competir sem IA vai ficar cada vez mais difícil nos próximos anos. A IA não substitui a equipe: tira o trabalho braçal e repetitivo e deixa as pessoas com o que exige relacionamento, julgamento e criatividade.
 
-Página: https://shiftsys.com.br/solucoes.html
+Desenvolvimento de software é parte da capacidade de entrega, não a oferta central. O objetivo é fazer a IA executar, operar, analisar e recomendar dentro da empresa. Decisões com impacto continuam sob revisão e aprovação humana.
 
-### Sites que vendem sozinhos (aquisição)
+## Os quatro níveis de uma empresa AI-first
 
-Landing pages e sites institucionais desenhados como funil: cada seção empurra o visitante pra próxima etapa até ele virar lead qualificado direto no WhatsApp. Inclui landing page, quiz/diagnóstico, otimização para conversão e analytics.
+### Nível 1 · A IA executa
 
-### Inbox de leads inteligente (vendas)
+Tarefas repetitivas saem das mãos da equipe: leitura de documentos, extração e digitação de dados, triagem de demandas, conferências e rascunhos de contratos, relatórios, propostas e e-mails.
 
-Captura WhatsApp, Instagram e formulário em uma fila única, qualifica o lead com IA e manda o próximo passo pro CRM.
+### Nível 2 · A IA opera
 
-### Painel de execução (operação)
+Agentes conduzem processos completos: recebem a demanda, consultam o sistema, executam etapas, fazem cobranças e follow-ups e chamam uma pessoa quando precisam de aprovação, exceção ou julgamento.
 
-Um cockpit simples para acompanhar pedidos, tarefas, prazos, responsáveis e gargalos sem depender de grupo ou áudio perdido.
+### Nível 3 · A IA analisa
 
-### Cobrança automática (financeiro)
+Gestores fazem perguntas em linguagem natural sobre os dados da empresa, acompanham indicadores e recebem alertas quando algo sai do padrão.
 
-Emissão, lembrete, status de pagamento e follow-up rodando sozinhos, com histórico limpo e visível.
+### Nível 4 · A IA recomenda
 
-### Agente com memória da empresa (atendimento)
+A IA cruza dados, organiza cenários, identifica riscos e recomenda próximos passos com justificativa. A decisão final é humana.
 
-Um assistente de IA que responde no tom da marca, consulta regras internas e chama humano quando a conversa precisa de cuidado.
+## Como a Shift implanta IA
 
-### Dashboard do dono (gestão)
+1. **Mapeamos onde o tempo vaza:** conversa com gestores e com quem executa o processo para localizar trabalho repetitivo e oportunidades.
+2. **Atacamos o processo que mais dói:** escolha de um processo de alto volume e risco controlado para o piloto.
+3. **Conectamos ou construímos:** integração aos sistemas existentes ou construção da base que falta.
+4. **Sua equipe aprova, a IA executa:** revisão humana no início e autonomia gradual apenas onde a empresa autorizar.
+5. **Medimos o resultado:** comparação do processo antes e depois com as métricas disponíveis para o caso real.
+6. **Expandimos e mantemos rodando:** ajustes, melhoria contínua e avanço para novos processos e níveis.
 
-Receita, conversão, canais, gargalos e metas em uma tela só. Menos feeling, mais leitura do jogo.
+## Modelo comercial
 
-### App sob medida (sistema interno)
+### Diagnóstico
 
-Login, permissões, cadastro, busca, relatórios e automações internas em uma ferramenta feita para o fluxo real da empresa.
+Mapeamento de processos e relatório com oportunidades priorizadas.
 
-### Integrações
+### Piloto
 
-Tudo isso conversando com o que a empresa já usa: WhatsApp API, CRM, ERP, n8n e bancos de dados.
+Implantação em um processo, com métricas de antes e depois definidas para aquele processo.
 
-## Sites
+### Operação contínua
 
-Página: https://shiftsys.com.br/sites.html
+Acompanhamento mensal, ajustes, melhorias e expansão para outros processos e níveis.
 
-O site é tratado como a primeira etapa do funil, não como cartão de visita digital.
+## Ofertas
 
-### Planejamento
+- **Implantação:** para empresas que ainda não usam IA nos processos.
+- **Consultoria e correção:** para empresas que já usam IA de forma solta ou têm chatbot e automações que não entregam o esperado.
 
-O site começa numa conversa sobre o negócio, e a estrutura sai dessa conversa antes de qualquer tela ser desenhada. Quatro perguntas guiam o mapa de seções: o que a empresa vende na palavra do dono; quem precisa disso agora e o que já tentou antes; a objeção que aparece antes do preço; e qual ação feita no site já vale um lead. A resposta da última vira o botão principal da página.
+## Soluções por nível
 
-### Decisões de conversão
+### Executa
 
-Uma decisão por tela — cada seção pede uma coisa só, porque quando tudo tem o mesmo peso nada chama. Prova antes do pedido — o visitante vê caso, número ou detalhe concreto antes de ser convidado a falar. O caminho mais curto até o contato — sem formulário de sete campos: o botão abre o WhatsApp com a mensagem já escrita.
+- Extração de dados de notas, guias, contratos, boletos e outros documentos.
+- Triagem e encaminhamento de demandas.
+- Geração de rascunhos de contratos, relatórios, propostas e e-mails.
+- Conferência automática entre fontes de dados.
 
-### O que acompanha a entrega
+### Opera
 
-Todo site sai com robots.txt (o que o buscador pode indexar), sitemap.xml (a lista completa de páginas, para indexação em dias e não em meses), llms.txt (o site em texto limpo, legível por ChatGPT, Claude, Gemini e Perplexity) e dados estruturados em JSON-LD (CNPJ, endereço, telefone, serviços e casos em código que o buscador entende). Sem cobrança à parte.
+- Agentes que conduzem processos de ponta a ponta.
+- Atendimento com memória da empresa e passagem para uma pessoa quando necessário.
+- Cobrança e follow-up automáticos.
+- Inbox de leads inteligente.
+- Gestão de tarefas do time: distribuição, prazos e cobrança do que atrasou.
+- Coordenação do trabalho entre áreas.
 
-### Sites publicados
+### Analisa
 
-- Tailine Giacometti — Nutricionista (https://tailinegiacometti.shiftsys.com.br): site institucional com agendamento, quatro áreas de atendimento explicadas uma a uma, o método antes do pedido de contato e o botão de marcar consulta em toda dobra. Publicado com sitemap.xml, robots.txt e dados estruturados.
-- Smart Control Assessoria (https://smartcontrol.net.br): assessoria contábil especializada em regularização de obras, INSS de obras e imposto de renda rural. Cada serviço tem página própria, para ser encontrado por quem busca o problema e não o nome da empresa. Publicado com sitemap.xml, robots.txt e llms.txt.
+- Perguntas em linguagem natural sobre os próprios dados.
+- Alertas quando algo sai do padrão.
+- Painel do dono com indicadores da operação.
+- Visão da equipe: quem está com o quê, o que atrasou e onde há sobrecarga.
 
-## Processo
+### Recomenda
 
-Página: https://shiftsys.com.br/processo.html
+- Análise de cenários.
+- Identificação de riscos.
+- Recomendações com justificativa e decisão final humana.
+- Apoio à diretoria: decisões preparadas com riscos, opções e impacto esperado.
 
-### 01 · Diagnóstico
+### A base que a IA precisa
 
-Mapeamos onde tempo, dinheiro e oportunidades escapam: mensagens sem dono, tarefas repetidas, planilhas paralelas e decisões sem número confiável. Saída: mapa de gargalos e ROI estimado.
+Quando o sistema existente não permite a integração necessária, a Shift pode construir sistemas internos sob medida, painéis de execução e integrações. O objetivo é criar a base de dados e operação de que a IA precisa sem descartar o que já funciona.
 
-### 02 · Mapeamento
+## Setores
 
-Transformamos o diagnóstico em blueprint: o que construir primeiro, quais integrações entram, quanto tempo leva e qual impacto esperar de cada entrega. Saída: blueprint técnico e cronograma.
+A transformação AI-first vale para qualquer empresa com processos, equipes e decisões. Exemplos: comércio e varejo (pedidos, estoque e atendimento), indústria (ordens de produção, gargalos e compras), prestação de serviços (agenda, execução e cobrança), saúde e clínicas (agendamentos, confirmações e retornos), logística e distribuição (entregas e exceções) e educação (matrículas e acompanhamento de alunos).
 
-### 03 · Desenvolvimento
+Três setores têm exemplos detalhados por nível no site:
 
-Toda semana tem avanço visível: tela, fluxo, automação ou agente funcionando em ambiente de teste para validar cedo e ajustar sem desperdício. Saída: releases semanais em ambiente de teste.
+### Escritórios contábeis
 
-### 04 · Evolução
+Leitura de guias e documentos fiscais, conferência de lançamentos, organização das demandas dos clientes, controle de prazos e geração de relatórios mensais.
 
-Depois do go-live, acompanhamos uso real, corrigimos rápido e evoluímos o sistema conforme novos gargalos aparecem. Saída: suporte contínuo e novas features.
+### Escritórios de advocacia
 
-## Diagnóstico
+Triagem de novos casos, organização de documentos, rascunho de peças e contratos, atendimento inicial qualificado e acompanhamento de prazos.
+
+### Imobiliárias
+
+Laudos de vistoria a partir de fotos e áudio, comparação entre vistoria de entrada e saída, análise de documentação e apoio à criação de anúncios.
+
+Qualquer outro setor pode ser atendido: o ponto de partida é onde o tempo e o dinheiro estão vazando na operação.
+
+## Segurança e supervisão humana
+
+- Uma pessoa aprova decisões com impacto.
+- As ações da IA devem ficar registradas.
+- O acesso aos dados segue o mínimo necessário e práticas alinhadas à LGPD.
+- A empresa entende o que a IA faz e pode interromper uma automação.
+
+## Diagnóstico online
 
 Página: https://shiftsys.com.br/diagnostico.html
 
-Quiz de 4 perguntas (área caótica → tamanho do time → controle atual → urgência), uma por tela. Ao final, estima o "tesouro" (horas por semana recuperáveis), aponta a prioridade, o que construir primeiro e a stack provável — com um botão que leva direto ao WhatsApp com a mensagem já preenchida. As respostas são processadas só no navegador: nada é enviado a servidor, a não ser que a pessoa escolha compartilhar clicando no WhatsApp.
+O diagnóstico tem seis perguntas: segmento, forma de controle do trabalho, tarefa que mais consome tempo, uso atual de IA, tamanho da operação e prazo desejado. O resultado identifica Fundação, Início do Nível 1, Nível 1 ou Nível 2; mostra o próximo passo, o primeiro processo sugerido e recomenda implantação ou consultoria/correção.
+
+Antes do resultado, nome, empresa e WhatsApp podem ser informados de forma opcional. O resultado aparece mesmo se a pessoa pular essa etapa. As respostas e os dados de contato só podem ser enviados ao CRM da Shift com consentimento explícito em checkbox. Sem consentimento, nenhum dado do diagnóstico é enviado automaticamente. O botão de WhatsApp abre uma mensagem preenchida para a pessoa revisar e enviar por decisão própria.
+
+## Presença digital
+
+Página: https://shiftsys.com.br/sites.html
+
+Sites permanecem como solução complementar. A Shift planeja sites institucionais e landing pages a partir do negócio, organiza a mensagem e o caminho até o contato e entrega os arquivos técnicos que ajudam mecanismos de busca e sistemas de IA a compreender o conteúdo.
+
+Projetos publicados apresentados na página:
+
+- Tailine Giacometti — Nutricionista: https://tailinegiacometti.shiftsys.com.br
+- Smart Control Assessoria: https://smartcontrol.net.br
 
 ## Contato
-
-Página: https://shiftsys.com.br/contato.html
 
 - WhatsApp: +55 54 98418-4808 — https://wa.me/5554984184808
 - Instagram: @shift_systemss — https://instagram.com/shift_systemss
 - E-mail: hello@shift.systems
 
-Resposta em menos de 24h.
+Resposta em até 24h.
+
+Conteúdo livre para citação, desde que atribuído à Shift Systems com link para https://shiftsys.com.br.

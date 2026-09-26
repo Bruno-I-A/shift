@@ -20,7 +20,7 @@
   const chartStatus = document.getElementById('chart-current');
   const legs = [...document.querySelectorAll('[data-leg]')];
   const points = [...document.querySelectorAll('[data-waypoint]')];
-  const stages = ['Diagnóstico', 'A solução certa', 'Construção', 'Mar aberto'];
+  const stages = ['Executa', 'Opera', 'Analisa', 'Recomenda'];
   const length = path?.getTotalLength() || 0;
   const statement = document.querySelector('[data-ink]');
   const words = [];
@@ -134,15 +134,6 @@
     entries.forEach(entry => entry.target.classList.toggle('in-view', entry.isIntersecting));
   }, { threshold: .08 });
   document.querySelectorAll('.opening,.solution-row').forEach(el => visibility.observe(el));
-  // Keyboard Easter egg is still handled in site.js; this carries it into the final frame.
-  const crew = document.querySelector('.crew-message');
-  if (crew) {
-    new MutationObserver(() => {
-      crew.textContent = root.classList.contains('op-mode')
-        ? 'O sonho de uma boa tripulação nunca tem fim. Bem-vindo a bordo, nakama.'
-        : 'Toda grande jornada começa com uma boa tripulação.';
-    }).observe(root, { attributes: true, attributeFilter: ['class'] });
-  }
   root.classList.add('motion-ready');
   syncMotion();
   frame();

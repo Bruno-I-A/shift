@@ -1,41 +1,53 @@
 # Shift Systems
 
-> Sistemas sob medida, automações e agentes de IA para empresas que querem sair do improviso operacional. Sites que vendem sozinhos, inbox de leads, cobrança automática, dashboards e sistemas internos — tudo conectado ao que a empresa já usa.
+> Transformamos empresas de todos os setores em AI-first. Aproveitamos o que funciona, construímos o que falta.
 
-Empresa brasileira, CNPJ 66.982.894/0001-70 (SHIFT SYSTEMS LTDA.). Sede em Getúlio Vargas — RS, com atendimento remoto para empresas em todo o Brasil. Site: https://shiftsys.com.br
+A Shift Systems transforma pequenas e médias empresas de qualquer setor em empresas AI-first: coloca IA para gerenciar processos, organizar o trabalho das equipes, acompanhar a operação e apoiar decisões. Conecta a IA aos sistemas já usados e, quando a integração não é possível ou a operação depende de planilhas e WhatsApp, constrói a estrutura necessária. A IA não substitui a equipe: tira o trabalho repetitivo e deixa as pessoas com o que exige julgamento. Sede em Getúlio Vargas/RS e atendimento em todo o Brasil.
 
-A Shift constrói, sob medida, conforme o gargalo de cada empresa:
+## Como a IA atua
 
-- **Sites que vendem sozinhos** — landing pages e sites institucionais desenhados como funil, do primeiro clique ao lead qualificado no WhatsApp. Detalhes e casos publicados: https://shiftsys.com.br/sites.html
-- **Inbox de leads inteligente** (vendas) — capta WhatsApp, Instagram e formulário numa fila única, qualifica o lead e atualiza o CRM.
-- **Painel de execução** (operação) — cockpit de pedidos, tarefas, prazos e responsáveis, sem depender de grupo ou áudio perdido.
-- **Cobrança automática** (financeiro) — emissão, lembrete, status de pagamento e follow-up rodando sozinhos.
-- **Agente com memória da empresa** (atendimento) — assistente de IA que responde no tom da marca, consulta regras internas e chama humano quando precisa.
-- **Dashboard do dono** (gestão) — receita, conversão, canais e metas numa tela só.
-- **App sob medida** (sistema interno) — login, permissões, cadastro, busca e relatórios feitos para o fluxo real da empresa.
+- **Nível 1 · Executa:** tarefas repetitivas de todas as áreas, como documentos, dados, triagem, conferências e rascunhos.
+- **Nível 2 · Opera:** agentes conduzem processos completos, distribuem tarefas para o time, acompanham prazos, fazem follow-up e chamam uma pessoa quando necessário.
+- **Nível 3 · Analisa:** perguntas em linguagem natural sobre dados da empresa, visão da equipe, alertas e indicadores para gestão.
+- **Nível 4 · Recomenda:** cenários, riscos e recomendações justificadas. A decisão final continua humana.
 
-Todo trabalho segue quatro etapas: diagnóstico (mapa de gargalos e ROI estimado), mapeamento (blueprint técnico e cronograma), desenvolvimento (entregas semanais em ambiente de teste) e evolução (suporte e novas features após o go-live).
+## Duas ofertas
+
+- **Implantação:** para empresas que ainda não usam IA nos processos.
+- **Consultoria e correção:** para empresas com uso solto, chatbot ou automação que não entrega o esperado.
+
+## Forma de trabalho
+
+1. **Diagnóstico:** mapeamento de processos e oportunidades priorizadas.
+2. **Piloto:** implantação em um processo, com comparação do antes e do depois.
+3. **Operação contínua:** acompanhamento mensal, ajustes, melhorias e expansão.
 
 Contato:
 
-- WhatsApp: +55 54 98418-4808 — https://wa.me/5554984184808?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Shift%20Systems%20e%20quero%20tirar%20minha%20empresa%20do%20modo%20manual.
+- WhatsApp: +55 54 98418-4808 — https://wa.me/5554984184808
 - Instagram: @shift_systemss — https://instagram.com/shift_systemss
 - E-mail: hello@shift.systems
-- Diagnóstico gratuito (4 perguntas, ~3 min): https://shiftsys.com.br/diagnostico.html
+- Diagnóstico gratuito: https://shiftsys.com.br/diagnostico.html
 
 ## Páginas
 
-- [Início](https://shiftsys.com.br/): Visão geral — o que a Shift constrói, a rota do funil e os três destaques da operação.
-- [Soluções](https://shiftsys.com.br/solucoes.html): As sete frentes de construção (site-funil, vendas, operação, financeiro, atendimento, gestão, sistema interno) e as integrações suportadas.
-- [Sites](https://shiftsys.com.br/sites.html): Como a Shift planeja, desenha e entrega sites — as quatro perguntas do planejamento, as três decisões de conversão, os arquivos técnicos que acompanham a entrega (robots.txt, sitemap.xml, llms.txt e dados estruturados em JSON-LD) e os sites já no ar.
-- [Processo](https://shiftsys.com.br/processo.html): As quatro etapas do trabalho, do diagnóstico à evolução contínua pós-entrega.
-- [Diagnóstico](https://shiftsys.com.br/diagnostico.html): Quiz de 4 perguntas que estima as horas por semana recuperáveis e aponta o que construir primeiro.
-- [Contato](https://shiftsys.com.br/contato.html): WhatsApp, Instagram e e-mail, com resposta em menos de 24h.
+- [Início](https://shiftsys.com.br/): por que adotar IA agora, o que a IA faz na gestão (processos, equipes, decisões e clientes), níveis de maturidade, áreas da empresa, dúvidas sobre segurança, forma de implantação e diagnóstico.
+- [Como funciona](https://shiftsys.com.br/processo.html): seis passos de implantação e modelo comercial em três etapas.
+- [Soluções](https://shiftsys.com.br/solucoes.html): soluções organizadas pelos quatro níveis de maturidade e pela base técnica necessária.
+- [Segmentos](https://shiftsys.com.br/segmentos.html): exemplos em comércio, indústria, serviços, saúde, logística e educação, com escritórios contábeis, advocacia e imobiliárias detalhados por nível.
+- [Diagnóstico](https://shiftsys.com.br/diagnostico.html): seis perguntas para identificar o nível atual, o próximo passo, o primeiro processo e a oferta recomendada.
+- [Contato](https://shiftsys.com.br/contato.html): WhatsApp, Instagram e e-mail.
 
-## Opcional
+## Solução complementar
 
-- [Conteúdo completo em markdown](https://shiftsys.com.br/llms-full.txt): todas as páginas em texto plano, sem navegação.
-- [Política de Privacidade](https://shiftsys.com.br/privacidade.html): tratamento de dados pessoais no site — o diagnóstico roda só no navegador, nada é enviado a servidores sem o usuário optar por enviar via WhatsApp.
-- [Termos de Uso](https://shiftsys.com.br/termos.html): regras de uso do site.
+- [Sites](https://shiftsys.com.br/sites.html): presença digital, planejamento, decisões de conversão, entrega técnica e projetos publicados.
 
-Conteúdo livre para citação, desde que atribuído a Shift Systems com link para https://shiftsys.com.br.
+## Privacidade
+
+O diagnóstico funciona mesmo sem cadastro. Nome, empresa e WhatsApp são opcionais. As respostas e os dados de contato só podem ser enviados ao CRM da Shift quando a pessoa marca o consentimento. Sem consentimento, nenhum dado do diagnóstico é enviado automaticamente; o compartilhamento pelo WhatsApp só acontece quando a própria pessoa aciona o botão e confirma o envio.
+
+- [Política de Privacidade](https://shiftsys.com.br/privacidade.html)
+- [Termos de Uso](https://shiftsys.com.br/termos.html)
+- [Conteúdo completo em markdown](https://shiftsys.com.br/llms-full.txt)
+
+Conteúdo livre para citação, desde que atribuído à Shift Systems com link para https://shiftsys.com.br.
