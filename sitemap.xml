@@ -11,7 +11,7 @@
 <priority>0.9</priority>
 </url>
 <url>
-<loc>https://shiftsys.com.br/sites.html</loc>
+<loc>https://shiftsys.com.br/segmentos.html</loc>
 <changefreq>monthly</changefreq>
 <priority>0.9</priority>
 </url>
@@ -24,6 +24,11 @@
 <loc>https://shiftsys.com.br/processo.html</loc>
 <changefreq>monthly</changefreq>
 <priority>0.7</priority>
+</url>
+<url>
+<loc>https://shiftsys.com.br/sites.html</loc>
+<changefreq>monthly</changefreq>
+<priority>0.5</priority>
 </url>
 <url>
 <loc>https://shiftsys.com.br/contato.html</loc>

@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400" fill="none" focusable="false">
+  <defs>
+    <linearGradient id="imo-bg" x1="28" y1="15" x2="613" y2="390" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0e2335"/>
+      <stop offset="1" stop-color="#071522"/>
+    </linearGradient>
+    <radialGradient id="imo-glow" cx="0" cy="0" r="1" gradientTransform="translate(202 187) rotate(21) scale(270 218)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#28495c" stop-opacity=".46"/>
+      <stop offset="1" stop-color="#071522" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="imo-photo" x1="416" y1="66" x2="581" y2="195" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#274a5e"/>
+      <stop offset="1" stop-color="#102838"/>
+    </linearGradient>
+    <linearGradient id="imo-paper" x1="428" y1="228" x2="573" y2="344" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffef8" stop-opacity=".96"/>
+      <stop offset="1" stop-color="#dce5e3" stop-opacity=".9"/>
+    </linearGradient>
+    <pattern id="imo-grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0H0V28" stroke="#9ab1be" stroke-opacity=".055"/>
+    </pattern>
+    <filter id="imo-shadow" x="-35%" y="-35%" width="175%" height="185%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="15" stdDeviation="14" flood-color="#020912" flood-opacity=".5"/>
+    </filter>
+    <filter id="imo-soft" x="-80%" y="-80%" width="260%" height="260%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+
+  <rect width="640" height="400" rx="24" fill="url(#imo-bg)"/>
+  <rect width="640" height="400" rx="24" fill="url(#imo-glow)"/>
+  <rect x="1" y="1" width="638" height="398" rx="23" stroke="#8ea8b7" stroke-opacity=".18"/>
+  <rect x="23" y="23" width="594" height="354" rx="18" fill="url(#imo-grid)"/>
+
+  <ellipse cx="240" cy="340" rx="181" ry="29" fill="#020912" fill-opacity=".4" filter="url(#imo-soft)"/>
+  <ellipse cx="500" cy="349" rx="113" ry="24" fill="#020912" fill-opacity=".4" filter="url(#imo-soft)"/>
+
+  <g filter="url(#imo-shadow)">
+    <rect x="48" y="48" width="342" height="286" rx="15" fill="#0a1d2c" stroke="#87a0ad" stroke-opacity=".34"/>
+    <path d="M66 77H372" stroke="#718b99" stroke-opacity=".26"/>
+    <circle cx="69" cy="63" r="3.5" fill="#edbc75"/>
+    <circle cx="83" cy="63" r="3.5" fill="#8da5b3" fill-opacity=".38"/>
+    <circle cx="97" cy="63" r="3.5" fill="#8da5b3" fill-opacity=".2"/>
+
+    <g stroke="#dfe7e5" stroke-opacity=".72" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M88 106H236V183H310V304H88V106Z"/>
+      <path d="M236 106H348V226H310"/>
+      <path d="M88 214H177V304"/>
+      <path d="M177 183V214"/>
+      <path d="M236 183V304"/>
+    </g>
+
+    <g stroke="#7893a1" stroke-opacity=".55" stroke-width="1.4">
+      <path d="M113 130H205V163H113V130Z"/>
+      <path d="M258 128H327V167H258V128Z"/>
+      <path d="M108 239H155V282H108V239Z"/>
+      <path d="M260 241H288V282H260V241Z"/>
+      <path d="M298 241H326V282H298V241Z"/>
+    </g>
+
+    <path d="M177 214A31 31 0 0 1 208 183" stroke="#edbc75" stroke-width="1.5" stroke-opacity=".76"/>
+    <path d="M236 183A33 33 0 0 0 269 216" stroke="#edbc75" stroke-width="1.5" stroke-opacity=".76"/>
+    <path d="M310 226A32 32 0 0 0 342 194" stroke="#edbc75" stroke-width="1.5" stroke-opacity=".76"/>
+
+    <path d="M125 106V94M144 106V94M279 106V94M298 106V94" stroke="#7b95a2" stroke-width="2"/>
+    <path d="M114 95H155M268 95H309" stroke="#edbc75" stroke-width="2" stroke-linecap="round"/>
+
+    <g fill="#8da5b3" fill-opacity=".34">
+      <circle cx="128" cy="146" r="4"/>
+      <circle cx="283" cy="147" r="4"/>
+      <circle cx="130" cy="260" r="4"/>
+      <circle cx="275" cy="261" r="4"/>
+    </g>
+
+    <path d="M69 309H82M69 296V309" stroke="#edbc75" stroke-width="1.5"/>
+    <path d="M369 93H356M369 80V93" stroke="#edbc75" stroke-width="1.5"/>
+  </g>
+
+  <path d="M391 129C407 129 411 129 421 129" stroke="#edbc75" stroke-width="1.3" stroke-dasharray="3 6"/>
+  <path d="M391 278C406 278 413 278 425 278" stroke="#8da5b3" stroke-width="1.2" stroke-dasharray="3 6"/>
+  <circle cx="408" cy="129" r="3" fill="#edbc75"/>
+  <circle cx="410" cy="278" r="3" fill="#edbc75" fill-opacity=".6"/>
+
+  <g filter="url(#imo-shadow)">
+    <rect x="414" y="54" width="181" height="151" rx="13" fill="url(#imo-photo)" stroke="#87a0ad" stroke-opacity=".38"/>
+    <rect x="426" y="66" width="157" height="127" rx="8" fill="#0a1d2c"/>
+    <path d="M426 140L471 99L515 130L548 103L583 135V193H426V140Z" fill="#25485a"/>
+    <path d="M426 151L473 116L512 143L548 117L583 148" stroke="#7893a1" stroke-opacity=".44"/>
+    <rect x="441" y="81" width="45" height="41" rx="3" fill="#8fb3c1" fill-opacity=".34" stroke="#9ab3bd" stroke-opacity=".4"/>
+    <path d="M463.5 81V122M441 101.5H486" stroke="#dce7e7" stroke-opacity=".36"/>
+    <rect x="495" y="151" width="64" height="23" rx="6" fill="#17384a" stroke="#87a0ad" stroke-opacity=".35"/>
+    <path d="M503 150V139H551V150" stroke="#87a0ad" stroke-opacity=".46"/>
+    <path d="M434 180H574" stroke="#edbc75" stroke-opacity=".35"/>
+  </g>
+
+  <g transform="translate(395 83)" filter="url(#imo-shadow)">
+    <rect width="55" height="43" rx="9" fill="#112d3e" stroke="#edbc75" stroke-opacity=".68"/>
+    <path d="M13 0L18 -8H37L42 0" fill="#112d3e" stroke="#edbc75" stroke-opacity=".68"/>
+    <circle cx="27.5" cy="21.5" r="11" fill="#071522" stroke="#edbc75" stroke-width="2"/>
+    <circle cx="27.5" cy="21.5" r="4" fill="#edbc75" fill-opacity=".62"/>
+    <circle cx="45" cy="10" r="2.5" fill="#edbc75"/>
+  </g>
+
+  <g filter="url(#imo-shadow)">
+    <rect x="426" y="220" width="166" height="130" rx="12" fill="url(#imo-paper)"/>
+    <rect x="448" y="205" width="122" height="29" rx="9" fill="#163548" stroke="#8ca4b0" stroke-opacity=".38"/>
+    <rect x="466" y="214" width="86" height="7" rx="3.5" fill="#dce7e4" fill-opacity=".55"/>
+
+    <rect x="445" y="249" width="19" height="19" rx="4" fill="#edf1ec" stroke="#6a818b" stroke-opacity=".48"/>
+    <path d="M449.5 258.5L453.5 262.5L460.5 254.5" stroke="#ad7c3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="477" y="253" width="88" height="6" rx="3" fill="#496370" fill-opacity=".56"/>
+
+    <rect x="445" y="283" width="19" height="19" rx="4" fill="#edf1ec" stroke="#6a818b" stroke-opacity=".48"/>
+    <path d="M449.5 292.5L453.5 296.5L460.5 288.5" stroke="#ad7c3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="477" y="287" width="70" height="6" rx="3" fill="#496370" fill-opacity=".48"/>
+
+    <rect x="445" y="317" width="19" height="19" rx="4" fill="#edf1ec" stroke="#6a818b" stroke-opacity=".48"/>
+    <rect x="477" y="321" width="96" height="6" rx="3" fill="#496370" fill-opacity=".42"/>
+  </g>
+
+  <circle cx="584" cy="331" r="17" fill="#edbc75" filter="url(#imo-shadow)"/>
+  <path d="M576.5 331L582 336.2L592 325" stroke="#071522" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
