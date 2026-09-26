@@ -2,9 +2,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
-<title>Diagnóstico · Shift Systems</title>
+<title>Diagnóstico de IA · Shift Systems</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content="Responda 4 perguntas e descubra onde sua empresa está perdendo tempo e dinheiro — e o que construir primeiro para resolver." />
+<meta name="description" content="Em 6 perguntas, descubra o nível de IA da sua empresa e o próximo processo para colocar a inteligência artificial para trabalhar." />
 <meta name="theme-color" content="#0A1428" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <meta name="robots" content="index, follow" />
@@ -14,15 +14,15 @@
 <meta property="og:url" content="https://shiftsys.com.br/diagnostico.html" />
 <meta property="og:site_name" content="Shift Systems" />
 <meta property="og:locale" content="pt_BR" />
-<meta property="og:title" content="Diagnóstico · Shift Systems" />
-<meta property="og:description" content="4 perguntas, 3 minutos. Descubra o que construir primeiro." />
+<meta property="og:title" content="Em que nível de IA sua empresa está? · Shift Systems" />
+<meta property="og:description" content="6 perguntas, 3 minutos. Descubra seu nível atual e o próximo passo para colocar IA para trabalhar." />
 <meta property="og:image" content="https://shiftsys.com.br/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Shift Systems — sistemas sob medida, automações e agentes de IA" />
+<meta property="og:image:alt" content="Shift Systems — IA aplicada aos processos da sua empresa" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Diagnóstico · Shift Systems" />
-<meta name="twitter:description" content="4 perguntas, 3 minutos. Descubra o que construir primeiro." />
+<meta name="twitter:title" content="Em que nível de IA sua empresa está? · Shift Systems" />
+<meta name="twitter:description" content="6 perguntas, 3 minutos. Descubra seu nível atual e o próximo passo para colocar IA para trabalhar." />
 <meta name="twitter:image" content="https://shiftsys.com.br/og-image.png" />
 
 <link rel="stylesheet" href="assets/fonts.css" />
@@ -30,6 +30,7 @@
 <link rel="stylesheet" href="assets/utilities.css" />
 <link rel="stylesheet" href="assets/site.css" />
 <link rel="stylesheet" href="assets/cinema.css" />
+<link rel="stylesheet" href="assets/ai-first.css" />
 <script>document.documentElement.classList.add('js'); setTimeout(function(){ if(!window.shiftReady) document.documentElement.classList.remove('js'); }, 2000);</script>
 <script type="application/ld+json">
 {
@@ -41,7 +42,7 @@
       "name": "Shift Systems",
       "legalName": "SHIFT SYSTEMS LTDA.",
       "url": "https://shiftsys.com.br",
-      "description": "Sistemas sob medida, automações e agentes de IA para empresas que querem sair do improviso operacional. Atendimento remoto para empresas em todo o Brasil.",
+      "description": "IA aplicada aos processos das empresas. A Shift aproveita os sistemas que funcionam e constrói a estrutura que falta.",
       "taxID": "66.982.894/0001-70",
       "address": {
         "@type": "PostalAddress",
@@ -68,8 +69,8 @@
       "@type": "WebPage",
       "@id": "https://shiftsys.com.br/diagnostico.html#pagina",
       "url": "https://shiftsys.com.br/diagnostico.html",
-      "name": "Diagnóstico · Shift Systems",
-      "description": "Quiz de 4 perguntas que estima as horas por semana recuperáveis e aponta o que construir primeiro. As respostas rodam só no navegador.",
+      "name": "Diagnóstico de IA · Shift Systems",
+      "description": "Diagnóstico gratuito de 6 perguntas para identificar o nível atual de IA da empresa e o próximo processo a transformar.",
       "inLanguage": "pt-BR",
       "isPartOf": { "@id": "https://shiftsys.com.br/#site" },
       "about": { "@id": "https://shiftsys.com.br/#organizacao" }
@@ -86,7 +87,7 @@
 }
 </script>
 </head>
-<body class="page-bg cinema-inner">
+<body class="page-bg cinema-inner ai-page">
 <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 <div id="scroll-progress" aria-hidden="true"></div>
 
@@ -99,11 +100,6 @@
           <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14" />
           <rect class="slab-bottom" x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF" />
         </svg>
-        <svg class="straw-hat" viewBox="0 0 48 26" aria-hidden="true">
-          <ellipse cx="24" cy="19" rx="22" ry="5.5" fill="#E8C56A" />
-          <path d="M10 19 C10 8 16 3 24 3 C32 3 38 8 38 19 Z" fill="#F2D98B" />
-          <path d="M10.4 15.5 C14 13 34 13 37.6 15.5 L37.9 18 C30 15.5 18 15.5 10.1 18 Z" fill="#C0392B" />
-        </svg>
       </span>
       <span class="flex items-baseline gap-2">
         <span class="font-semibold tracking-tight text-paper">Shift<span class="text-purple">.</span></span>
@@ -111,216 +107,221 @@
       </span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2" aria-label="navegação principal">
-      <a href="index.html" class="nav-link text-sm px-2.5 lg:px-4 py-2">início</a>
-      <a href="solucoes.html" class="nav-link text-sm px-2.5 lg:px-4 py-2">soluções</a>
-      <a href="sites.html" class="nav-link text-sm px-2.5 lg:px-4 py-2">sites</a>
-      <a href="processo.html" class="nav-link text-sm px-2.5 lg:px-4 py-2">processo</a>
-      <a href="contato.html" class="nav-link text-sm px-2.5 lg:px-4 py-2">contato</a>
+    <nav class="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2" aria-label="Navegação principal">
+      <a href="index.html" class="nav-link text-sm px-3 py-2">início</a>
+      <a href="processo.html" class="nav-link text-sm px-3 py-2">como funciona</a>
+      <a href="solucoes.html" class="nav-link text-sm px-3 py-2">soluções</a>
+      <a href="segmentos.html" class="nav-link text-sm px-3 py-2">segmentos</a>
     </nav>
 
-    <div class="flex items-center gap-3">
-      <a href="contato.html" class="btn-ghost hidden sm:inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm">Falar com a Shift</a>
-      <button id="menu-btn" class="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-white/15 cursor-pointer" aria-label="abrir menu" aria-controls="mobile-menu" aria-expanded="false">
+    <div class="flex items-center gap-2">
+      <a href="diagnostico.html" class="btn-primary hidden lg:inline-flex items-center justify-center rounded-full px-4 py-2.5 text-sm font-medium" aria-current="page">diagnóstico</a>
+      <a href="contato.html" class="nav-link hidden lg:inline-flex items-center min-h-11 px-3 py-2 text-sm">contato</a>
+      <button id="menu-btn" class="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-white/15 cursor-pointer" aria-label="abrir menu" aria-controls="mobile-menu" aria-expanded="false">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></svg>
       </button>
     </div>
   </div>
 </header>
 
-<div id="mobile-menu" aria-label="menu">
+<div id="mobile-menu" aria-label="Menu principal">
   <a href="index.html" class="nav-link">início</a>
+  <a href="processo.html" class="nav-link">como funciona</a>
   <a href="solucoes.html" class="nav-link">soluções</a>
-  <a href="sites.html" class="nav-link">sites</a>
-  <a href="processo.html" class="nav-link">processo</a>
+  <a href="segmentos.html" class="nav-link">segmentos</a>
+  <a href="diagnostico.html" class="btn-primary rounded-full px-8 py-4 text-lg font-medium mt-4" aria-current="page">diagnóstico</a>
   <a href="contato.html" class="nav-link">contato</a>
 </div>
 
 <main id="main-content">
-  <!-- ===== hero da página ===== -->
   <section class="relative pt-36 sm:pt-44 pb-8 px-6 md:px-12 lg:px-20 overflow-hidden">
     <div class="grid-overlay" aria-hidden="true"></div>
     <div class="relative max-w-3xl mx-auto text-center">
       <div class="reveal d1 flex items-center justify-center gap-3 mb-6">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC93D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M15 9l-2 5-4 1 2-5 4-1z" /></svg>
-        <span class="eyebrow">log pose · diagnóstico</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EDBC75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/><path d="M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>
+        <span class="eyebrow">diagnóstico de maturidade em IA</span>
       </div>
-      <h1 class="reveal d2 display text-4xl md:text-6xl text-paper"><span class="text-white/55">Onde sua empresa está perdendo</span> <span class="text-accent">velocidade</span>?</h1>
-      <p class="reveal d3 mt-5 text-white/60 max-w-xl mx-auto">4 perguntas, 3 minutos. No final você recebe a rota: o que construir primeiro e quanto tempo dá pra recuperar por semana.</p>
+      <h1 class="reveal d2 display text-4xl md:text-6xl text-paper">Em que nível de IA sua empresa está?</h1>
+      <p class="reveal d3 mt-5 text-white/60 max-w-2xl mx-auto">6 perguntas, 3 minutos. No final você descobre seu nível atual e qual é o próximo passo para colocar IA para trabalhar.</p>
     </div>
   </section>
 
-  <!-- ===== quiz ===== -->
   <section class="relative px-6 md:px-12 lg:px-20 pb-20 md:pb-32 pt-8">
     <div class="max-w-3xl mx-auto">
       <div class="reveal glass-strong rounded-3xl p-7 md:p-12 relative overflow-hidden">
+        <p id="step-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></p>
 
-        <!-- progresso -->
-        <div id="quiz-progress" class="flex items-center gap-4 mb-10">
-          <span class="font-mono text-xs uppercase tracking-wider text-white/55"><span id="q-num">pergunta 1</span> de 4</span>
-          <div class="flex-1 flex items-center gap-2" aria-hidden="true">
-            <span class="waypoint lit" data-wp="1"></span>
-            <span class="flex-1 h-px bg-white/10" data-seg="1"></span>
-            <span class="waypoint" data-wp="2"></span>
-            <span class="flex-1 h-px bg-white/10" data-seg="2"></span>
-            <span class="waypoint" data-wp="3"></span>
-            <span class="flex-1 h-px bg-white/10" data-seg="3"></span>
-            <span class="waypoint" data-wp="4"></span>
+        <div id="quiz-progress" class="flex flex-col sm:flex-row sm:items-center gap-4 mb-10">
+          <span class="font-mono text-xs uppercase tracking-wider text-white/55"><span id="q-num">pergunta 1</span> de 6</span>
+          <div id="quiz-progress-track" class="flex-1 flex items-center gap-2" role="progressbar" aria-label="Progresso do diagnóstico" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1">
+            <span class="waypoint lit" data-wp="1" aria-hidden="true"></span>
+            <span class="flex-1 h-px bg-white/10" data-seg="1" aria-hidden="true"></span>
+            <span class="waypoint" data-wp="2" aria-hidden="true"></span>
+            <span class="flex-1 h-px bg-white/10" data-seg="2" aria-hidden="true"></span>
+            <span class="waypoint" data-wp="3" aria-hidden="true"></span>
+            <span class="flex-1 h-px bg-white/10" data-seg="3" aria-hidden="true"></span>
+            <span class="waypoint" data-wp="4" aria-hidden="true"></span>
+            <span class="flex-1 h-px bg-white/10" data-seg="4" aria-hidden="true"></span>
+            <span class="waypoint" data-wp="5" aria-hidden="true"></span>
+            <span class="flex-1 h-px bg-white/10" data-seg="5" aria-hidden="true"></span>
+            <span class="waypoint" data-wp="6" aria-hidden="true"></span>
           </div>
         </div>
 
-        <!-- pergunta 1 -->
         <div class="quiz-step active" data-step="1">
-          <h2 class="text-2xl md:text-3xl font-semibold text-paper mb-8">Qual área está mais caótica hoje?</h2>
+          <h2 tabindex="-1" class="text-2xl md:text-3xl font-semibold text-paper mb-8">Qual é o segmento da sua empresa?</h2>
           <div class="grid sm:grid-cols-2 gap-4">
-            <button class="quiz-option glass rounded-2xl p-5" data-q="area" data-value="atendimento">
-              <span class="block font-semibold text-paper">Atendimento</span>
-              <span class="block mt-1 text-sm text-white/50">Mensagens espalhadas, lead sem dono, resposta atrasada</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="area" data-value="vendas">
-              <span class="block font-semibold text-paper">Vendas</span>
-              <span class="block mt-1 text-sm text-white/50">Follow-up de memória, proposta perdida, lead esfriando</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="area" data-value="financeiro">
-              <span class="block font-semibold text-paper">Financeiro</span>
-              <span class="block mt-1 text-sm text-white/50">Cobrança manual, conferência chata, dinheiro parado invisível</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="area" data-value="operacao">
-              <span class="block font-semibold text-paper">Operação</span>
-              <span class="block mt-1 text-sm text-white/50">Tarefa no grupo, planilha paralela, status que ninguém sabe</span>
-            </button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="segmento" data-value="comercio"><span class="block font-semibold text-paper">Comércio/varejo</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="segmento" data-value="industria"><span class="block font-semibold text-paper">Indústria</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="segmento" data-value="servicos"><span class="block font-semibold text-paper">Prestação de serviços</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="segmento" data-value="saude"><span class="block font-semibold text-paper">Saúde e clínicas</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="segmento" data-value="contabil"><span class="block font-semibold text-paper">Escritório contábil</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="segmento" data-value="advocacia"><span class="block font-semibold text-paper">Escritório de advocacia</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="segmento" data-value="imobiliaria"><span class="block font-semibold text-paper">Imobiliária</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="segmento" data-value="outro"><span class="block font-semibold text-paper">Outro</span></button>
           </div>
         </div>
 
-        <!-- pergunta 2 -->
         <div class="quiz-step" data-step="2">
-          <h2 class="text-2xl md:text-3xl font-semibold text-paper mb-8">Quanta gente toca a operação?</h2>
+          <h2 tabindex="-1" class="text-2xl md:text-3xl font-semibold text-paper mb-8">Como o trabalho é controlado hoje?</h2>
           <div class="grid sm:grid-cols-2 gap-4">
-            <button class="quiz-option glass rounded-2xl p-5" data-q="team" data-value="solo">
-              <span class="block font-semibold text-paper">Só eu</span>
-              <span class="block mt-1 text-sm text-white/50">Eu vendo, eu entrego, eu cobro</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="team" data-value="2-5">
-              <span class="block font-semibold text-paper">2 a 5 pessoas</span>
-              <span class="block mt-1 text-sm text-white/50">Time pequeno, todo mundo faz de tudo</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="team" data-value="6-15">
-              <span class="block font-semibold text-paper">6 a 15 pessoas</span>
-              <span class="block mt-1 text-sm text-white/50">Áreas começando a se separar</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="team" data-value="16+">
-              <span class="block font-semibold text-paper">16 ou mais</span>
-              <span class="block mt-1 text-sm text-white/50">Operação grande, caos escala junto</span>
-            </button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="controle" data-value="whatsapp"><span class="block font-semibold text-paper">WhatsApp e memória</span><span class="block mt-1 text-sm text-white/50">O grupo é o sistema</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="controle" data-value="planilhas"><span class="block font-semibold text-paper">Planilhas</span><span class="block mt-1 text-sm text-white/50">Várias versões, ninguém sabe qual é a certa</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="controle" data-value="ilhas"><span class="block font-semibold text-paper">Temos sistemas, mas eles não conversam entre si</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="controle" data-value="integrado"><span class="block font-semibold text-paper">Sistemas organizados e integrados</span></button>
           </div>
         </div>
 
-        <!-- pergunta 3 -->
         <div class="quiz-step" data-step="3">
-          <h2 class="text-2xl md:text-3xl font-semibold text-paper mb-8">Como o trabalho é controlado hoje?</h2>
+          <h2 tabindex="-1" class="text-2xl md:text-3xl font-semibold text-paper mb-8">Qual tarefa mais consome tempo da sua equipe?</h2>
           <div class="grid sm:grid-cols-2 gap-4">
-            <button class="quiz-option glass rounded-2xl p-5" data-q="control" data-value="whatsapp">
-              <span class="block font-semibold text-paper">WhatsApp e memória</span>
-              <span class="block mt-1 text-sm text-white/50">O grupo é o sistema</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="control" data-value="planilhas">
-              <span class="block font-semibold text-paper">Planilhas</span>
-              <span class="block mt-1 text-sm text-white/50">Várias versões, ninguém sabe qual é a certa</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="control" data-value="sistema-isolado">
-              <span class="block font-semibold text-paper">Sistema que não conversa</span>
-              <span class="block mt-1 text-sm text-white/50">Tem ferramenta, mas cada uma é uma ilha</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="control" data-value="quase-la">
-              <span class="block font-semibold text-paper">Quase lá</span>
-              <span class="block mt-1 text-sm text-white/50">Ferramentas ok, falta integração e IA</span>
-            </button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="dor" data-value="documentos"><span class="block font-semibold text-paper">Digitar dados de documentos e PDFs</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="dor" data-value="atendimento"><span class="block font-semibold text-paper">Responder as mesmas perguntas de clientes</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="dor" data-value="conferencia"><span class="block font-semibold text-paper">Conferir informações entre planilhas e sistemas</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="dor" data-value="demandas"><span class="block font-semibold text-paper">Organizar e distribuir demandas</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="dor" data-value="relatorios"><span class="block font-semibold text-paper">Montar relatórios, contratos e documentos repetitivos</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="dor" data-value="decisao"><span class="block font-semibold text-paper">Falta informação para tomar decisões</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="dor" data-value="processos"><span class="block font-semibold text-paper">Processos que só andam com alguém cobrando</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="dor" data-value="equipe"><span class="block font-semibold text-paper">Acompanhar a equipe e saber quem está com o quê</span></button>
           </div>
         </div>
 
-        <!-- pergunta 4 -->
         <div class="quiz-step" data-step="4">
-          <h2 class="text-2xl md:text-3xl font-semibold text-paper mb-8">Quando você quer resolver isso?</h2>
+          <h2 tabindex="-1" class="text-2xl md:text-3xl font-semibold text-paper mb-8">Sua empresa já usa IA?</h2>
           <div class="grid sm:grid-cols-2 gap-4">
-            <button class="quiz-option glass rounded-2xl p-5" data-q="urgency" data-value="agora">
-              <span class="block font-semibold text-paper">O quanto antes</span>
-              <span class="block mt-1 text-sm text-white/50">Isso já dói toda semana</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="urgency" data-value="trimestre">
-              <span class="block font-semibold text-paper">Nos próximos meses</span>
-              <span class="block mt-1 text-sm text-white/50">Dá pra planejar, mas quero começar logo</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="urgency" data-value="semestre">
-              <span class="block font-semibold text-paper">Esse semestre</span>
-              <span class="block mt-1 text-sm text-white/50">Sem pressa, mas é prioridade pro ano</span>
-            </button>
-            <button class="quiz-option glass rounded-2xl p-5" data-q="urgency" data-value="pesquisando">
-              <span class="block font-semibold text-paper">Só pesquisando</span>
-              <span class="block mt-1 text-sm text-white/50">Quero entender as opções antes de decidir</span>
-            </button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="ia" data-value="nao"><span class="block font-semibold text-paper">Ainda não</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="ia" data-value="solta"><span class="block font-semibold text-paper">Funcionários usam ChatGPT ou similares por conta própria</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="ia" data-value="insatisfeito"><span class="block font-semibold text-paper">Temos chatbot ou automação, mas não entrega o que esperávamos</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="ia" data-value="integrada"><span class="block font-semibold text-paper">Temos IA integrada aos processos e funcionando</span></button>
           </div>
         </div>
 
-        <!-- calculando -->
-        <div class="quiz-step text-center py-10" data-step="5">
-          <svg id="compass" class="mx-auto mb-6" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#FFC93D" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" />
-            <path class="compass-needle" d="M15.5 8.5l-2.2 5.8-4.8 1.2 2.2-5.8 4.8-1.2z" fill="rgba(242, 166, 61,0.35)" stroke="#F2A63D" />
-          </svg>
-          <p class="font-mono text-xs uppercase tracking-[0.24em] text-white/50">calibrando o log pose…</p>
+        <div class="quiz-step" data-step="5">
+          <h2 tabindex="-1" class="text-2xl md:text-3xl font-semibold text-paper mb-8">Quanta gente toca a operação?</h2>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="equipe" data-value="solo"><span class="block font-semibold text-paper">Só eu</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="equipe" data-value="2-5"><span class="block font-semibold text-paper">2 a 5 pessoas</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="equipe" data-value="6-15"><span class="block font-semibold text-paper">6 a 15 pessoas</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="equipe" data-value="16+"><span class="block font-semibold text-paper">16 ou mais</span></button>
+          </div>
         </div>
 
-        <!-- resultado -->
         <div class="quiz-step" data-step="6">
-          <p class="eyebrow mb-6">Sua rota está pronta</p>
-          <h2 class="display text-3xl md:text-5xl text-paper">
-            <span class="text-white/55">Seu tesouro:</span> <span class="treasure-num"><span id="treasure-lo">0</span> a <span id="treasure-hi">0</span>h</span> <span class="text-white/55">por semana de volta.</span>
-          </h2>
-          <p class="mt-4 text-white/70 text-sm">Faixa estimada a partir das suas 4 respostas. O número real depende de como sua operação está montada hoje — isso a gente vê junto no diagnóstico completo, de graça.</p>
-          <p id="result-urgency" class="mt-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent/30 text-accent"></p>
+          <h2 tabindex="-1" class="text-2xl md:text-3xl font-semibold text-paper mb-8">Quando você quer resolver isso?</h2>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="prazo" data-value="agora"><span class="block font-semibold text-paper">O quanto antes</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="prazo" data-value="proximos-meses"><span class="block font-semibold text-paper">Nos próximos meses</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="prazo" data-value="semestre"><span class="block font-semibold text-paper">Neste semestre</span></button>
+            <button type="button" aria-pressed="false" class="quiz-option glass rounded-2xl p-5" data-q="prazo" data-value="pesquisando"><span class="block font-semibold text-paper">Só pesquisando</span></button>
+          </div>
+        </div>
+
+        <div class="quiz-step" data-step="7">
+          <p class="eyebrow mb-5">opcional</p>
+          <h2 tabindex="-1" class="text-2xl md:text-3xl font-semibold text-paper">Seu resultado está pronto.</h2>
+          <p class="mt-3 text-white/60 leading-relaxed">Se quiser que a Shift guarde o diagnóstico e entre em contato, deixe seus dados abaixo. Você pode pular esta etapa e ver o resultado normalmente.</p>
+
+          <form id="lead-form" class="mt-8" novalidate>
+            <div class="grid sm:grid-cols-2 gap-5">
+              <label class="block">
+                <span class="block mb-2 text-sm text-white/70">Nome <span class="text-white/40">(opcional)</span></span>
+                <input id="lead-name" name="nome" type="text" autocomplete="name" class="quiz-field" placeholder="Como podemos chamar você?" />
+              </label>
+              <label class="block">
+                <span class="block mb-2 text-sm text-white/70">Empresa <span class="text-white/40">(opcional)</span></span>
+                <input id="lead-company" name="empresa" type="text" autocomplete="organization" class="quiz-field" placeholder="Nome da empresa" />
+              </label>
+            </div>
+            <label class="block mt-5">
+              <span class="block mb-2 text-sm text-white/70">WhatsApp <span class="text-white/40">(opcional)</span></span>
+              <input id="lead-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" class="quiz-field" placeholder="(00) 00000-0000" />
+            </label>
+
+            <label class="consent-row mt-6">
+              <input id="lead-consent" name="consentimento" type="checkbox" autocomplete="off" />
+              <span>Autorizo a Shift Systems a guardar minhas respostas e entrar em contato sobre o diagnóstico. Consulte a <a href="privacidade.html" target="_blank" rel="noopener" class="text-gold hover:underline">política de privacidade</a>.</span>
+            </label>
+            <p class="privacy-status mt-3">Sem marcar esta opção, nenhum dado será enviado ao CRM.</p>
+
+            <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <button type="submit" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium">Ver meu resultado <span aria-hidden="true">→</span></button>
+              <button id="lead-skip" type="button" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base">Pular esta etapa</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="quiz-step" data-step="8" role="region" aria-labelledby="result-title">
+          <p class="eyebrow mb-5">seu diagnóstico</p>
+          <p id="result-level-label" class="font-mono text-xs uppercase tracking-[0.2em] text-gold mb-3"></p>
+          <h2 id="result-title" tabindex="-1" class="display text-3xl md:text-5xl text-paper"></h2>
+          <p id="result-description" class="mt-4 text-white/70 leading-relaxed"></p>
+
+          <div class="diagnostic-stair" aria-label="Os quatro níveis de maturidade em IA">
+            <div class="diagnostic-level" data-result-level="1"><span>Nível 1<br />A IA executa</span></div>
+            <div class="diagnostic-level" data-result-level="2"><span>Nível 2<br />A IA opera</span></div>
+            <div class="diagnostic-level" data-result-level="3"><span>Nível 3<br />A IA analisa</span></div>
+            <div class="diagnostic-level" data-result-level="4"><span>Nível 4<br />A IA recomenda</span></div>
+          </div>
+          <p id="foundation-note" class="foundation-note" hidden></p>
 
           <div class="hr-grad my-8"></div>
 
-          <div class="grid md:grid-cols-2 gap-6">
-            <div>
-              <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-white/55 mb-2">Onde dói</p>
-              <p id="result-pain" class="text-white/70 text-sm"></p>
+          <div class="result-grid">
+            <div class="result-block">
+              <span>Próximo passo</span>
+              <p id="result-next"></p>
             </div>
-            <div>
-              <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-white/55 mb-2">O que construir primeiro</p>
-              <p id="result-build" class="text-white/70 text-sm"></p>
+            <div class="result-block">
+              <span>Primeiro processo sugerido</span>
+              <p id="result-process"></p>
+            </div>
+            <div class="result-block">
+              <span>Oferta recomendada</span>
+              <p id="result-offer"></p>
+            </div>
+            <div id="result-alert-block" class="result-block" hidden>
+              <span>Atenção à LGPD</span>
+              <p id="result-alert"></p>
             </div>
           </div>
 
-          <div class="mt-8">
-            <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-white/55 mb-3">Stack provável</p>
-            <div id="result-stack" class="flex flex-wrap gap-2"></div>
+          <div class="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <a id="result-wa" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium">Receber meu plano no WhatsApp <span aria-hidden="true">→</span></a>
+            <button id="quiz-restart" type="button" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base cursor-pointer">Refazer o diagnóstico</button>
           </div>
-
-          <div class="mt-10 flex flex-col sm:flex-row items-center gap-4">
-            <a id="result-wa" href="#" target="_blank" rel="noopener" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium w-full sm:w-auto">
-              Ver a rota completa no WhatsApp
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-            </a>
-            <button id="quiz-restart" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base w-full sm:w-auto cursor-pointer">Refazer a rota</button>
-          </div>
-          <p class="mt-5 text-sm text-white/70">
-            O botão abre o WhatsApp com a mensagem já escrita — você lê e edita antes de enviar. Resposta em menos de 24h, sem compromisso.
-          </p>
-          <p class="mt-2 text-sm text-white/55">
-            Prefere e-mail? <a href="mailto:hello@shift.systems" class="text-gold hover:underline">hello@shift.systems</a>
-          </p>
+          <p class="mt-5 text-sm text-white/70">O botão abre o WhatsApp com as respostas e o resultado já preenchidos. Você pode revisar e editar a mensagem antes de enviar.</p>
+          <!-- TODO Bruno: confirmar se o e-mail hello@shift.systems funciona e se o domínio shift.systems é da Shift. Avaliar trocar por contato@shiftsys.com.br. -->
+          <p class="mt-2 text-sm text-white/55">Prefere e-mail? <a href="mailto:hello@shift.systems" class="text-gold hover:underline">hello@shift.systems</a></p>
         </div>
 
-        <!-- voltar -->
         <div id="quiz-back-row" class="mt-8">
-          <button id="quiz-back" class="text-sm text-white/70 hover:text-paper transition-colors cursor-pointer hidden">← Voltar</button>
+          <button id="quiz-back" type="button" class="text-sm text-white/70 hover:text-paper transition-colors cursor-pointer hidden">← Voltar</button>
         </div>
       </div>
 
-      <p class="reveal mt-6 text-center font-mono text-[11px] uppercase tracking-wider text-white/75">
+      <p class="reveal mt-6 text-center text-sm text-white/65 leading-relaxed">
         <svg class="inline-block -translate-y-px mr-1.5" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></svg>
-        Suas respostas não são salvas — só seguem com você se clicar no botão do WhatsApp.
+        Sem consentimento, nenhum dado é enviado ao CRM. Se você escolher o WhatsApp, revisa a mensagem antes de compartilhar.
       </p>
     </div>
   </section>
@@ -329,172 +330,376 @@
 <footer class="relative px-6 md:px-12 lg:px-20 pt-16 pb-10">
   <div class="max-w-7xl mx-auto">
     <div class="hr-grad mb-8"></div>
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs uppercase tracking-wider text-white/55">
+    <p class="max-w-xl text-sm text-white/60 leading-relaxed mb-8">IA aplicada aos processos da sua empresa. Aproveitamos o que funciona, construímos o que falta.</p>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs uppercase tracking-wider text-white/55">
       <span>© <span data-year>2026</span> shift systems</span>
-      <span class="flex items-center gap-5">
+      <span class="flex flex-wrap justify-center items-center gap-5">
+        <a href="sites.html" class="hover:text-paper transition-colors">sites</a>
         <a href="privacidade.html" class="hover:text-paper transition-colors">privacidade</a>
         <a href="termos.html" class="hover:text-paper transition-colors">termos de uso</a>
       </span>
-      <span>feito em mar aberto · uma nova direção</span>
     </div>
   </div>
 </footer>
 
 <script src="assets/site.js" defer></script>
 <script src="assets/cinema.js" defer></script>
+<!-- TODO Bruno: configurar o endpoint público do CRM quando a API estiver pronta. Nunca incluir chave ou segredo no front-end. -->
 <script>
-/* ===== log pose · lógica do quiz ===== */
 (function () {
   'use strict';
 
-  var tracks = {
-    atendimento: {
-      label: 'atendimento',
-      base: 12,
-      pain: 'Mensagens espalhadas, lead sem dono e resposta dependendo de quem viu primeiro.',
-      build: 'Triagem automática, fila única, respostas com contexto e passagem inteligente para humano.',
-      stack: ['WhatsApp API', 'agente IA', 'CRM', 'dashboard']
+  const CRM_ENDPOINT = '';
+  const TOTAL_QUESTIONS = 6;
+  const LEAD_STEP = 7;
+  const RESULT_STEP = 8;
+
+  const labels = {
+    segmento: {
+      contabil: 'Escritório contábil',
+      advocacia: 'Escritório de advocacia',
+      imobiliaria: 'Imobiliária',
+      comercio: 'Comércio/varejo',
+      servicos: 'Prestação de serviços',
+      industria: 'Indústria',
+      saude: 'Saúde e clínicas',
+      outro: 'Outro'
     },
-    vendas: {
-      label: 'vendas',
-      base: 10,
-      pain: 'Follow-up feito na memória, proposta perdida e oportunidade esfriando sem alerta.',
-      build: 'Pipeline visual, alertas, automações de follow-up e resumo automático de cada negociação.',
-      stack: ['CRM leve', 'webhooks', 'IA SDR', 'notificações']
+    controle: {
+      whatsapp: 'WhatsApp e memória',
+      planilhas: 'Planilhas',
+      ilhas: 'Sistemas que não conversam entre si',
+      integrado: 'Sistemas organizados e integrados'
     },
-    financeiro: {
-      label: 'financeiro',
-      base: 8,
-      pain: 'Cobrança manual, conferência chata e pouca visibilidade de dinheiro parado.',
-      build: 'Emissão, lembrete, baixa, conciliação simples e painel de pendências por cliente.',
-      stack: ['ERP', 'banco de dados', 'notas', 'relatórios']
+    dor: {
+      documentos: 'Digitar dados de documentos e PDFs',
+      atendimento: 'Responder as mesmas perguntas de clientes',
+      conferencia: 'Conferir informações entre planilhas e sistemas',
+      demandas: 'Organizar e distribuir demandas',
+      relatorios: 'Montar relatórios, contratos e documentos repetitivos',
+      decisao: 'Falta informação para tomar decisões',
+      processos: 'Processos que só andam com alguém cobrando',
+      equipe: 'Acompanhar a equipe e saber quem está com o quê'
     },
-    operacao: {
-      label: 'operação',
-      base: 14,
-      pain: 'Tarefas no WhatsApp, planilhas diferentes e ninguém sabendo exatamente o status real.',
-      build: 'Sistema interno com etapas, responsáveis, prazos, alertas e visão de gargalo.',
-      stack: ['web app', 'permissões', 'alertas', 'BI']
+    ia: {
+      nao: 'Ainda não usa IA',
+      solta: 'Funcionários usam ChatGPT ou similares por conta própria',
+      insatisfeito: 'Tem chatbot ou automação, mas não entrega o esperado',
+      integrada: 'Tem IA integrada aos processos e funcionando'
+    },
+    equipe: {
+      solo: 'Só eu',
+      '2-5': '2 a 5 pessoas',
+      '6-15': '6 a 15 pessoas',
+      '16+': '16 ou mais'
+    },
+    prazo: {
+      agora: 'O quanto antes',
+      'proximos-meses': 'Nos próximos meses',
+      semestre: 'Neste semestre',
+      pesquisando: 'Só pesquisando'
     }
   };
-  var teamFactor = { 'solo': 0.6, '2-5': 1, '6-15': 1.6, '16+': 2.2 };
-  var teamLabel = { 'solo': 'só eu', '2-5': '2 a 5 pessoas', '6-15': '6 a 15 pessoas', '16+': '16+ pessoas' };
-  var controlBonus = { 'whatsapp': 4, 'planilhas': 3, 'sistema-isolado': 2, 'quase-la': 2 };
-  var controlLabel = {
-    'whatsapp': 'WhatsApp e memória',
-    'planilhas': 'planilhas',
-    'sistema-isolado': 'sistemas que não conversam',
-    'quase-la': 'ferramentas ok, falta integração e IA'
-  };
-  var urgencyMsg = {
-    'agora': 'o quanto antes',
-    'trimestre': 'nos próximos meses',
-    'semestre': 'esse semestre',
-    'pesquisando': 'ainda só pesquisando'
+
+  const processByPain = {
+    documentos: 'Extração automática de dados de documentos',
+    atendimento: 'Atendimento com IA treinada no conhecimento da empresa',
+    conferencia: 'Conferência automática entre fontes de dados',
+    demandas: 'Triagem e encaminhamento automático de demandas',
+    relatorios: 'Geração automática de relatórios e documentos',
+    decisao: 'Organização dos dados e painel de indicadores (base para os níveis 3 e 4)',
+    processos: 'Agente de IA conduzindo um processo de ponta a ponta, com cobrança automática das etapas',
+    equipe: 'Gestão de tarefas da equipe com IA: distribuição, prazos e acompanhamento'
   };
 
-  var answers = {};
-  var current = 1;
-  var TOTAL = 4;
+  let answers = {};
+  let current = 1;
+  let transitionLocked = false;
+  let crmSubmissionStarted = false;
 
-  var steps = document.querySelectorAll('.quiz-step');
-  var qNum = document.getElementById('q-num');
-  var backBtn = document.getElementById('quiz-back');
+  const steps = Array.from(document.querySelectorAll('.quiz-step'));
+  const options = Array.from(document.querySelectorAll('.quiz-option'));
+  const qNum = document.getElementById('q-num');
+  const progress = document.getElementById('quiz-progress');
+  const progressTrack = document.getElementById('quiz-progress-track');
+  const announcer = document.getElementById('step-announcer');
+  const backBtn = document.getElementById('quiz-back');
+  const leadForm = document.getElementById('lead-form');
+  const consent = document.getElementById('lead-consent');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  function show(step) {
-    current = step;
-    steps.forEach(function (el) {
-      el.classList.toggle('active', parseInt(el.getAttribute('data-step'), 10) === step);
+  function motionIsPaused() {
+    return reducedMotion.matches || document.documentElement.classList.contains('motion-paused');
+  }
+
+  function focusStep(step) {
+    const active = document.querySelector('.quiz-step[data-step="' + step + '"]');
+    const heading = active && active.querySelector('h2');
+    if (!heading) return;
+    window.requestAnimationFrame(function () {
+      try { heading.focus({ preventScroll: true }); }
+      catch (error) { heading.focus(); }
     });
-    if (step <= TOTAL) {
+  }
+
+  function show(step, shouldFocus) {
+    current = step;
+    steps.forEach(function (element) {
+      element.classList.toggle('active', Number(element.getAttribute('data-step')) === step);
+    });
+
+    const isQuestion = step <= TOTAL_QUESTIONS;
+    progress.hidden = !isQuestion;
+    if (isQuestion) {
       qNum.textContent = 'pergunta ' + step;
-      document.querySelectorAll('[data-wp]').forEach(function (wp) {
-        wp.classList.toggle('lit', parseInt(wp.getAttribute('data-wp'), 10) <= step);
+      progressTrack.setAttribute('aria-valuenow', String(step));
+      document.querySelectorAll('[data-wp]').forEach(function (waypoint) {
+        waypoint.classList.toggle('lit', Number(waypoint.getAttribute('data-wp')) <= step);
       });
-      document.querySelectorAll('[data-seg]').forEach(function (seg) {
-        seg.style.background = parseInt(seg.getAttribute('data-seg'), 10) < step
-          ? 'linear-gradient(90deg, rgba(242, 166, 61,0.5), rgba(255,201,61,0.5))'
+      document.querySelectorAll('[data-seg]').forEach(function (segment) {
+        segment.style.background = Number(segment.getAttribute('data-seg')) < step
+          ? 'linear-gradient(90deg, rgba(242, 166, 61, 0.5), rgba(255, 201, 61, 0.5))'
           : 'rgba(255,255,255,0.1)';
       });
     }
-    backBtn.classList.toggle('hidden', step === 1 || step > TOTAL);
-    document.getElementById('quiz-progress').style.visibility = step > TOTAL ? 'hidden' : 'visible';
+
+    const canGoBack = step > 1 && step <= LEAD_STEP;
+    backBtn.classList.toggle('hidden', !canGoBack);
+    backBtn.textContent = step === LEAD_STEP ? '← Voltar à última pergunta' : '← Voltar';
+    transitionLocked = false;
+
+    const active = document.querySelector('.quiz-step[data-step="' + step + '"]');
+    const heading = active && active.querySelector('h2');
+    if (heading) {
+      announcer.textContent = isQuestion
+        ? 'Pergunta ' + step + ' de ' + TOTAL_QUESTIONS + ': ' + heading.textContent
+        : heading.textContent;
+    }
+    if (shouldFocus !== false) focusStep(step);
   }
 
-  document.querySelectorAll('.quiz-option').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var q = btn.getAttribute('data-q');
-      answers[q] = btn.getAttribute('data-value');
-      btn.parentElement.querySelectorAll('.quiz-option').forEach(function (b) { b.classList.remove('picked'); });
-      btn.classList.add('picked');
-      setTimeout(function () {
-        if (current < TOTAL) { show(current + 1); }
-        else { finish(); }
-      }, 260);
+  function calculateResult() {
+    let level;
+    if (answers.controle === 'whatsapp') {
+      level = {
+        code: 'fundacao',
+        stairLevel: 0,
+        label: 'Fundação · antes do Nível 1',
+        title: 'Primeiro, a IA precisa de uma base para trabalhar.',
+        description: 'Antes da IA, sua empresa precisa de estrutura. Hoje a informação vive em conversas e na memória das pessoas, e a IA não tem onde trabalhar. O primeiro passo é organizar a base, e nós construímos isso junto com a primeira automação.',
+        next: 'Organizar a informação da operação e implantar a primeira automação sobre essa base.'
+      };
+    } else if (answers.ia === 'integrada' && answers.controle === 'integrado') {
+      level = {
+        code: 'nivel-2',
+        stairLevel: 2,
+        label: 'Nível 2 · A IA opera',
+        title: 'Sua IA já participa da operação.',
+        description: 'Sua empresa já tem IA integrada aos processos e uma base organizada. O próximo avanço é usar esses dados para analisar a operação e avisar quando algo sair do padrão.',
+        next: 'Subir para o Nível 3: fazer a IA analisar seus dados e entregar respostas e alertas em tempo real.'
+      };
+    } else if (answers.ia === 'integrada') {
+      level = {
+        code: 'nivel-1',
+        stairLevel: 1,
+        label: 'Nível 1 · A IA executa',
+        title: 'Sua IA já executa tarefas pontuais.',
+        description: 'A IA já trabalha em partes da operação. Agora o ganho vem de conectar essas tarefas em processos completos, com regras claras e participação humana nos pontos de decisão.',
+        next: 'Subir para o Nível 2: conectar tarefas para que a IA conduza processos de ponta a ponta.'
+      };
+    } else {
+      level = {
+        code: 'inicio-nivel-1',
+        stairLevel: 1,
+        label: 'Início do Nível 1',
+        title: 'O primeiro trabalho repetitivo já pode sair das mãos da equipe.',
+        description: 'Sua empresa está no começo da adoção de IA. O melhor ponto de partida é um processo de alto volume e baixo risco, com resultado acompanhado desde o início.',
+        next: 'Tirar o primeiro processo repetitivo das mãos da equipe e medir o antes e o depois.'
+      };
+    }
+
+    const correction = answers.ia === 'insatisfeito' || answers.ia === 'solta';
+    const offer = correction
+      ? {
+          code: 'consultoria-correcao',
+          label: 'Consultoria e correção',
+          description: 'Auditamos o que já existe, corrigimos o que pode ser aproveitado e organizamos o uso da IA com regras claras.'
+        }
+      : {
+          code: 'implantacao',
+          label: 'Implantação',
+          description: 'Começamos pelo processo de maior retorno e menor risco, com resultado acompanhado desde o primeiro ciclo.'
+        };
+
+    return {
+      level: level,
+      offer: offer,
+      process: processByPain[answers.dor] || 'Mapeamento do primeiro processo a transformar',
+      alert: answers.ia === 'solta'
+        ? 'Funcionários usando IA pública com dados de clientes, sem regras, é um risco de LGPD que a maioria das empresas nem sabe que tem.'
+        : ''
+    };
+  }
+
+  function fillResult(result) {
+    document.getElementById('result-level-label').textContent = result.level.label;
+    document.getElementById('result-title').textContent = result.level.title;
+    document.getElementById('result-description').textContent = result.level.description;
+    document.getElementById('result-next').textContent = result.level.next;
+    document.getElementById('result-process').textContent = result.process;
+    document.getElementById('result-offer').textContent = result.offer.label + '. ' + result.offer.description;
+
+    document.querySelectorAll('[data-result-level]').forEach(function (element) {
+      const selected = Number(element.getAttribute('data-result-level')) === result.level.stairLevel;
+      element.classList.toggle('is-current', selected);
+      if (selected) element.setAttribute('aria-current', 'step');
+      else element.removeAttribute('aria-current');
+    });
+
+    const foundation = document.getElementById('foundation-note');
+    foundation.hidden = result.level.code !== 'fundacao';
+    foundation.textContent = result.level.code === 'fundacao'
+      ? 'Sua posição atual: Fundação. A base vem antes dos quatro níveis e é construída junto com a primeira automação.'
+      : '';
+
+    const alertBlock = document.getElementById('result-alert-block');
+    alertBlock.hidden = !result.alert;
+    document.getElementById('result-alert').textContent = result.alert;
+  }
+
+  function contactData() {
+    return {
+      nome: document.getElementById('lead-name').value.trim(),
+      empresa: document.getElementById('lead-company').value.trim(),
+      whatsapp: document.getElementById('lead-whatsapp').value.trim()
+    };
+  }
+
+  function buildWhatsAppUrl(result, contact) {
+    const lines = [
+      'Olá! Fiz o diagnóstico de IA no site da Shift Systems.',
+      '',
+      'Minhas respostas:',
+      '• segmento: ' + (labels.segmento[answers.segmento] || '-'),
+      '• controle hoje: ' + (labels.controle[answers.controle] || '-'),
+      '• tarefa que mais consome tempo: ' + (labels.dor[answers.dor] || '-'),
+      '• uso atual de IA: ' + (labels.ia[answers.ia] || '-'),
+      '• equipe: ' + (labels.equipe[answers.equipe] || '-'),
+      '• prazo: ' + (labels.prazo[answers.prazo] || '-'),
+      '',
+      'Resultado:',
+      '• nível atual: ' + result.level.label,
+      '• próximo passo: ' + result.level.next,
+      '• primeiro processo sugerido: ' + result.process,
+      '• oferta recomendada: ' + result.offer.label
+    ];
+    if (contact.nome) lines.push('• nome: ' + contact.nome);
+    if (contact.empresa) lines.push('• empresa: ' + contact.empresa);
+    if (result.alert) lines.push('', 'Alerta: ' + result.alert);
+    lines.push('', 'Quero receber meu plano e entender o próximo passo.');
+    return 'https://wa.me/5554984184808?text=' + encodeURIComponent(lines.join('\n'));
+  }
+
+  function sendLead(result, contact) {
+    if (!consent.checked || !CRM_ENDPOINT.trim() || crmSubmissionStarted) return;
+    crmSubmissionStarted = true;
+    const payload = {
+      respostas: {
+        segmento: answers.segmento,
+        controle: answers.controle,
+        dor: answers.dor,
+        ia: answers.ia,
+        equipe: answers.equipe,
+        prazo: answers.prazo
+      },
+      nivelCalculado: result.level.label,
+      ofertaRecomendada: result.offer.label,
+      processoSugerido: result.process,
+      nome: contact.nome,
+      empresa: contact.empresa,
+      whatsapp: contact.whatsapp,
+      consentimento: {
+        autorizado: true,
+        dataHora: new Date().toISOString()
+      },
+      origem: 'diagnostico-site'
+    };
+
+    try {
+      window.fetch(CRM_ENDPOINT.trim(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(function () {
+        /* O diagnóstico e o WhatsApp continuam funcionando se o CRM estiver indisponível. */
+      });
+    } catch (error) {
+      /* O resultado já está visível; uma falha de rede nunca bloqueia o fluxo. */
+    }
+  }
+
+  function completeDiagnostic(allowCrmSend) {
+    const result = calculateResult();
+    const contact = contactData();
+    fillResult(result);
+    document.getElementById('result-wa').href = buildWhatsAppUrl(result, contact);
+    show(RESULT_STEP, true);
+    if (allowCrmSend) sendLead(result, contact);
+  }
+
+  options.forEach(function (button) {
+    button.addEventListener('click', function () {
+      if (transitionLocked) return;
+      transitionLocked = true;
+      const question = button.getAttribute('data-q');
+      answers[question] = button.getAttribute('data-value');
+      button.parentElement.querySelectorAll('.quiz-option').forEach(function (candidate) {
+        const selected = candidate === button;
+        candidate.classList.toggle('picked', selected);
+        candidate.setAttribute('aria-pressed', String(selected));
+      });
+
+      const next = current < TOTAL_QUESTIONS ? current + 1 : LEAD_STEP;
+      window.setTimeout(function () { show(next, true); }, motionIsPaused() ? 0 : 220);
     });
   });
 
-  backBtn.addEventListener('click', function () { if (current > 1) show(current - 1); });
+  backBtn.addEventListener('click', function () {
+    if (transitionLocked || current <= 1 || current > LEAD_STEP) return;
+    show(current === LEAD_STEP ? TOTAL_QUESTIONS : current - 1, true);
+  });
 
-  function finish() {
-    show(5);
-    var compass = document.getElementById('compass');
-    compass.parentElement.classList.add('compass-spin');
-    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTimeout(showResult, reduced ? 150 : 1400);
-  }
+  leadForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    if (transitionLocked) return;
+    transitionLocked = true;
+    completeDiagnostic(true);
+  });
 
-  function showResult() {
-    var t = tracks[answers.area] || tracks.operacao;
-    var hours = Math.round((t.base + (controlBonus[answers.control] || 2)) * (teamFactor[answers.team] || 1));
-
-    document.getElementById('result-pain').textContent = t.pain;
-    document.getElementById('result-build').textContent = t.build;
-    document.getElementById('result-urgency').textContent = 'Prioridade: ' + (urgencyMsg[answers.urgency] || '-');
-
-    var stackEl = document.getElementById('result-stack');
-    stackEl.innerHTML = '';
-    t.stack.forEach(function (s) {
-      var chip = document.createElement('span');
-      chip.className = 'font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-gold/30 text-gold';
-      chip.textContent = s;
-      stackEl.appendChild(chip);
-    });
-
-    var msg = 'Olá! Fiz o diagnóstico no site da Shift Systems.\n'
-      + '• área mais caótica: ' + t.label + '\n'
-      + '• time: ' + (teamLabel[answers.team] || '-') + '\n'
-      + '• controle hoje: ' + (controlLabel[answers.control] || '-') + '\n'
-      + '• quer resolver: ' + (urgencyMsg[answers.urgency] || '-') + '\n'
-      + 'Quero ver a rota completa!';
-    document.getElementById('result-wa').href =
-      'https://wa.me/5554984184808?text=' + encodeURIComponent(msg);
-
-    show(6);
-
-    /* contador do tesouro — faixa, porque a conta nao tem precisao de unidade */
-    var lo = Math.max(2, Math.round(hours * 0.8));
-    var hi = Math.round(hours * 1.15);
-    var elLo = document.getElementById('treasure-lo');
-    var elHi = document.getElementById('treasure-hi');
-    var dur = 1200, t0 = performance.now();
-    var tick = function (now) {
-      var p = Math.min(1, (now - t0) / dur);
-      var eased = 1 - Math.pow(1 - p, 3);
-      elLo.textContent = Math.round(lo * eased);
-      elHi.textContent = Math.round(hi * eased);
-      if (p < 1) requestAnimationFrame(tick);
-      else { elLo.textContent = lo; elHi.textContent = hi; }
-    };
-    requestAnimationFrame(tick);
-  }
+  document.getElementById('lead-skip').addEventListener('click', function () {
+    if (transitionLocked) return;
+    transitionLocked = true;
+    leadForm.reset();
+    consent.checked = false;
+    completeDiagnostic(false);
+  });
 
   document.getElementById('quiz-restart').addEventListener('click', function () {
     answers = {};
-    document.querySelectorAll('.quiz-option').forEach(function (b) { b.classList.remove('picked'); });
-    document.querySelector('[data-step="5"]').classList.remove('compass-spin');
-    show(1);
+    transitionLocked = false;
+    crmSubmissionStarted = false;
+    leadForm.reset();
+    options.forEach(function (button) {
+      button.classList.remove('picked');
+      button.setAttribute('aria-pressed', 'false');
+    });
+    document.getElementById('result-wa').href = '#';
+    show(1, true);
   });
+
+  consent.checked = false;
+  show(1, false);
 })();
 </script>
 <button type="button" id="motion-toggle" class="motion-toggle" aria-label="Pausar animações" aria-pressed="false"><span class="motion-symbol" aria-hidden="true">Ⅱ</span><span class="motion-text">Pausar movimento</span></button>
