@@ -1,0 +1,3 @@
+# Scripts que rodam em Linux (CI e contêineres) nascem e morrem com LF.
+*.sh text eol=lf
+*.yml text eol=lf
