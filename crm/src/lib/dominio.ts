@@ -26,6 +26,21 @@ export const TIPOS = [
 export type Tipo = (typeof TIPOS)[number]["id"];
 export const IDS_TIPO = TIPOS.map((t) => t.id) as [Tipo, ...Tipo[]];
 
+/** O funil de vendas, escolhido pelo Bruno em 25/09/2026. */
+export const ETAPAS_LEAD = [
+  { id: "novo", nome: "Novo" },
+  { id: "qualificado", nome: "Qualificado" },
+  { id: "diagnostico", nome: "Diagnóstico" },
+  { id: "proposta", nome: "Proposta" },
+  { id: "negociacao", nome: "Negociação" },
+  { id: "ganho", nome: "Ganho" },
+  { id: "perdido", nome: "Perdido" },
+] as const;
+
+export type EtapaLead = (typeof ETAPAS_LEAD)[number]["id"];
+export const IDS_ETAPA_LEAD = ETAPAS_LEAD.map((e) => e.id) as [EtapaLead, ...EtapaLead[]];
+export const nomeDaEtapaLead = (id: string) => ETAPAS_LEAD.find((e) => e.id === id)?.nome ?? id;
+
 export const nomeDaEtapa = (id: string) => ETAPAS.find((e) => e.id === id)?.nome ?? id;
 export const nomeDoTipo = (id: string) => TIPOS.find((t) => t.id === id)?.nome ?? id;
 

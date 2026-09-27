@@ -7,6 +7,7 @@
  * vez de quebrar a primeira tela depois do deploy.
  */
 import { PGlite } from "@electric-sql/pglite";
+import { afterEach } from "vitest";
 
 import type { Consulta } from "@/lib/consulta";
 // O mesmo script que roda no boot da imagem.
@@ -27,8 +28,19 @@ export function adaptar(db: PGlite): Consulta {
   };
 }
 
+/*
+ * Cada teste abre o seu banco; sem fechar, cada instância do PGlite segura a
+ * própria memória de WebAssembly até o arquivo acabar, e numa máquina com
+ * pouca memória livre o processo morre no meio dos testes.
+ */
+const abertos: PGlite[] = [];
+afterEach(async () => {
+  while (abertos.length) await abertos.pop()!.close();
+});
+
 export async function bancoDeTeste() {
   const db = await PGlite.create();
+  abertos.push(db);
   await db.exec("create role shift_crm_app nologin");
   await migrar(adaptar(db), () => {});
   await db.exec("set role shift_crm_app");

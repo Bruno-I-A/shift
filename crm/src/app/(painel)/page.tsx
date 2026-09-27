@@ -8,13 +8,16 @@ import { emTransacao } from "@/lib/banco";
 import { DIAS_PARA_PARADO, painelHoje } from "@/lib/crm";
 import { nomeDaEtapa } from "@/lib/dominio";
 import { haQuanto, hojePorExtenso, nomeDoAtor } from "@/lib/formato";
+import { listarLeads } from "@/lib/leads";
 import { exigirSessao } from "@/lib/sessao";
 
 export const metadata: Metadata = { title: "Hoje" };
 
 export default async function Hoje() {
   await exigirSessao();
-  const { propostas, parados, tarefas, sessoes } = await emTransacao((tx) => painelHoje(tx));
+  const [{ propostas, parados, tarefas, sessoes }, leadsNovos] = await emTransacao(async (tx) =>
+    Promise.all([painelHoje(tx), listarLeads(tx, "novo")]),
+  );
 
   // Tarefas agrupadas por projeto, na ordem em que vieram (já ordenadas por nome).
   const porProjeto = new Map<string, { nome: string; slug: string; itens: typeof tarefas }>();
@@ -42,6 +45,38 @@ export default async function Hoje() {
           </div>
         )}
       </Secao>
+
+      {leadsNovos.length > 0 && (
+        <Secao
+          titulo="Leads novos"
+          contagem={leadsNovos.length}
+          acao={
+            <Link href="/leads?etapa=novo" className="text-sm text-destaque hover:underline">
+              Ver todos
+            </Link>
+          }
+        >
+          <ul className="divide-y divide-linha rounded-lg border border-linha">
+            {leadsNovos.slice(0, 5).map((l) => (
+              <li key={l.id}>
+                <Link
+                  href="/leads?etapa=novo"
+                  className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-3 transition-colors hover:bg-superficie"
+                >
+                  <span className="min-w-0">
+                    <span className="text-sm font-medium">{l.nome}</span>
+                    {l.empresa && <span className="text-sm text-suave"> · {l.empresa}</span>}
+                    <span className="block text-xs text-apagado">
+                      {[l.segmento, l.dor].filter(Boolean).join(" · ")}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-xs text-apagado">{haQuanto(l.criadoEm)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Secao>
+      )}
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <Secao titulo="Tarefas abertas" contagem={tarefas.length}>

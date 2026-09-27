@@ -6,10 +6,21 @@ import { usePathname } from "next/navigation";
 const ITENS = [
   { href: "/", rotulo: "Hoje" },
   { href: "/projetos", rotulo: "Projetos" },
+  { href: "/leads", rotulo: "Leads" },
   { href: "/agentes", rotulo: "Agentes" },
 ];
 
-export function Navegacao({ pendentes }: { pendentes: number }) {
+function Contador({ n, rotulo }: { n: number; rotulo: string }) {
+  if (n <= 0) return null;
+  return (
+    <span className="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-destaque px-1.5 text-xs font-medium text-fundo">
+      {n}
+      <span className="sr-only"> {rotulo}</span>
+    </span>
+  );
+}
+
+export function Navegacao({ pendentes, leadsNovos }: { pendentes: number; leadsNovos: number }) {
   const caminho = usePathname();
   const ativo = (href: string) => (href === "/" ? caminho === "/" : caminho.startsWith(href));
 
@@ -25,12 +36,8 @@ export function Navegacao({ pendentes }: { pendentes: number }) {
           }`}
         >
           {item.rotulo}
-          {item.href === "/" && pendentes > 0 && (
-            <span className="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-destaque px-1.5 text-xs font-medium text-fundo">
-              {pendentes}
-              <span className="sr-only"> esperando você</span>
-            </span>
-          )}
+          {item.href === "/" && <Contador n={pendentes} rotulo="esperando você" />}
+          {item.href === "/leads" && <Contador n={leadsNovos} rotulo="novos" />}
         </Link>
       ))}
     </nav>

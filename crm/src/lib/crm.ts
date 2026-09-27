@@ -11,7 +11,7 @@ import { ETAPAS_ATIVAS, ErroDeDominio, gerarSlug, nomeDaEtapa, normalizarReposit
 import type { Etapa, Tipo } from "./dominio";
 import { gerarToken, hashDoToken } from "./segredos";
 
-export type Ator = "bruno" | "sistema" | `agente:${string}`;
+export type Ator = "bruno" | "sistema" | "site" | `agente:${string}`;
 
 export interface Projeto {
   id: string;

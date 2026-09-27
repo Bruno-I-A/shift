@@ -1,12 +1,15 @@
 # Shift CRM
 
-O quadro dos projetos de cliente da Shift, em `crm.shiftsys.com.br`. Os agentes
+O quadro dos projetos de cliente e dos leads da Shift, em `crm.shiftsys.com.br`.
+Mora em `crm/` do repositório `Bruno-I-A/shift`, ao lado do site (`site/`); o
+passo a passo de subir os dois está no README da raiz. Os agentes
 (Claude Code e Codex) atualizam o quadro pelo MCP enquanto trabalham: leem o
 contexto ao começar, registram o que fizeram ao terminar e **propõem** mudança
 de etapa. Quem aceita é o Bruno, na tela **Hoje**.
 
 - **Etapas:** Descoberta → Desenho → Construção → Validação com o cliente → Entregue → Acompanhamento
 - **Tipos:** Transformação AI first · Site · Software
+- **Funil de leads:** Novo → Qualificado → Diagnóstico → Proposta → Negociação → Ganho · Perdido
 - **Stack:** Next.js 16 · PostgreSQL (`pg`, SQL à mão) · MCP SDK v2 · Tailwind 4
 - Decisões e contexto de negócio: `Cerebro/Projetos/Shift CRM/Shift CRM.md`
 
@@ -26,34 +29,25 @@ No `.env.local` de desenvolvimento use `BANCO_PAPEL=shift_crm_app` e
 `BANCO_MAX_CONEXOES=1`. O hash da senha sai de `npm run configurar-login`.
 
 ```bash
-npm test          # 32 testes, com Postgres de verdade (PGlite) e o papel restrito
+npm test          # testes com Postgres de verdade (PGlite) e o papel restrito
 npm run lint
 npm run typecheck
 ```
 
-## Deploy no Easypanel
+## Leads do site
 
-1. **Repositório** privado `github.com/Bruno-I-A/shift-crm`, com este código.
-2. **DNS:** registro `crm.shiftsys.com.br` apontando para a VPS.
-3. **Easypanel → novo serviço App**, fonte GitHub, build pelo `Dockerfile`, porta
-   `3000`, domínio `crm.shiftsys.com.br` com HTTPS.
-4. **Ambiente do serviço** — na sua máquina, `npm run configurar-login` gera
-   `ADMIN_SENHA_HASH` e `SESSAO_SEGREDO`. Cole as duas, mais:
-   `ADMIN_EMAIL` e `APP_URL=https://crm.shiftsys.com.br`.
-5. **Implante.** Sem banco o app sobe mesmo assim; `/api/saude` lista o que falta.
-6. **Banco:** no Console do serviço, rode `node scripts/configurar-banco.mjs`.
-   Ele pede a URL de administrador do Postgres (a do serviço Postgres no
-   Easypanel), cria os papéis `shift_crm_owner` e `shift_crm_app`, o banco
-   `shift_crm`, aplica as migrações e imprime `DATABASE_URL` e
-   `DATABASE_URL_MIGRACAO` **uma vez**. Cole as duas no Ambiente e reimplante.
-7. **Confira** `https://crm.shiftsys.com.br/api/saude` → `"ok": true`.
-8. **Agentes:** entre, abra **Agentes**, gere uma chave para `claude` e outra
-   para `codex` e siga os dois passos que a tela mostra.
-9. **Regra dos agentes:** instale `docs/regra-dos-agentes.md` no `CLAUDE.md`
-   global e no `AGENTS.md` do Codex, para eles usarem o CRM sem ser lembrados.
+`POST /api/leads` é a única escrita pública do CRM. O diagnóstico do site manda
+o corpo como `text/plain` (JSON dentro) para não disparar preflight. Travas:
+origem (`ORIGENS_SITE`, padrão `shiftsys.com.br` e `www`), formato e
+consentimento (`lerEnvioDoSite`), e limite de 5 envios por IP por hora e 100 no
+total. O IP entra no banco só como HMAC, para contar. O mesmo WhatsApp com
+lead em aberto atualiza o lead em vez de criar outro.
 
-A partir daí, toda subida do contêiner roda as migrações pendentes antes do
-servidor (`docker-entrypoint.sh`). Se uma falhar, o contêiner não sobe.
+## Deploy
+
+Ver o README da raiz do repositório: o CRM é o serviço com build path `/crm`,
+porta 3000. Toda subida do contêiner roda as migrações pendentes antes do
+servidor (`docker-entrypoint.sh`); se uma falhar, o contêiner não sobe.
 
 ## MCP
 

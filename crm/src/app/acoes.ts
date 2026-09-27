@@ -6,7 +6,8 @@ import * as z from "zod";
 
 import { emTransacao } from "@/lib/banco";
 import * as crm from "@/lib/crm";
-import { ErroDeDominio, IDS_ETAPA, IDS_TIPO } from "@/lib/dominio";
+import { ErroDeDominio, IDS_ETAPA, IDS_ETAPA_LEAD, IDS_TIPO } from "@/lib/dominio";
+import { mudarEtapaDoLead } from "@/lib/leads";
 import { conferirSenha, iguais } from "@/lib/segredos";
 import {
   credenciaisDoAdmin,
@@ -188,6 +189,21 @@ export async function alternarTarefa(id: string, concluir: boolean): Promise<Res
       if (concluir) await crm.concluirTarefa(tx, id, "bruno");
       else await crm.reabrirTarefa(tx, id, "bruno");
     });
+  } catch (erro) {
+    return { erro: mensagemDe(erro) };
+  }
+  revalidatePath("/", "layout");
+}
+
+// -----------------------------------------------------------------------------
+// Leads
+// -----------------------------------------------------------------------------
+
+export async function mudarEtapaLead(id: string, etapa: string): Promise<Resultado> {
+  await exigirSessao();
+  try {
+    const para = z.enum(IDS_ETAPA_LEAD).parse(etapa);
+    await emTransacao((tx) => mudarEtapaDoLead(tx, id, para, "bruno"));
   } catch (erro) {
     return { erro: mensagemDe(erro) };
   }

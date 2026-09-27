@@ -254,7 +254,7 @@
             </div>
             <label class="block mt-5">
               <span class="block mb-2 text-sm text-white/70">WhatsApp <span class="text-white/40">(opcional)</span></span>
-              <input id="lead-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" class="quiz-field" placeholder="(00) 00000-0000" />
+              <input id="lead-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" pattern="(?:\D*\d){10,13}\D*" title="Informe o DDD e o número, como (54) 99999-0000." class="quiz-field" placeholder="(00) 00000-0000" />
             </label>
 
             <label class="consent-row mt-6">
@@ -349,7 +349,8 @@
 (function () {
   'use strict';
 
-  const CRM_ENDPOINT = '';
+  // O CRM da Shift. Só recebe com a caixa de consentimento marcada (ver sendLead).
+  const CRM_ENDPOINT = 'https://crm.shiftsys.com.br/api/leads';
   const TOTAL_QUESTIONS = 6;
   const LEAD_STEP = 7;
   const RESULT_STEP = 8;
@@ -603,15 +604,14 @@
   function sendLead(result, contact) {
     if (!consent.checked || !CRM_ENDPOINT.trim() || crmSubmissionStarted) return;
     crmSubmissionStarted = true;
+    // As respostas vão em texto legível, e não nos códigos dos botões: é o que
+    // aparece no CRM, e assim os dois lados não precisam manter a mesma tabela.
+    const respostas = {};
+    Object.keys(labels).forEach(function (pergunta) {
+      respostas[pergunta] = labels[pergunta][answers[pergunta]] || '';
+    });
     const payload = {
-      respostas: {
-        segmento: answers.segmento,
-        controle: answers.controle,
-        dor: answers.dor,
-        ia: answers.ia,
-        equipe: answers.equipe,
-        prazo: answers.prazo
-      },
+      respostas: respostas,
       nivelCalculado: result.level.label,
       ofertaRecomendada: result.offer.label,
       processoSugerido: result.process,
@@ -626,9 +626,12 @@
     };
 
     try {
+      // text/plain e não application/json: assim o navegador não faz o preflight
+      // (OPTIONS) de outra origem, que o fetch com keepalive não suporta em todo
+      // navegador. O corpo continua sendo JSON, e o CRM lê assim.
       window.fetch(CRM_ENDPOINT.trim(), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
         body: JSON.stringify(payload),
         keepalive: true
       }).catch(function () {
@@ -673,6 +676,12 @@
   leadForm.addEventListener('submit', function (event) {
     event.preventDefault();
     if (transitionLocked) return;
+    // Com o consentimento marcado, nome e WhatsApp viram obrigatórios: sem eles
+    // o CRM recusa o envio e ninguém consegue retornar o contato.
+    const exigeContato = consent.checked;
+    document.getElementById('lead-name').required = exigeContato;
+    document.getElementById('lead-whatsapp').required = exigeContato;
+    if (exigeContato && !leadForm.reportValidity()) return;
     transitionLocked = true;
     completeDiagnostic(true);
   });
