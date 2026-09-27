@@ -756,3 +756,6 @@ html.js [data-draw]:not(.in) .sail-ship { visibility: hidden; animation-play-sta
   html.js [data-draw] { transform: none !important; }
   .reveal, .stagger > *, .quiz-step.active { transition-duration: 0.01ms !important; transition-delay: 0s !important; animation-duration: 0.01ms !important; }
 }
+
+/* logo "Em dados" (27/09/2026) */
+.brand-logo { display: block; height: auto; }

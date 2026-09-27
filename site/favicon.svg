@@ -1,14 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="22" fill="#08080b"/>
-  <defs>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <g filter="url(#glow)">
-    <rect x="26" y="18" width="60" height="14" rx="2" fill="#B56BFF"/>
-    <path d="M38 32 L62 68" stroke="#B56BFF" stroke-width="14"/>
-    <rect x="14" y="68" width="60" height="14" rx="2" fill="#B56BFF"/>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><rect width="64" height="64" rx="14.1" fill="#0a1428"/><circle cx="32.00" cy="32.00" r="7.19" fill="#ffc93d"/><circle cx="44.42" cy="32.00" r="4.31" fill="#ffc93d"/><circle cx="54.51" cy="32.00" r="2.52" fill="#ffc93d"/><circle cx="19.58" cy="32.00" r="4.31" fill="#ffc93d"/><circle cx="9.49" cy="32.00" r="2.52" fill="#ffc93d"/><circle cx="32.00" cy="44.42" r="4.31" fill="#ffc93d"/><circle cx="32.00" cy="54.51" r="2.52" fill="#ffc93d"/><circle cx="32.00" cy="19.58" r="4.31" fill="#ffc93d"/><circle cx="32.00" cy="9.49" r="2.52" fill="#ffc93d"/></svg>
