@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/*
+ * A paleta do site da Shift (design_handoff_shift_landing/tailwind.config.cjs):
+ * navy de fundo, papel no texto, âmbar como a única cor de ação. O roxo é da
+ * logo e fica fora do CRM.
+ *
+ * Os tons de texto sobre o navy foram escolhidos acima de 4.5:1 de contraste;
+ * "apagado" é o piso e só vai em metadado.
+ */
+@theme {
+  --color-fundo: #071522;
+  --color-superficie: #0e2335;
+  --color-superficie-2: #143049;
+  --color-linha: #1d3a54;
+  --color-linha-forte: #2b5070;
+
+  --color-texto: #f6f5f1;
+  --color-suave: #b4bcc4;
+  --color-apagado: #8a95a1;
+
+  --color-destaque: #f2a63d;
+  --color-destaque-forte: #d4841a;
+  --color-destaque-fundo: #2a2718;
+  --color-ouro: #ffc93d;
+
+  --color-sucesso: #6fd6a2;
+  --color-perigo: #f58a78;
+  --color-perigo-fundo: #331b1d;
+
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-fundo);
+  color: var(--color-texto);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-destaque);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
