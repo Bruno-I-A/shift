@@ -4,13 +4,20 @@
 #      Console do Easypanel);
 #   2. o contêiner sobe com as URLs que ele gerou e o entrypoint confere as
 #      migrações de novo;
-#   3. /api/saude, /api/mcp e /api/leads respondem como devem.
+#   3. /api/saude, /api/mcp e /api/leads respondem como devem;
+#   4. o Docker declara o contêiner saudável.
+#
+# Imita o Easypanel: rede própria do contêiner (não a do host), PORT=80 injetada
+# e usuário sem root. Foi a combinação que o Easypanel usou e que a primeira
+# versão deste teste não reproduzia — o HEALTHCHECK olhava a 3000 e o serviço
+# ficou "não saudável" lá, embora aqui tudo passasse.
 set -euo pipefail
 
-ADMIN=postgres://postgres:postgres@localhost:5432/postgres
+: "${REDE:?defina REDE com a rede do serviço postgres (job.services.postgres.network)}"
+ADMIN=postgres://postgres:postgres@postgres:5432/postgres
 
 # As senhas geradas vão para um arquivo, não para o log.
-docker run --rm --network host -e DATABASE_URL_ADMIN="$ADMIN" shift-crm \
+docker run --rm --network "$REDE" -e DATABASE_URL_ADMIN="$ADMIN" shift-crm \
   node scripts/configurar-banco.mjs > configurar.txt
 grep '^\[configurar\]' configurar.txt
 DATABASE_URL=$(grep '^DATABASE_URL=' configurar.txt | cut -d= -f2-)
@@ -18,7 +25,7 @@ DATABASE_URL_MIGRACAO=$(grep '^DATABASE_URL_MIGRACAO=' configurar.txt | cut -d= 
 echo "::add-mask::$DATABASE_URL"
 echo "::add-mask::$DATABASE_URL_MIGRACAO"
 
-docker run -d --name crm --network host \
+docker run -d --name crm --network "$REDE" -p 3000:80 -e PORT=80 \
   -e DATABASE_URL="$DATABASE_URL" \
   -e DATABASE_URL_MIGRACAO="$DATABASE_URL_MIGRACAO" \
   -e ADMIN_EMAIL=ci@shift.local \
@@ -76,5 +83,13 @@ total=$(PGPASSWORD=postgres psql -h localhost -U postgres -d shift_crm -tAc "sel
 confere "o mesmo WhatsApp virou um lead só (4 leads)" 4 "$total"
 confere "IP não guardado em claro" 0 \
   "$(PGPASSWORD=postgres psql -h localhost -U postgres -d shift_crm -tAc "select count(*) from crm.envio_publico where chave in ('desconhecido','127.0.0.1')")"
+
+# O Docker só declara saudável depois do primeiro intervalo do HEALTHCHECK (30 s).
+for _ in $(seq 1 25); do
+  estado=$(docker inspect -f '{{.State.Health.Status}}' crm)
+  [ "$estado" = healthy ] && break
+  sleep 3
+done
+confere "contêiner saudável para o Docker" healthy "$(docker inspect -f '{{.State.Health.Status}}' crm)"
 
 exit $falhou

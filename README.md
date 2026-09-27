@@ -23,8 +23,9 @@ A ordem importa: o CRM primeiro, porque o site passa a enviar leads para ele.
 
 1. **DNS:** registro `crm` apontando para o IP da VPS.
 2. **Easypanel → serviço App**, fonte GitHub `Bruno-I-A/shift`, branch `vps`,
-   **build path `/crm`**, build por Dockerfile. Porta **3000**. Domínio
-   `crm.shiftsys.com.br` com HTTPS.
+   **build path `/crm`**, build por Dockerfile. Domínio `crm.shiftsys.com.br`
+   com HTTPS, na **porta 80**: o Easypanel injeta `PORT=80` e o Next obedece
+   (o log mostra `http://0.0.0.0:80`).
 3. **Ambiente**, gerado na sua máquina com `cd crm && npm run configurar-login`:
    `ADMIN_EMAIL`, `ADMIN_SENHA_HASH`, `SESSAO_SEGREDO`, e mais
    `APP_URL=https://crm.shiftsys.com.br`.

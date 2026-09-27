@@ -60,4 +60,6 @@ jobs:
       - name: Construir a imagem, como o Easypanel faz
         run: docker build -t shift-crm crm
       - name: Preparar o banco, subir o CRM e mandar leads
+        env:
+          REDE: ${{ job.services.postgres.network }}
         run: bash .github/scripts/fumaca-crm.sh

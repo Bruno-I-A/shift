@@ -43,8 +43,10 @@ RUN chmod +x /usr/local/bin/entrada.sh
 USER nextjs
 EXPOSE 3000
 
+# A porta vem de $PORT: o Easypanel define PORT=80 e o Next obedece. Com a
+# porta fixa em 3000 a checagem falhava e o serviço ficava "não saudável".
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3000/api/saude >/dev/null 2>&1 || exit 1
+  CMD wget -qO- "http://127.0.0.1:${PORT:-3000}/api/saude?vivo" >/dev/null 2>&1 || exit 1
 
 ENTRYPOINT ["/usr/local/bin/entrada.sh"]
 CMD ["node", "server.js"]
