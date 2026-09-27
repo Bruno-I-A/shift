@@ -1,0 +1,19 @@
+# O que não entra no contexto de build: sem isto a imagem passa a depender do
+# que existe na máquina de quem constrói, não do que está no repositório.
+node_modules
+.next
+out
+build
+*.tsbuildinfo
+.git
+.claude
+.banco-local
+.vitest
+coverage
+
+# segredo nenhum entra em camada de imagem
+.env
+.env.*
+!.env.exemplo
+
+README.md
