@@ -179,13 +179,7 @@ html.motion-ready .solution-row:not(.in-view) .funnel-track>span{transform:trans
 .cinema-inner .grid-overlay{opacity:.45}
 .cinema-inner .treasure-num{text-shadow:none;color:var(--cinema-gold)}
 .cinema-inner footer{background:#06111d}
-html.js .reveal{transition:opacity .85s var(--film-ease),transform .85s var(--film-ease);transform:translateY(28px)}
-html.js .reveal.in{transform:none}
-html.js .stagger>*{transition:opacity .65s var(--film-ease),transform .65s var(--film-ease)}
-/* Never let animation availability control content availability. */
-html:not(.js) .reveal,html:not(.js) .stagger>*{opacity:1!important;transform:none!important}
 html.motion-paused *,html.motion-paused *:before,html.motion-paused *:after{animation-play-state:paused!important;scroll-behavior:auto!important;transition:none!important}
-html.motion-paused .reveal,html.motion-paused .stagger>*{opacity:1!important;transform:none!important}
 /* pausar congela a animação no quadro zero; quem entra do zero precisa sair da animação, senão fica invisível */
 html.motion-paused .quiz-step.active,html.motion-paused #mobile-menu.open .nav-link{animation:none!important;opacity:1;transform:none}
 html.motion-paused .opening-copy{opacity:1;transform:none}

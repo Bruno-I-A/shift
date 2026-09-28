@@ -56,16 +56,47 @@
     });
   }
 
-  /* ===== reveal on scroll ===== */
+  /* ===== entrada no scroll (convenção em site.css: .reveal, .stagger, .reveal-words) =====
+     Um observer só. O JS apenas marca .in (entrou) e, terminada a entrada, .done
+     (o componente volta às próprias transições). Esconder e animar é com o CSS,
+     que já ignora tudo isso com movimento pausado ou reduzido. */
+  document.querySelectorAll('.reveal-words').forEach(function (el) {
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    var nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    var w = 0;
+    nodes.forEach(function (node) {
+      var parts = node.textContent.split(/(\s+)/);
+      if (parts.length === 1 && !parts[0]) return;
+      var frag = document.createDocumentFragment();
+      parts.forEach(function (part) {
+        if (!part) return;
+        if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+        var span = document.createElement('span');
+        span.className = 'rw';
+        span.style.setProperty('--w', String(Math.min(w++, 14)));
+        span.textContent = part;
+        frag.appendChild(span);
+      });
+      node.parentNode.replaceChild(frag, node);
+    });
+  });
+  var settle = function (el) {
+    var steps = el.classList.contains('stagger') ? Math.min(el.children.length, 9) * 70
+      : el.classList.contains('reveal-words') ? el.querySelectorAll('.rw').length * 45 : 350;
+    setTimeout(function () { el.classList.add('done'); }, 900 + Math.min(steps, 700));
+  };
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (en) {
-      if (en.isIntersecting) {
+      /* entrou na tela, ou já ficou para trás (recarregou no meio, pulou por âncora) */
+      if (en.isIntersecting || en.boundingClientRect.bottom < 0) {
         en.target.classList.add('in');
         io.unobserve(en.target);
+        if (!en.target.hasAttribute('data-draw')) settle(en.target);
       }
     });
-  }, { threshold: 0.04 });
-  document.querySelectorAll('.reveal, .stagger, [data-draw]').forEach(function (el) { io.observe(el); });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+  document.querySelectorAll('.reveal, .stagger, .reveal-words, [data-draw]').forEach(function (el) { io.observe(el); });
 
   /* ===== barra de progresso de leitura ===== */
   var prog = document.getElementById('scroll-progress');
