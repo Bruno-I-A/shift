@@ -970,3 +970,11 @@
     transition: none;
   }
 }
+
+/* rodada site-clean: segmentos/sites */
+.segment-level p {
+  margin: 0.75rem 0 0;
+  color: rgba(246, 245, 241, 0.58);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}

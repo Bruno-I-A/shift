@@ -507,24 +507,7 @@
   line-height: 1;
 }
 
-.segment-hook {
-  margin: 1.25rem 0 0;
-  color: var(--cinema-gold);
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(1.55rem, 2.6vw, 2.15rem);
-  font-style: italic;
-  font-weight: 500;
-  line-height: 1.2;
-}
 
-.pain-chips-label {
-  margin: 2rem 0 0;
-  color: rgba(246, 245, 241, 0.5);
-  font-family: 'Geist Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
 
 .pain-chips {
   display: flex;
@@ -588,15 +571,6 @@
   line-height: 1.6;
 }
 
-.sector-detail-intro {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 1.2rem;
-  align-items: center;
-  margin: 2rem 0 0;
-  color: rgba(246, 245, 241, 0.62);
-  font-size: 0.92rem;
-}
 
 .segment-detail .level-process-demo {
   margin: 2.75rem 0 0;
