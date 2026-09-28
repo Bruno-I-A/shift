@@ -15,8 +15,6 @@
   --accent-glow: rgba(242, 166, 61, 0.5);
   --gold: #FFC93D;
   --gold-glow: rgba(255, 201, 61, 0.35);
-  --purple: #B56BFF;             /* reservado para a marca */
-  --purple-glow: rgba(181, 107, 255, 0.55);
   --border: rgba(255, 255, 255, 0.1);
   --glass: linear-gradient(180deg, rgba(18, 32, 60, 0.72), rgba(10, 20, 40, 0.55));
   --glass-strong: linear-gradient(180deg, rgba(20, 36, 66, 0.9), rgba(10, 20, 40, 0.78));
@@ -143,26 +141,6 @@ body {
   background: linear-gradient(90deg, transparent, rgba(242, 166, 61, 0.28), rgba(255, 201, 61, 0.22), transparent);
 }
 
-/* ===== a marca (roxa, sempre) ===== */
-.mark-glow { filter: drop-shadow(0 0 10px var(--purple-glow)); }
-
-/* easter egg · 5 cliques na marca e o chapéu aparece (quem sabe, sabe) */
-.straw-hat {
-  position: absolute;
-  top: -12px; left: 50%;
-  width: 26px; height: auto;
-  opacity: 0;
-  transform: translateX(-50%) translateY(6px) rotate(-14deg);
-  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1.4);
-  pointer-events: none;
-}
-html.op-mode .straw-hat { opacity: 1; transform: translateX(-50%) translateY(0) rotate(-14deg); }
-html.op-mode .eyebrow { color: #FFD54A; text-shadow: 0 0 26px rgba(255, 213, 74, 0.5); }
-html.op-mode .btn-primary {
-  background: linear-gradient(135deg, #FFE082 0%, #FFD54A 52%, #E8B33C 100%);
-  box-shadow: 0 12px 40px -10px rgba(255, 213, 74, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
-
 /* ===== entrada do site — uma vez por load, só transform/opacity ===== */
 @keyframes header-drop {
   from { transform: translateY(-18px); opacity: 0; }
@@ -282,9 +260,9 @@ body > header { animation: header-drop 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both
 .hero-visual-legend span:last-child { text-align: right; color: rgba(255, 201, 61, 0.64); }
 .hero-legend-center {
   padding: 6px 10px;
-  border: 1px solid rgba(181, 107, 255, 0.18);
+  border: 1px solid rgba(237, 188, 117, 0.18);
   border-radius: 999px;
-  color: rgba(205, 172, 255, 0.62);
+  color: rgba(237, 188, 117, 0.62);
   background: rgba(10, 20, 40, 0.5);
 }
 
@@ -727,11 +705,15 @@ html.js [data-draw]:not(.in) .sail-ship { visibility: hidden; animation-play-sta
 
 /* ===== foco visível (teclado) ===== */
 :where(a, button, [role="button"], input, textarea, select):focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--cinema-gold, #EDBC75);
   outline-offset: 4px;
-  border-radius: 8px;
+  border-radius: 2px; /* cantos retos, como o resto do site */
 }
 :where(a, button, [role="button"]) { -webkit-tap-highlight-color: rgba(255, 201, 61, 0.18); }
+
+/* partes do navegador também na paleta: barra de rolagem e cursor de texto */
+html { scrollbar-color: #2a4356 #071522; scrollbar-width: thin; }
+input, textarea { caret-color: #EDBC75; }
 
 /* ===== mobile ===== */
 @media (max-width: 767px) {

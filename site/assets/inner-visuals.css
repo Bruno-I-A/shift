@@ -67,7 +67,7 @@
   overflow: hidden;
   border: 1px solid rgba(237, 188, 117, 0.25);
   background:
-    radial-gradient(circle at 48% 50%, rgba(181, 107, 255, 0.09), transparent 38%),
+    radial-gradient(circle at 48% 50%, rgba(237, 188, 117, 0.06), transparent 38%),
     rgba(7, 21, 34, 0.78);
 }
 
@@ -168,8 +168,8 @@
 }
 
 .flow-node--ai {
-  border-color: rgba(181, 107, 255, 0.42);
-  background: linear-gradient(145deg, rgba(181, 107, 255, 0.12), rgba(10, 30, 43, 0.92));
+  border-color: rgba(111, 168, 199, 0.5);
+  background: linear-gradient(145deg, rgba(111, 168, 199, 0.14), rgba(10, 30, 43, 0.92));
 }
 
 .flow-node--review {
@@ -239,7 +239,7 @@
   padding: clamp(1.5rem, 4vw, 2.6rem);
   overflow: hidden;
   background:
-    radial-gradient(circle at 80% 0%, rgba(181, 107, 255, 0.09), transparent 42%),
+    radial-gradient(circle at 80% 0%, rgba(237, 188, 117, 0.06), transparent 42%),
     #0a1e2b;
 }
 

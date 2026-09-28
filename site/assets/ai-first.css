@@ -6,7 +6,7 @@
 .ai-page {
   background:
     radial-gradient(900px 640px at 86% 2%, rgba(33, 82, 120, 0.3), transparent 68%),
-    radial-gradient(780px 520px at 4% 18%, rgba(181, 107, 255, 0.08), transparent 72%),
+    radial-gradient(780px 520px at 4% 18%, rgba(33, 82, 120, 0.16), transparent 72%),
     #071522;
 }
 
@@ -106,7 +106,7 @@
   color: var(--paper);
   font-size: clamp(3.35rem, 6.3vw, 6.6rem);
   font-weight: 450;
-  letter-spacing: -0.068em;
+  letter-spacing: -0.05em;
   line-height: 0.96;
   text-wrap: balance;
 }
@@ -159,7 +159,7 @@
   border: 1px solid rgba(148, 186, 188, 0.18);
   border-radius: 4px;
   background:
-    radial-gradient(circle at 50% 50%, rgba(181, 107, 255, 0.14), transparent 36%),
+    radial-gradient(circle at 50% 50%, rgba(237, 188, 117, 0.07), transparent 36%),
     linear-gradient(145deg, rgba(19, 43, 58, 0.78), rgba(6, 17, 29, 0.82));
 }
 
@@ -536,7 +536,7 @@
   overflow: hidden;
   border: 1px solid rgba(237, 188, 117, 0.28);
   background:
-    radial-gradient(circle at 84% 20%, rgba(181, 107, 255, 0.16), transparent 38%),
+    radial-gradient(circle at 84% 20%, rgba(237, 188, 117, 0.08), transparent 38%),
     linear-gradient(140deg, rgba(23, 53, 67, 0.92), rgba(7, 21, 34, 0.96));
 }
 
@@ -788,8 +788,8 @@
 .foundation-note {
   margin-top: 0.75rem;
   padding: 0.9rem 1rem;
-  border-left: 3px solid var(--purple);
-  background: rgba(181, 107, 255, 0.08);
+  border: 1px solid rgba(237, 188, 117, 0.28);
+  background: rgba(237, 188, 117, 0.06);
   color: rgba(246, 245, 241, 0.72);
 }
 
