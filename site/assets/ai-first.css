@@ -949,7 +949,7 @@
 
 @media (max-width: 380px) {
   .ai-shell {
-    width: min(100% - 1.5rem, 1280px);
+    width: min(100% - 2rem, 1280px);
   }
 
   .ai-hero h1 {

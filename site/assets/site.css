@@ -743,6 +743,20 @@ html.js [data-draw]:not(.in) .sail-ship { visibility: hidden; animation-play-sta
     min-width: 44px;
   }
   footer ul.space-y-3 > li + li { margin-top: 0; }
+  /* links de texto miúdo (rodapé em linha do diagnóstico, "Por que isso não
+     pode esperar" na home, "abrir o site" em sites.html): a área de toque
+     cresce para 44px pela altura mínima, e a margem negativa devolve o espaço,
+     então o desenho e o ritmo vertical ficam iguais. */
+  footer span.flex-wrap > a,
+  .hero-bottomline a,
+  main a.font-mono.inline-flex {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    min-width: 44px;
+    justify-content: center;
+    margin-block: -14px;
+  }
   /* a marca no header tinha 146x24 */
   #site-header [data-mark] { min-height: 44px; }
   .display { letter-spacing: -0.025em; }

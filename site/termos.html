@@ -121,6 +121,13 @@
     outline: 2px solid var(--shift-focus); outline-offset: 4px;
     box-shadow: 0 0 0 6px rgba(255,201,61,0.12);
   }
+  /* alvos de toque de 44px no celular, sem mudar o desenho: a altura
+     mínima cresce a área e a margem negativa devolve o espaço. */
+  @media (max-width: 767px) {
+    body > div > header > a, body > div > footer a { display: inline-flex; align-items: center; min-height: 44px; }
+    body > div > header > a { margin-block: -7px; }
+    body > div > footer a { margin-block: -14px; }
+  }
 </style>
 <script type="application/ld+json">
 {
@@ -319,6 +326,6 @@
   </footer>
 
 </div>
-<button type="button" id="motion-toggle" class="motion-toggle" aria-label="Pausar animações" aria-pressed="false"><span class="motion-symbol" aria-hidden="true">Ⅱ</span><span class="motion-text">Pausar movimento</span></button>
+<button type="button" id="motion-toggle" class="motion-toggle" aria-label="Pausar animações" aria-pressed="false" hidden><span class="motion-symbol" aria-hidden="true">Ⅱ</span><span class="motion-text">Pausar movimento</span></button>
 </body>
 </html>
