@@ -141,17 +141,16 @@
 <main id="main-content">
   <section class="ai-hero">
     <div class="ai-shell ai-hero-grid">
-      <div class="ai-hero-copy reveal">
+      <div class="ai-hero-copy enter-stagger">
         <p class="eyebrow">Como funciona</p>
         <h1>Como colocamos IA para <em>trabalhar</em> na sua empresa.</h1>
-        <p class="ai-hero-lead">Começamos pequeno, no processo que mais consome tempo e tem menor risco. Sua equipe acompanha, aprova e vê o resultado antes de a IA avançar.</p>
-        <p class="ai-hero-support">O objetivo não é encher a empresa de ferramentas. É fazer um processo real funcionar melhor, medir e então expandir.</p>
+        <p class="ai-hero-lead">Diagnóstico, piloto e operação contínua. Começamos pelo processo que mais consome tempo e tem menor risco, e sua equipe aprova antes de a IA avançar.</p>
         <div class="ai-hero-actions">
           <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium">Começar pelo diagnóstico <span aria-hidden="true">→</span></a>
           <a href="#passos" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base">Ver os passos</a>
         </div>
       </div>
-      <div class="ai-hero-art reveal" aria-hidden="true">
+      <div class="ai-hero-art enter d3" aria-hidden="true">
         <div class="inner-hero-stack">
           <div class="inner-hero-row"><span>→</span><strong>Processo real</strong><span>entrada</span></div>
           <div class="inner-hero-row"><span>IA</span><strong>Prepara e executa</strong><span>automação</span></div>
@@ -162,12 +161,43 @@
     </div>
   </section>
 
+  <section id="modelo-comercial" class="ai-section">
+    <div class="ai-shell">
+      <div class="ai-section-heading">
+        <p class="eyebrow reveal">Modelo de trabalho</p>
+        <h2 class="reveal-words">Do diagnóstico à operação contínua</h2>
+        <p class="reveal d1">Cada fase tem uma entrega. Você decide se avança.</p>
+      </div>
+
+      <div class="phase-visual stagger" role="list" aria-label="As três fases do trabalho com a Shift">
+        <article class="phase-card" role="listitem">
+          <span class="phase-index" aria-hidden="true">01</span>
+          <h3>Diagnóstico</h3>
+          <p>Mapeamos processos e riscos para indicar por onde começar.</p>
+          <span class="phase-output">oportunidades priorizadas</span>
+        </article>
+        <article class="phase-card" role="listitem">
+          <span class="phase-index" aria-hidden="true">02</span>
+          <h3>Piloto</h3>
+          <p>Um processo delimitado, com revisão humana e métricas reais.</p>
+          <span class="phase-output">antes e depois</span>
+        </article>
+        <article class="phase-card" role="listitem">
+          <span class="phase-index" aria-hidden="true">03</span>
+          <h3>Operação contínua</h3>
+          <p>Acompanhamos, ajustamos e expandimos para os próximos processos.</p>
+          <span class="phase-output">melhoria e expansão</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <section id="passos" class="ai-section">
     <div class="ai-shell">
-      <div class="ai-section-heading reveal">
-        <p class="eyebrow eyebrow-long">Da operação real ao resultado medido</p>
-        <h2>Um processo por vez. Com sua equipe no controle.</h2>
-        <p>Os seis passos evitam uma transformação grande demais para validar e pequena demais para gerar valor.</p>
+      <div class="ai-section-heading">
+        <p class="eyebrow eyebrow-long reveal">Da operação real ao resultado medido</p>
+        <h2 class="reveal-words">Um processo por vez. Com sua equipe no controle.</h2>
+        <p class="reveal d1">Seis passos, do mapeamento à expansão.</p>
       </div>
 
       <div class="steps-accordion stagger">
@@ -178,8 +208,7 @@
             <span class="process-detail-toggle" aria-hidden="true"></span>
           </summary>
           <div class="process-detail-copy">
-            <p>Sentamos com você e com quem executa o trabalho de verdade. Entendemos entradas, decisões, retrabalho, exceções e onde a informação fica presa.</p>
-            <p>O diagnóstico termina com as oportunidades priorizadas: onde a IA pode entrar, o que precisa ser organizado antes e qual processo faz sentido atacar primeiro.</p>
+            <p>Conversamos com você e com quem executa o trabalho. Saímos com as oportunidades priorizadas e o processo certo para começar.</p>
           </div>
         </details>
 
@@ -190,8 +219,7 @@
             <span class="process-detail-toggle" aria-hidden="true"></span>
           </summary>
           <div class="process-detail-copy">
-            <p>Não tentamos transformar a empresa inteira de uma vez. Escolhemos um processo de maior volume e menor risco, com começo, fim e responsável claros.</p>
-            <p>Esse recorte permite validar a solução na rotina, observar as exceções e corrigir cedo, antes de ampliar o escopo.</p>
+            <p>Um processo de maior volume e menor risco, com começo, fim e responsável claros. Validamos na rotina e corrigimos cedo, antes de ampliar.</p>
           </div>
         </details>
 
@@ -202,8 +230,7 @@
             <span class="process-detail-toggle" aria-hidden="true"></span>
           </summary>
           <div class="process-detail-copy">
-            <p>Quando seus sistemas permitem integração, conectamos a IA a eles e preservamos o que já funciona.</p>
-            <p>Quando não permitem, ou quando o controle está em planilhas e grupos de WhatsApp, construímos a estrutura necessária para organizar dados, permissões e execução.</p>
+            <p>Se seus sistemas permitem integração, conectamos a IA a eles. Se não, ou se o controle está em planilhas e WhatsApp, construímos a estrutura necessária.</p>
           </div>
         </details>
 
@@ -214,8 +241,7 @@
             <span class="process-detail-toggle" aria-hidden="true"></span>
           </summary>
           <div class="process-detail-copy">
-            <p>No início, as ações da IA passam por uma pessoa. Ela prepara, sua equipe confere e aprova antes de qualquer etapa com impacto seguir.</p>
-            <p>Conforme o processo prova consistência, você escolhe o que pode rodar sozinho e o que continua exigindo revisão. A IA recomenda; pessoas decidem.</p>
+            <p>No início, cada ação com impacto passa pela sua equipe. Conforme o processo prova consistência, você escolhe o que roda sozinho. A IA recomenda; pessoas decidem.</p>
           </div>
         </details>
 
@@ -226,8 +252,7 @@
             <span class="process-detail-toggle" aria-hidden="true"></span>
           </summary>
           <div class="process-detail-copy">
-            <p>Registramos como o processo funciona antes do piloto e comparamos com o novo fluxo usando dados reais da sua empresa.</p>
-            <p>Horas consumidas, erros, retrabalho e prazo são medidos quando houver base para isso. Você vê o que mudou sem depender de estimativa genérica.</p>
+            <p>Comparamos o antes e o depois do piloto com dados reais da sua empresa: horas, erros, retrabalho e prazo, quando houver base para medir.</p>
           </div>
         </details>
 
@@ -238,41 +263,9 @@
             <span class="process-detail-toggle" aria-hidden="true"></span>
           </summary>
           <div class="process-detail-copy">
-            <p>Com o primeiro processo validado, acompanhamos a operação, ajustamos regras, revisamos integrações e corrigimos mudanças no trabalho real.</p>
-            <p>Depois, avançamos para o próximo processo ou nível de maturidade sem perder o que já foi aprendido.</p>
+            <p>Acompanhamos a operação, ajustamos regras e integrações e avançamos para o próximo processo sem perder o que foi aprendido.</p>
           </div>
         </details>
-      </div>
-    </div>
-  </section>
-
-  <section id="modelo-comercial" class="ai-section">
-    <div class="ai-shell">
-      <div class="ai-section-heading reveal">
-        <p class="eyebrow">Modelo de trabalho</p>
-        <h2>Do diagnóstico à operação contínua</h2>
-        <p>Cada etapa tem uma entrega clara. A empresa decide avançar com base no que aprendeu e no resultado observado.</p>
-      </div>
-
-      <div class="phase-visual stagger" role="list" aria-label="As três fases do trabalho com a Shift">
-        <article class="phase-card" role="listitem">
-          <span class="phase-index" aria-hidden="true">01</span>
-          <h3>Diagnóstico</h3>
-          <p>Mapeamos processos, dependências e riscos para indicar o melhor ponto de partida.</p>
-          <span class="phase-output">oportunidades priorizadas</span>
-        </article>
-        <article class="phase-card" role="listitem">
-          <span class="phase-index" aria-hidden="true">02</span>
-          <h3>Piloto</h3>
-          <p>Implantamos em um processo delimitado, com revisão humana e métricas da operação real.</p>
-          <span class="phase-output">antes e depois</span>
-        </article>
-        <article class="phase-card" role="listitem">
-          <span class="phase-index" aria-hidden="true">03</span>
-          <h3>Operação contínua</h3>
-          <p>Acompanhamos, ajustamos e expandimos para os próximos processos e níveis de maturidade.</p>
-          <span class="phase-output">melhoria e expansão</span>
-        </article>
       </div>
     </div>
   </section>
@@ -281,7 +274,7 @@
     <div class="ai-shell">
       <div class="ai-cta reveal">
         <h2>O primeiro passo é entender onde a IA realmente cabe.</h2>
-        <p>O diagnóstico mostra o nível atual da empresa e qual processo deve ser avaliado primeiro.</p>
+        <p>O diagnóstico mostra seu nível atual e qual processo avaliar primeiro.</p>
         <div class="ai-cta-actions">
           <a href="diagnostico.html" class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-medium">Começar pelo diagnóstico <span aria-hidden="true">→</span></a>
           <a href="contato.html" class="btn-ghost inline-flex items-center justify-center rounded-full px-8 py-4 text-base">Falar com a Shift</a>
