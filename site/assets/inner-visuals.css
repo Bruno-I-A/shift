@@ -51,7 +51,7 @@
 .inner-hero-row > span:last-child {
   color: rgba(246, 245, 241, 0.42);
   font-family: 'Geist Mono', monospace;
-  font-size: 0.64rem;
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -93,7 +93,7 @@
   margin-bottom: 1rem;
   color: rgba(246, 245, 241, 0.52);
   font-family: 'Geist Mono', monospace;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -153,7 +153,7 @@
 .flow-node span {
   color: rgba(246, 245, 241, 0.45);
   font-family: 'Geist Mono', monospace;
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
@@ -296,7 +296,7 @@
   margin-top: 1.5rem;
   color: rgba(246, 245, 241, 0.48);
   font-family: 'Geist Mono', monospace;
-  font-size: 0.67rem;
+  font-size: 0.7rem;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
@@ -360,7 +360,7 @@
   display: block;
   color: rgba(246, 245, 241, 0.46);
   font-family: 'Geist Mono', monospace;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
@@ -460,7 +460,7 @@
   display: block;
   color: var(--cinema-gold);
   font-family: 'Geist Mono', monospace;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -521,7 +521,7 @@
   margin: 2rem 0 0;
   color: rgba(246, 245, 241, 0.5);
   font-family: 'Geist Mono', monospace;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }

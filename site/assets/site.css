@@ -126,6 +126,9 @@ body {
   color: var(--gold);
   text-shadow: 0 0 22px var(--gold-glow);
 }
+/* frase longa como rótulo: caixa alta só em rótulos curtos; aqui fica
+   em caixa normal, com o mesmo mono dourado e um tracking mais leve. */
+.eyebrow.eyebrow-long { text-transform: none; letter-spacing: 0.08em; }
 .num-tag {
   font-family: 'Geist Mono', monospace;
   font-size: 11px;
@@ -270,7 +273,7 @@ body > header { animation: header-drop 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   font-family: 'Geist Mono', monospace;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(246, 245, 241, 0.42);
@@ -369,14 +372,14 @@ body > header { animation: header-drop 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both
     mask-image: radial-gradient(ellipse at center, #000 48%, transparent 96%);
   }
   .hero-static-fallback { grid-template-columns: 1fr 82px 1fr; gap: 12px; padding: 0 3%; }
-  .hero-visual-legend { right: 22px; bottom: 20px; left: 22px; font-size: 8px; letter-spacing: 0.13em; }
+  .hero-visual-legend { right: 22px; bottom: 20px; left: 22px; font-size: 11px; letter-spacing: 0.13em; }
   .hero-legend-center { padding: 5px 7px; }
   .hero-title { font-size: clamp(2.25rem, 10.5vw, 3rem); }
   .hero-lead { margin-top: 24px; font-size: 18px; }
   .hero-support { font-size: 15px; }
   .hero-actions { width: 100%; margin-top: 32px; }
   .hero-actions a { width: 100%; min-height: 52px; }
-  .hero-meta { gap: 10px 18px; margin-top: 30px; font-size: 10px; }
+  .hero-meta { gap: 10px 18px; margin-top: 30px; font-size: 11px; }
   .hero-meta-separator { display: none; }
 }
 
