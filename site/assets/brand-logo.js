@@ -1,11 +1,14 @@
-/* Shift Systems · logo do cabeçalho, animada uma vez por carregamento.
+/* Shift Systems · logotipo animado, em todo lugar onde ele aparece.
    O "Sh" fica. O "ift" se desfaz em pontos e remonta como dado; o pingo
    do i acende em faísca — a mesma geometria de conteudo/marca/gerar-marca.js.
-   Progressive enhancement: se a fonte não carregar a tempo ou o navegador
-   não tiver canvas, o <img> estático que já está no HTML continua valendo. */
+   Toca a primeira vez quando o logotipo entra na tela (cabeçalho quase na
+   hora, rodapé quando a pessoa rola até lá) e de novo sempre que o mouse
+   passa por cima. Progressive enhancement: se a fonte não carregar a
+   tempo ou o navegador não tiver canvas, o <img> estático que já está no
+   HTML continua valendo. */
 (function () {
   'use strict';
-  var alvos = document.querySelectorAll('a[data-mark] > img.brand-logo');
+  var alvos = document.querySelectorAll('img.brand-logo');
   if (!alvos.length || !window.CanvasRenderingContext2D || !document.fonts) return;
 
   var SERIF = '"Shift Serif", Georgia, serif';
@@ -15,7 +18,7 @@
     f: ['..XX', '.X..', '.X..', 'XXXX', '.X..', '.X..', '.X..', '.X..', 'XXX.'],
     t: ['....', '.X..', '.X..', 'XXXX', '.X..', '.X..', '.X..', '.X..', '..XX']
   };
-  var T = 1650; /* duração total da entrada, em ms */
+  var T = 1650; /* duração de cada entrada, em ms */
 
   var media = matchMedia('(prefers-reduced-motion: reduce)');
   function paradoAgora() {
@@ -117,6 +120,7 @@
     var cv = document.createElement('canvas');
     cv.className = img.className;
     cv.style.width = w + 'px'; cv.style.height = h + 'px';
+    cv.style.cursor = getComputedStyle(img).cursor; /* não muda o cursor onde o <img> não tinha link */
     cv.setAttribute('role', 'img');
     cv.setAttribute('aria-label', img.alt || 'Shift');
     cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
@@ -152,32 +156,52 @@
       ctx.restore();
     }
 
-    var t0 = null, rafId = null;
-    function tick(now) {
-      if (t0 === null) t0 = now;
-      var t = now - t0;
-      if (paradoAgora()) t = T; /* pulado: mostra o quadro final direto */
-      frame(Math.min(t, T));
-      if (t < T) { rafId = requestAnimationFrame(tick); }
+    var rafId = null, animando = false;
+    function tocar() {
+      if (paradoAgora()) { frame(T); return; }
+      if (animando) return; /* já tocando: deixa terminar em vez de reiniciar em cima */
+      animando = true;
+      var t0 = null;
+      function tick(now) {
+        if (t0 === null) t0 = now;
+        var t = now - t0;
+        if (paradoAgora()) t = T;
+        frame(Math.min(t, T));
+        if (t < T) { rafId = requestAnimationFrame(tick); } else { animando = false; }
+      }
+      rafId = requestAnimationFrame(tick);
     }
     function pararNoFinal() {
       if (rafId) cancelAnimationFrame(rafId);
+      animando = false;
       frame(T);
     }
     window.addEventListener('shift:motion', function (e) { if (e.detail && e.detail.paused) pararNoFinal(); });
+    cv.addEventListener('mouseenter', tocar); /* passa o mouse por cima: toca de novo */
 
     img.replaceWith(cv);
-    if (paradoAgora()) { frame(T); } else { requestAnimationFrame(tick); }
+    tocar(); /* primeira entrada, no instante em que aparece na tela */
+  }
+
+  /* Cada logotipo só entra na dança quando está prestes a aparecer —
+     o do rodapé espera a rolagem, o do cabeçalho já está visível e
+     toca quase na hora. Sem IntersectionObserver, toca tudo direto. */
+  function observar() {
+    if (!('IntersectionObserver' in window)) { alvos.forEach(iniciar); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        io.unobserve(entry.target);
+        iniciar(entry.target);
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -10% 0px' });
+    alvos.forEach(function (img) { io.observe(img); });
   }
 
   /* A fonte cobre só S, f, h, i, t — o bastante para a palavra "Shift".
      Timeout curto: se travar, a página segue com o <img> estático. */
-  var pronto = false;
   Promise.race([
     document.fonts.load('400 100px ' + SERIF).then(function () { return document.fonts.ready; }),
     new Promise(function (_, rej) { setTimeout(rej, 1200); })
-  ]).then(function () {
-    pronto = true;
-    alvos.forEach(iniciar);
-  }).catch(function () { /* fica o <img> */ });
+  ]).then(observar).catch(function () { /* fica o <img> */ });
 })();
