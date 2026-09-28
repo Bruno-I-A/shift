@@ -86,17 +86,47 @@
       : el.classList.contains('reveal-words') ? el.querySelectorAll('.rw').length * 45 : 350;
     setTimeout(function () { el.classList.add('done'); }, 900 + Math.min(steps, 700));
   };
+  var pending = [];
+  var reveal = function (el) {
+    if (el.classList.contains('in')) return;
+    el.classList.add('in');
+    io.unobserve(el);
+    if (!el.hasAttribute('data-draw')) settle(el);
+  };
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (en) {
       /* entrou na tela, ou já ficou para trás (recarregou no meio, pulou por âncora) */
-      if (en.isIntersecting || en.boundingClientRect.bottom < 0) {
-        en.target.classList.add('in');
-        io.unobserve(en.target);
-        if (!en.target.hasAttribute('data-draw')) settle(en.target);
-      }
+      if (en.isIntersecting || en.boundingClientRect.bottom < 0) reveal(en.target);
     });
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
-  document.querySelectorAll('.reveal, .stagger, .reveal-words, [data-draw]').forEach(function (el) { io.observe(el); });
+  document.querySelectorAll('.reveal, .stagger, .reveal-words, [data-draw]').forEach(function (el) {
+    pending.push(el);
+    io.observe(el);
+  });
+  /* rede de segurança quando a rolagem para. O observer só avisa quando o estado
+     muda; um elemento pulado numa rolagem rápida (estava abaixo, passou para cima
+     sem nenhum quadro na tela) não gera aviso, e a faixa de -8% embaixo nunca é
+     alcançada no fim da página. Parou de rolar: tudo o que está na tela ou já
+     ficou para trás entra. Primeiro lê todas as posições, depois escreve. */
+  var sweepTimer = 0;
+  var sweep = function () {
+    var vh = window.innerHeight;
+    var due = [];
+    pending = pending.filter(function (el) {
+      if (el.classList.contains('in')) return false;
+      var r = el.getBoundingClientRect();
+      if (!r.width && !r.height) return true; /* dentro de aba oculta: entra quando a aba abrir */
+      if (r.top < vh) { due.push(el); return false; }
+      return true;
+    });
+    due.forEach(reveal);
+    if (!pending.length) window.removeEventListener('scroll', onScrollSettle);
+  };
+  var onScrollSettle = function () {
+    clearTimeout(sweepTimer);
+    sweepTimer = setTimeout(sweep, 120);
+  };
+  if (pending.length) window.addEventListener('scroll', onScrollSettle, { passive: true });
 
   /* ===== barra de progresso de leitura ===== */
   var prog = document.getElementById('scroll-progress');
