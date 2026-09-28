@@ -609,15 +609,17 @@ html.js .stagger.in > * { opacity: 1; transform: none; }
 html.js [data-draw] { transform: scaleX(0); transform-origin: left center; transition: transform 1.4s cubic-bezier(0.2, 0.7, 0.3, 1); }
 html.js [data-draw].in { transform: scaleX(1); }
 
+/* o marcador percorre a linha só com transform (sem animar left, que
+   força layout a cada quadro). 100cqw = largura da própria .route-line. */
+.route-line { container-type: inline-size; }
 @keyframes sail-x {
-  0%   { left: 0%; opacity: 0; }
+  0%   { transform: translateX(0); opacity: 0; }
   8%   { opacity: 1; }
   92%  { opacity: 1; }
-  100% { left: 100%; opacity: 0; }
+  100% { transform: translateX(100cqw); opacity: 0; }
 }
-/* barquinho dourado velejando a rota (quem sabe, sabe) */
 .sail-ship {
-  position: absolute; top: 50%;
+  position: absolute; top: 50%; left: 0;
   width: 20px; height: 15px;
   margin-top: -13px; margin-left: -10px;
   color: var(--gold);
@@ -639,20 +641,29 @@ html.js [data-draw]:not(.in) .sail-ship { visibility: hidden; animation-play-sta
 }
 
 /* linha vertical do processo + ponto viajante (mantidos — baratos e bonitos) */
+/* mesmo movimento de antes (topo do ponto de 0% a 100% da linha), só com
+   transform: a caixa tem a altura da linha, então translateY(100%) percorre
+   a linha inteira; o ponto visível é o ::before, preso no topo da caixa. */
 @keyframes travel-y {
-  0%   { top: 0%; opacity: 0; }
+  0%   { transform: translateY(0); opacity: 0; }
   8%   { opacity: 1; }
   92%  { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
+  100% { transform: translateY(100%); opacity: 0; }
 }
 .travel-dot {
-  position: absolute; left: 50%;
-  width: 7px; height: 7px;
+  position: absolute; top: 0; left: 50%;
+  width: 7px; height: 100%;
   margin-left: -3.5px;
+  pointer-events: none;
+  animation: travel-y 5s linear infinite;
+}
+.travel-dot::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 7px; height: 7px;
   border-radius: 9999px;
   background: var(--accent);
   box-shadow: 0 0 12px var(--accent-glow);
-  animation: travel-y 5s linear infinite;
 }
 
 /* ===== quiz (log pose) ===== */
