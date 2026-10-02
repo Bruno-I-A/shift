@@ -24,10 +24,8 @@ for (const file of pages) {
   if (marketingPages.includes(file)) {
     const header = source.match(/<header[\s\S]*?<\/header>/)?.[0] || '';
     const mobile = source.match(/<div id="mobile-menu"[\s\S]*?<\/div>/)?.[0] || '';
-    if (header.includes('href="sites.html"') || mobile.includes('href="sites.html"')) {
-      issues.push(`${file}: sites.html must not appear in the primary navigation`);
-    }
-    for (const required of ['processo.html', 'solucoes.html', 'segmentos.html', 'diagnostico.html', 'contato.html']) {
+    // Desde 02/10/2026 "sites" volta ao menu: a Shift divulga sites e a oferta precisa estar visível.
+    for (const required of ['processo.html', 'solucoes.html', 'segmentos.html', 'sites.html', 'diagnostico.html', 'contato.html']) {
       if (!header.includes(`href="${required}"`) || !mobile.includes(`href="${required}"`)) {
         issues.push(`${file}: primary navigation missing ${required}`);
       }
