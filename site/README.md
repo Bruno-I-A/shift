@@ -34,7 +34,9 @@ node scripts/check.mjs
 
 ## Identidade e acessibilidade
 
-- Tema escuro, azul profundo, âmbar e dourado; o monograma permanece roxo.
+- Identidade aprovada em 09/10/2026: preto suave `#191918` e Linho `#EAE5DC`.
+- Onça contínua junto ao nome SHIFT; assinatura estática, com versões para o site e favicon.
+- `assets/brand-linho.css` centraliza os tokens e as superfícies da nova identidade.
 - Fontes locais Geist, Geist Mono e Cormorant Garamond.
 - Conteúdo acessível sem JavaScript e sem depender das animações de entrada.
 - `prefers-reduced-motion` e o botão “Pausar movimento” são respeitados.
@@ -43,7 +45,7 @@ node scripts/check.mjs
 
 ## Diagnóstico e dados
 
-O diagnóstico mantém as respostas no navegador. Nome, empresa e WhatsApp são opcionais. O `CRM_ENDPOINT` fica vazio por padrão; nenhum POST é feito sem endpoint configurado e consentimento explícito. O resultado e o WhatsApp funcionam mesmo quando o CRM não existe ou falha.
+O diagnóstico mantém as respostas no navegador. Nome, empresa e WhatsApp são opcionais. O `CRM_ENDPOINT` já está configurado para `https://crm.shiftsys.com.br/api/leads`; nenhum POST é feito sem consentimento explícito. O resultado e o WhatsApp funcionam mesmo quando o CRM não existe ou falha.
 
 Nunca coloque segredo, token ou chave no endpoint ou no JavaScript do site: todo código enviado ao navegador é público.
 

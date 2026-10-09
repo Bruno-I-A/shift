@@ -68,11 +68,18 @@ const diagnostic = readFileSync('diagnostico.html', 'utf8');
 for (const key of ['segmento', 'controle', 'dor', 'ia', 'equipe', 'prazo']) {
   if (!diagnostic.includes(`data-q="${key}"`)) issues.push(`diagnostico.html: missing question key ${key}`);
 }
-if (!/(?:const|var) CRM_ENDPOINT\s*=\s*['"]['"]/.test(diagnostic)) issues.push('diagnostico.html: CRM_ENDPOINT must default to empty');
+const crmEndpoint = diagnostic.match(/(?:const|var) CRM_ENDPOINT\s*=\s*['"]([^'"]*)['"]/)?.[1];
+if (!['', 'https://crm.shiftsys.com.br/api/leads'].includes(crmEndpoint)) issues.push('diagnostico.html: unexpected CRM_ENDPOINT');
 if (!diagnostic.includes('type="checkbox"') || /type="checkbox"[^>]*\bchecked\b/.test(diagnostic)) issues.push('diagnostico.html: consent checkbox missing or checked by default');
 if (/estimativa de horas|horas por semana|treasure-/i.test(diagnostic)) issues.push('diagnostico.html: unsupported time estimate remains');
 
 const privacy = readFileSync('privacidade.html', 'utf8');
 if (!/consentimento/i.test(privacy) || !/exclus[aã]o/i.test(privacy)) issues.push('privacidade.html: consent or deletion disclosure missing');
+for (const file of pages) {
+  const source = readFileSync(file, 'utf8');
+  if (!source.includes('assets/brand-linho.css')) issues.push(file + ': missing current brand theme');
+  if (!source.includes('assets/brand/shift-logo-linho.png')) issues.push(file + ': missing approved Shift identity');
+  if (source.includes('assets/brand-logo.js') || source.includes('shift-logo-navy-site.svg')) issues.push(file + ': legacy logo still active');
+}
 if (issues.length) { console.error(issues.join('\n')); process.exitCode = 1; }
 else console.log(`PASS: ${pages.length} routes, local links, anchors, assets, headings and structured metadata.`);

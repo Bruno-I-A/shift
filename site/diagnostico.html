@@ -5,7 +5,7 @@
 <title>Diagnóstico de IA · Shift Systems</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="Em 6 perguntas, descubra o nível de IA da sua empresa e o próximo processo para colocar a inteligência artificial para trabalhar." />
-<meta name="theme-color" content="#0A1428" />
+<meta name="theme-color" content="#191918" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <meta name="robots" content="index, follow" />
 <link rel="canonical" href="https://shiftsys.com.br/diagnostico.html" />
@@ -86,6 +86,8 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="assets/brand-linho.css" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 </head>
 <body class="page-bg cinema-inner ai-page">
 <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
@@ -94,7 +96,7 @@
 <header class="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
   <div id="site-header" class="mx-auto rounded-full px-5 md:px-7 py-3 flex items-center justify-between">
     <a href="index.html" data-mark class="relative flex items-center gap-3 cursor-pointer" aria-label="Shift Systems — página inicial">
-      <img src="assets/brand/shift-logo-navy-site.svg" alt="Shift" class="brand-logo" width="76" height="30" />
+      <img src="assets/brand/shift-logo-linho.png" alt="Shift" class="brand-logo" width="158" height="42" />
     </a>
 
     <nav class="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2" aria-label="Navegação principal">
@@ -130,7 +132,7 @@
     <div class="grid-overlay" aria-hidden="true"></div>
     <div class="relative max-w-3xl mx-auto text-center enter-stagger">
       <div class="flex items-center justify-center gap-3 mb-6">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EDBC75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/><path d="M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eae5dc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/><path d="M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>
         <span class="eyebrow">diagnóstico de maturidade em IA</span>
       </div>
       <h1 class="display text-4xl md:text-6xl text-paper">Em que nível de IA sua empresa está?</h1>
@@ -336,7 +338,6 @@
 
 <script src="assets/site.js" defer></script>
 <script src="assets/cinema.js" defer></script>
-<script src="assets/brand-logo.js" defer></script>
 <!-- TODO Bruno: configurar o endpoint público do CRM quando a API estiver pronta. Nunca incluir chave ou segredo no front-end. -->
 <script>
 (function () {
@@ -452,8 +453,8 @@
       });
       document.querySelectorAll('[data-seg]').forEach(function (segment) {
         segment.style.background = Number(segment.getAttribute('data-seg')) < step
-          ? 'linear-gradient(90deg, rgba(242, 166, 61, 0.5), rgba(255, 201, 61, 0.5))'
-          : 'rgba(255,255,255,0.1)';
+          ? 'linear-gradient(90deg, rgba(234,229,220, 0.5), rgba(234,229,220, 0.5))'
+          : 'rgba(234,229,220,0.1)';
       });
     }
 

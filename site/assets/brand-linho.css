@@ -1,0 +1,55 @@
+/* Shift · identidade aprovada: Linho e preto suave. */
+:root {
+  --ink: #191918;
+  --linen: #EAE5DC;
+  --navy: var(--ink);
+  --navy-2: #252622;
+  --paper: var(--linen);
+  --accent: var(--linen);
+  --accent-deep: #D5D0C6;
+  --gold: var(--linen);
+  --cinema-gold: var(--linen);
+  --sea-ink: #B6B3AA;
+  --visual-muted: #B6B3AA;
+  --visual-line: rgba(234,229,220,.17);
+  --muted: rgba(234,229,220,.72);
+  --focus: var(--linen);
+  --border: rgba(234,229,220,.15);
+  --accent-glow: transparent;
+  --gold-glow: transparent;
+  --purple-glow: transparent;
+  --glass: #20211E;
+  --glass-strong: #252622;
+}
+html,body,body.page-bg,body.ai-home,body.ai-page { background:var(--ink); color:var(--linen); }
+.brand-logo { width:158px; height:auto; flex-shrink:0; }
+footer .brand-logo { width:190px; }
+.page-bg::before,.mark-glow { filter:none; }
+.glass,.glass-strong { background:var(--glass); box-shadow:none; }
+.glass:hover { background:#252622; border-color:rgba(234,229,220,.35); box-shadow:none; }
+.grid-overlay,.ai-hero::before,.art-grid,.command-art::before { opacity:.35; }
+body .btn-primary,body .cinema-button {
+  background:var(--linen)!important;
+  color:var(--ink)!important;
+  border-color:var(--linen);
+  box-shadow:none;
+}
+body .btn-primary:hover,body .cinema-button:hover { background:#D5D0C6!important; box-shadow:none; filter:none; }
+#site-header .btn-primary { background:transparent!important; color:var(--linen)!important; border-color:rgba(234,229,220,.35); }
+#site-header .btn-primary:hover { background:var(--linen)!important; color:var(--ink)!important; }
+#site-header.scrolled { background:rgba(25,25,24,.96); border-color:var(--border); }
+#mobile-menu { background:#191918; }
+.btn-ghost { background:transparent; box-shadow:none; }
+.command-art,.scenario-stage,.level-process-demo,.inner-hero-row { background:#20211E; box-shadow:none; }
+.command-core,.art-engine,.flow-connector img { background:#292A25; box-shadow:none; }
+.command-core img { object-fit:contain; }
+.core-ring,.engine-halo { opacity:.45; }
+.conversion-cta,.ai-cta { background:#20211E; }
+footer { background:#141513; }
+:where(a,button,input,select,textarea,[tabindex]):focus-visible { outline-color:var(--linen); }
+@media(max-width:1100px) {
+  #site-header .brand-logo { width:128px; }
+  #site-header nav { position:static; transform:none; }
+  #site-header .nav-link { padding-left:.5rem; padding-right:.5rem; }
+}
+@media(max-width:420px) { #site-header .brand-logo { width:116px; } }

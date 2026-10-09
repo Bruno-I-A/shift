@@ -3,10 +3,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        navy: { DEFAULT: '#071522', 2: '#0E2335' },
-        accent: { DEFAULT: '#F2A63D', deep: '#D4841A' },
-        gold: '#FFC93D', paper: '#F6F5F1',
-        purple: { DEFAULT: '#B56BFF', deep: '#8A4DCC' }
+        navy: { DEFAULT: '#191918', 2: '#252622' },
+        accent: { DEFAULT: '#EAE5DC', deep: '#D5D0C6' },
+        gold: '#EAE5DC', paper: '#EAE5DC',
+        purple: { DEFAULT: '#EAE5DC', deep: '#D5D0C6' }
       },
       fontFamily: {
         sans: ['Geist', 'system-ui', 'sans-serif'],
