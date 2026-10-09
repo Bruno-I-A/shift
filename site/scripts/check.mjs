@@ -53,9 +53,9 @@ if (!readFileSync('sitemap.xml', 'utf8').includes('/segmentos.html')) issues.pus
 
 const home = readFileSync('index.html', 'utf8');
 const homeMeta = {
-  title: '<title>Shift Systems · Transformamos sua empresa em AI-first</title>',
-  description: 'Empresas que colocam IA na operação estão saindo na frente. A Shift transforma a sua em AI-first: IA que gerencia processos, organiza equipes e apoia decisões, com segurança e a sua equipe no controle. Diagnóstico gratuito.',
-  socialTitle: 'Shift Systems · Sua empresa AI-first, agora'
+  title: '<title>Shift · Inteligência artificial nos processos da sua empresa</title>',
+  description: 'Colocamos inteligência artificial nos processos da sua empresa para automatizar tarefas, organizar o trabalho e apoiar decisões. Começamos por um processo, com sua equipe no controle. Diagnóstico gratuito.',
+  socialTitle: 'Shift · IA nos processos. Agilidade na sua empresa.'
 };
 if (!home.includes(homeMeta.title)) issues.push('index.html: required title is missing');
 if ((home.match(new RegExp(homeMeta.description.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length < 3) issues.push('index.html: description must match meta, OG and Twitter');

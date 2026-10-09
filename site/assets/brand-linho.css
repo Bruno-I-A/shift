@@ -53,3 +53,49 @@ footer { background:#141513; }
   #site-header .nav-link { padding-left:.5rem; padding-right:.5rem; }
 }
 @media(max-width:420px) { #site-header .brand-logo { width:116px; } }
+
+/* A primeira tela explica a entrega antes dos conceitos de maturidade. */
+.purpose-hero h1 { font-size:clamp(3rem,5.1vw,4.9rem); max-width:650px; }
+.purpose-hero h1 em { font-size:1.06em; }
+.purpose-hero .ai-hero-lead { max-width:540px; line-height:1.7; }
+.purpose-example { position:relative; overflow:hidden; background:#20211E; border:1px solid var(--border); padding:2rem; isolation:isolate; }
+.purpose-example-head { position:relative; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; padding-bottom:1.4rem; border-bottom:1px solid var(--border); }
+.purpose-example-head p { margin:0; font-size:.95rem; color:var(--linen); }
+.purpose-example-head > span { font:400 .7rem/1.5 'Geist Mono',monospace; color:var(--visual-muted); }
+.purpose-watermark { position:absolute; width:280px; height:280px; right:-2rem; top:-1rem; opacity:.045; z-index:-1; pointer-events:none; }
+.purpose-flow { padding:0; margin:0; list-style:none; }
+.purpose-flow li { position:relative; display:grid; grid-template-columns:2.1rem 1fr; gap:1.1rem; padding:1.35rem 0; }
+.purpose-flow li + li { border-top:1px solid rgba(234,229,220,.09); }
+.purpose-step { font:400 .72rem/1.6 'Geist Mono',monospace; color:var(--visual-muted); margin-top:.15rem; }
+.purpose-role { display:block; font:400 .72rem/1.5 'Geist Mono',monospace; color:var(--visual-muted); margin-bottom:.5rem; }
+.purpose-flow strong { display:block; font-size:clamp(1rem,1.4vw,1.2rem); line-height:1.4; font-weight:450; color:var(--linen); }
+.purpose-outcome { display:flex; align-items:center; gap:.9rem; border-top:1px solid var(--border); padding-top:1.25rem; }
+.purpose-outcome > img { flex-shrink:0; width:48px; height:48px; object-fit:contain; }
+.purpose-outcome p { margin:0; font-size:.82rem; line-height:1.7; }
+.purpose-outcome strong,.purpose-outcome span { display:block; }
+.purpose-outcome strong { font-weight:500; }
+.purpose-outcome span { color:var(--visual-muted); }
+.brand-statement { padding:clamp(3rem,6vw,5rem) 0; border-block:1px solid var(--border); background:#1D1E1B; }
+.brand-statement-inner { display:grid; grid-template-columns:180px minmax(0,670px); justify-content:center; align-items:center; gap:clamp(2rem,5vw,5rem); }
+.brand-statement-mark { width:180px; height:180px; object-fit:contain; }
+.brand-statement h2 { font-size:clamp(2rem,3.4vw,3.3rem); font-weight:450; letter-spacing:-.045em; line-height:1.12; margin:.7rem 0 1.25rem; }
+.brand-statement h2 .word { display:inline-block; }
+.brand-statement-inner > div > p:last-child { max-width:600px; color:var(--visual-muted); font-size:1rem; line-height:1.75; margin:0; }
+.brand-cta { position:relative; isolation:isolate; overflow:hidden; }
+.brand-cta > div { position:relative; z-index:1; }
+.brand-cta-watermark { position:absolute; width:360px; height:360px; right:1rem; bottom:-1rem; opacity:.04; pointer-events:none; z-index:0; }
+@media(max-width:800px) {
+  .purpose-example { padding:1.5rem; }
+  .brand-statement-inner { grid-template-columns:110px minmax(0,1fr); gap:1.5rem; }
+  .brand-statement-mark { width:110px; height:110px; }
+}
+@media(max-width:540px) {
+  .purpose-hero h1 { font-size:clamp(2.8rem,11.8vw,3.6rem); }
+  .purpose-hero .ai-hero-lead { font-size:1rem; }
+  .purpose-flow li { gap:.7rem; padding:1.15rem 0; }
+  .purpose-example-head { gap:.5rem; }
+  .brand-statement-inner { grid-template-columns:1fr; gap:1rem; }
+  .brand-statement-mark { width:100px; height:100px; }
+  .brand-statement h2 { margin-top:.5rem; }
+  .brand-cta-watermark { width:250px; height:250px; right:-1rem; }
+}
