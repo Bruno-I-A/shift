@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { Vazio } from "@/componentes/secao";
 import { SeletorEtapaLead } from "@/componentes/seletor-etapa-lead";
+import { BotaoAcao } from "@/componentes/botao-acao";
+import { mudarModoWhatsApp } from "@/app/acoes";
 import { emTransacao } from "@/lib/banco";
 import { ETAPAS_LEAD, IDS_ETAPA_LEAD, nomeDaEtapaLead } from "@/lib/dominio";
 import type { EtapaLead } from "@/lib/dominio";
@@ -45,7 +47,7 @@ export default async function Leads({ searchParams }: PageProps<"/leads">) {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Leads</h1>
         <p className="mt-1 text-sm text-apagado">
-          Quem fez o diagnóstico no site e autorizou o contato.
+          Contatos do diagnóstico no site e do atendimento no WhatsApp, com autorização para guardar os dados.
         </p>
       </header>
 
@@ -79,7 +81,7 @@ export default async function Leads({ searchParams }: PageProps<"/leads">) {
         <Vazio>
           {etapa
             ? `Nenhum lead em ${nomeDaEtapaLead(etapa)}.`
-            : "Nenhum lead ainda. Quando alguém fizer o diagnóstico no site e autorizar o contato, aparece aqui."}
+            : "Nenhum lead ainda. O diagnóstico do site e os contatos autorizados no WhatsApp aparecem aqui."}
         </Vazio>
       ) : (
         <ul className="divide-y divide-linha rounded-lg border border-linha">
@@ -109,13 +111,35 @@ export default async function Leads({ searchParams }: PageProps<"/leads">) {
                       <span title={dataCompleta(lead.atualizadoEm)}> · atualizado {haQuanto(lead.atualizadoEm)}</span>
                     )}
                   </p>
+                  {lead.modoWhatsApp && (
+                    <p className="mt-2 text-xs text-suave">
+                      WhatsApp · {lead.modoWhatsApp === "agente" ? "agente ativo" : "atendimento humano"}
+                    </p>
+                  )}
+                  {lead.enviosPendentes > 0 && (
+                    <p className="mt-1 text-xs text-perigo" role="alert">
+                      {lead.enviosPendentes} resposta(s) sem confirmação de envio. Verifique a conversa no WhatsApp.
+                    </p>
+                  )}
                 </div>
-                <SeletorEtapaLead id={lead.id} etapa={lead.etapa} nome={lead.nome} />
+                <div className="flex flex-col items-end gap-2">
+                  <SeletorEtapaLead id={lead.id} etapa={lead.etapa} nome={lead.nome} />
+                  {lead.modoWhatsApp && (
+                    <BotaoAcao
+                      acao={mudarModoWhatsApp.bind(null, lead.id, lead.modoWhatsApp === "agente" ? "humano" : "agente")}
+                      className="text-xs text-destaque hover:underline"
+                    >
+                      {lead.modoWhatsApp === "agente" ? "Assumir atendimento" : "Reativar agente"}
+                    </BotaoAcao>
+                  )}
+                </div>
               </div>
 
               <details>
-                <summary className="cursor-pointer text-sm text-apagado hover:text-suave">Diagnóstico completo</summary>
+                <summary className="cursor-pointer text-sm text-apagado hover:text-suave">Detalhes do lead</summary>
                 <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+                  <div><dt className="text-xs text-apagado">Origem</dt><dd>{lead.origem === "whatsapp" ? "WhatsApp" : lead.origem}</dd></div>
+                  {lead.resumoWhatsApp && <div className="sm:col-span-2"><dt className="text-xs text-apagado">Resumo do atendimento</dt><dd>{lead.resumoWhatsApp}</dd></div>}
                   {Object.entries(lead.respostas).map(([chave, valor]) => (
                     <div key={chave}>
                       <dt className="text-xs text-apagado">{ROTULOS[chave] ?? chave}</dt>

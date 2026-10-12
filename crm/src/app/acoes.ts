@@ -7,7 +7,7 @@ import * as z from "zod";
 import { emTransacao } from "@/lib/banco";
 import * as crm from "@/lib/crm";
 import { ErroDeDominio, IDS_ETAPA, IDS_ETAPA_LEAD, IDS_TIPO } from "@/lib/dominio";
-import { mudarEtapaDoLead } from "@/lib/leads";
+import { mudarEtapaDoLead, mudarModoAtendimentoWhatsApp } from "@/lib/leads";
 import { conferirSenha, iguais } from "@/lib/segredos";
 import {
   credenciaisDoAdmin,
@@ -208,6 +208,18 @@ export async function mudarEtapaLead(id: string, etapa: string): Promise<Resulta
     return { erro: mensagemDe(erro) };
   }
   revalidatePath("/", "layout");
+}
+
+export async function mudarModoWhatsApp(id: string, modo: string): Promise<Resultado> {
+  await exigirSessao();
+  try {
+    const valido = z.enum(["agente", "humano"]).parse(modo);
+    const leadId = z.uuid().parse(id);
+    await emTransacao((tx) => mudarModoAtendimentoWhatsApp(tx, leadId, valido));
+  } catch (erro) {
+    return { erro: mensagemDe(erro) };
+  }
+  revalidatePath("/leads");
 }
 
 // -----------------------------------------------------------------------------

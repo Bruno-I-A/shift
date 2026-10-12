@@ -31,6 +31,7 @@ RUN addgroup --system --gid 1001 nextjs \
 COPY --from=compilacao --chown=nextjs:nextjs /app/.next/standalone ./
 COPY --from=compilacao --chown=nextjs:nextjs /app/.next/static ./.next/static
 COPY --from=compilacao --chown=nextjs:nextjs /app/public ./public
+COPY --from=compilacao --chown=nextjs:nextjs /app/conhecimento ./conhecimento
 
 # Migrações e scripts de operação. O `pg` que eles importam já vem no
 # standalone, porque o servidor também usa.
