@@ -188,7 +188,7 @@
 .approval-art { display: flex; align-items: center; justify-content: center; gap: 1rem; min-height: 220px; background: radial-gradient(ellipse,#3b3a3766,transparent 68%); }
 .approval-art > span { padding: 1rem; background: #2d2c29; border: 1px solid #7d7c7977; color: #cecdca; font-size: .85rem; transform: rotate(-4deg); }
 .approval-art i { color: #eae5dc; font-style: normal; }
-.approval-art b { display: grid; justify-items: center; gap: .7rem; padding: 1.6rem 1.2rem; background: #2d2c29; border: 1px solid #eae5dc77; color: #eae5dc; font-weight: 400; font-size: .9rem; transform: rotate(4deg); }
+.approval-art b { display: grid; justify-items: center; gap: .7rem; text-align: center; padding: 1.6rem 1.2rem; background: #2d2c29; border: 1px solid #eae5dc77; color: #eae5dc; font-weight: 400; font-size: .9rem; transform: rotate(4deg); }
 .approval-art svg { width: 30px; height: 30px; }
 .conversion-cta { display: grid; grid-template-columns: 1.5fr .7fr; gap: 4rem; text-align: left; align-items: center; padding: clamp(2rem,5vw,4rem); border: 1px solid #eae5dc44; background: radial-gradient(ellipse at 90% 50%,#6d6b6819,transparent 60%),#201f1c; }
 .conversion-cta h2 { margin-inline: 0; font-size: clamp(2.2rem,4vw,4rem); line-height: 1.05; max-width: 700px; }
