@@ -118,6 +118,21 @@
     window.dispatchEvent(new CustomEvent('shift:motion', { detail: { paused } }));
     schedule();
   }
+  /* Abaixo de 1024 px o botão de pausa fica no cabeçalho, ao lado do menu. Solto no canto de
+     baixo, ele cobria o texto em toda tela do celular. Sem botão de menu (404), continua solto. */
+  const menuButton = document.getElementById('menu-btn');
+  const compact = matchMedia('(max-width: 1023px)');
+  function placeToggle() {
+    if (!button || !menuButton) return;
+    if (compact.matches) {
+      if (button.nextElementSibling !== menuButton) menuButton.before(button);
+    } else if (button.parentElement !== document.body) {
+      document.body.append(button);
+    }
+    button.classList.toggle('in-header', compact.matches);
+  }
+  compact.addEventListener('change', placeToggle);
+  placeToggle();
   button?.addEventListener('click', () => {
     userPaused = !userPaused;
     try { sessionStorage.setItem('shift-motion', userPaused ? 'paused' : 'active'); } catch {}

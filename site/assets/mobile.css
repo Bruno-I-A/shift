@@ -1,0 +1,154 @@
+/* Shift · camada do celular (13/10/2026, revisão mobile com o Impeccable "adapt").
+   Carrega depois de brand-linho.css em todas as páginas.
+
+   O que mudou no celular:
+   - o botão de pausa foi para o cabeçalho, ao lado do menu (cinema.js), e não cobre mais o texto;
+   - o texto miúdo subiu para 12 px nos rótulos e para 13–15 px no texto de apoio e nos botões;
+   - os fluxos "Exemplo de processo" viraram uma linha do tempo compacta;
+   - os níveis e as soluções de cada nível viraram listas com divisória, em vez de cartões empilhados;
+   - os setores viraram linhas com ícone ao lado;
+   - os botões de convite ocupam a largura toda;
+   - o rodapé tem duas colunas e o rótulo de "sites" não cola mais na palavra.
+
+   Fora o ícone de pausa, que agora é desenhado em todas as telas, nada aqui vale acima de 767 px. */
+
+/* ── ícone de pausa / continuar: desenhado, no lugar dos glifos Ⅱ e ▷ ── */
+.motion-symbol { position:relative; display:inline-block; width:12px; height:12px; font-size:0 !important; line-height:0; }
+.motion-symbol::before,
+.motion-symbol::after { content:''; position:absolute; top:0; width:3.5px; height:12px; border-radius:1px; background:currentColor; }
+.motion-symbol::before { left:1.5px; }
+.motion-symbol::after { right:1.5px; }
+.motion-toggle[aria-pressed="true"] .motion-symbol::before { left:2px; width:0; height:0; border-radius:0; background:none; border-style:solid; border-width:6px 0 6px 10px; border-color:transparent transparent transparent currentColor; }
+.motion-toggle[aria-pressed="true"] .motion-symbol::after { display:none; }
+
+/* ── no cabeçalho (abaixo de 1024 px, onde existe o botão de menu) ── */
+.motion-toggle.in-header {
+  position:static;
+  width:44px;
+  min-width:44px;
+  height:44px;
+  min-height:44px;
+  padding:0;
+  gap:0;
+  border-radius:999px;
+  border:1px solid rgba(234,229,220,.15);
+  background:transparent;
+  backdrop-filter:none;
+  color:var(--linen);
+}
+.motion-toggle.in-header .motion-text { display:none; }
+.motion-toggle.in-header:hover,
+.motion-toggle.in-header:focus-visible { border-color:rgba(234,229,220,.45); }
+
+@media (max-width:767px) {
+  /* o rodapé não precisa mais de espaço para o botão solto */
+  .cinema-home footer { padding-bottom:40px; }
+
+  /* ── tipografia: piso de leitura no celular ── */
+  .eyebrow,
+  .demo-kicker,
+  .stage-topline > span,
+  .segment-level > span,
+  .flow-node > span:first-child,
+  .purpose-role,
+  .purpose-step,
+  .maturity-label,
+  .pilot-number,
+  .phase-output,
+  .segment-pick-label,
+  .sites-cases-label,
+  .demo-status,
+  .output-kicker,
+  .human-stamp,
+  .num-tag,
+  .process-detail-number,
+  .purpose-example-head > span,
+  footer .font-mono { font-size:.75rem !important; }
+  .eyebrow { letter-spacing:.16em; }
+  .eyebrow-long { letter-spacing:.03em; } /* a frase de cima do hero continua numa linha só */
+  .visual-hero .ai-hero-meta,
+  .ai-cta-meta,
+  .conversion-cta .ai-cta-meta { font-size:.78rem !important; line-height:1.65; }
+  main .font-mono.uppercase.tracking-wider,
+  main .font-mono.text-xs,
+  main .font-mono.text-\[11px\],
+  .versus-row > span,
+  .versus-head span,
+  .sample-data span,
+  .chat-person,
+  .queue-note { font-size:.75rem !important; }
+
+  .visual-button { font-size:.95rem !important; }
+  .hero-bottomline { font-size:.86rem; }
+  .hero-bottomline a { font-size:.9rem; }
+  .sample-pipeline li,
+  .scenario-output li { font-size:.84rem; }
+  .sample-pipeline small,
+  .manual-caption { font-size:.78rem; }
+  .pilot-story li > span:last-child { font-size:.78rem !important; }
+  main a.text-link { font-size:.9rem; }
+
+  /* a ilustração do ciclo: o rótulo cabe dentro do laço */
+  .pilot-cycle svg { width:100%; max-width:132px; height:auto; }
+  .pilot-cycle b { max-width:5.6em; text-align:center; line-height:1.25; font-size:.72rem !important; }
+
+  /* ── convites: botão na largura toda, ao alcance do polegar ── */
+  main .btn-primary.inline-flex,
+  main .btn-ghost.inline-flex { width:100%; justify-content:center; text-align:center; }
+  .ai-cta { padding:2.4rem 1.35rem; }
+  .ai-cta h2 { font-size:clamp(2.1rem,9.6vw,2.6rem); }
+
+  /* ── "Exemplo de processo": linha do tempo compacta (ícone, etapa, texto) ── */
+  .level-process-demo { padding:1rem 1rem 1.1rem; }
+  .level-process-demo .demo-kicker { margin-bottom:.85rem; }
+  .flow-track { grid-template-columns:1fr; gap:.55rem; }
+  .flow-node {
+    display:grid;
+    grid-template-columns:2.25rem minmax(0,1fr);
+    grid-template-areas:"icon label" "icon text";
+    column-gap:.85rem;
+    align-items:center;
+    min-height:0;
+    padding:.75rem .85rem;
+  }
+  .flow-node > span:first-child { grid-area:label; align-self:end; }
+  .flow-node .flow-node-icon { grid-area:icon; width:2.25rem; height:2.25rem; margin:0; }
+  .flow-node strong { grid-area:text; align-self:start; margin-top:.15rem; font-size:.95rem; }
+  .flow-node + .flow-node::before,
+  .flow-node + .flow-node::after { display:block; }
+  .flow-node + .flow-node::before { top:auto; right:auto; bottom:100%; left:1.975rem; width:1px; height:.55rem; }
+  .flow-node + .flow-node::after { top:auto; right:auto; bottom:calc(100% + .1rem); left:calc(1.975rem - 3px); transform:rotate(135deg); }
+
+  /* ── níveis por setor e soluções por nível: lista com divisória, não pilha de cartões ── */
+  .segment-levels,
+  .compact-solution-grid { gap:0; border:1px solid rgba(178,177,174,.17); background:rgba(28,27,24,.7); }
+  .segment-level,
+  .compact-solution-grid .solution-card { border:0; background:transparent; padding:1rem 1.1rem; }
+  .segment-level + .segment-level,
+  .compact-solution-grid .solution-card + .solution-card { border-top:1px solid rgba(178,177,174,.14); }
+  .segment-level h3 { margin-top:.4rem; }
+  .segment-level p { margin-top:.35rem; }
+  .compact-solution-grid .solution-card:hover { background:rgba(234,229,220,.03); }
+
+  /* ── setores: ícone ao lado do nome, em vez de em cima ── */
+  .sector-grid { gap:0; border:1px solid rgba(178,177,174,.18); background:rgba(28,27,24,.7); }
+  .sector-card {
+    display:grid;
+    grid-template-columns:2.4rem minmax(0,1fr);
+    column-gap:1rem;
+    align-items:start;
+    padding:1.05rem 1.1rem;
+    border:0;
+    background:transparent;
+  }
+  .sector-card + .sector-card { border-top:1px solid rgba(178,177,174,.14); }
+  .sector-card .sector-icon { grid-row:1 / span 2; }
+  .sector-card h3 { margin:.15rem 0 .3rem; font-size:1.08rem; }
+
+  /* ── rodapé: duas colunas de links, rótulo separado da palavra ── */
+  footer .grid.md\:grid-cols-12 { grid-template-columns:1fr 1fr; column-gap:1.25rem; row-gap:2.25rem; }
+  footer .grid.md\:grid-cols-12 > :first-child { grid-column:1 / -1; }
+  footer li > a { flex-wrap:wrap; column-gap:.5em; }
+  footer li > a > span.font-mono { color:rgba(234,229,220,.5); }
+  footer .hr-grad + div { align-items:flex-start; text-align:left; }
+}
