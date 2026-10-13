@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Consulta } from "@/lib/consulta";
 import { buscarConhecimento } from "@/lib/conhecimento-shift";
 import * as leads from "@/lib/leads";
-import { decidirConsentimentoWhatsApp, enviarTextoEvolution, lerMensagemDaShiftEvolution, lerMensagemEvolution } from "@/lib/whatsapp";
+import { decidirConsentimentoWhatsApp, enviarTextoMeta, lerMensagensMeta } from "@/lib/whatsapp";
 
 import { bancoDeTeste } from "./banco-de-teste";
 
@@ -15,24 +15,25 @@ const analise = {
   prazo: "Este mês", resumo: "Quer automatizar a conferência de pedidos.", passarParaHumano: false,
 };
 
-describe("ponte Evolution e base de conhecimento", () => {
+describe("ponte oficial da Meta e base de conhecimento", () => {
   const evento = {
-    event: "messages.upsert", instance: "shift", data: {
-      key: { id: "ABC1", remoteJid: "5554999991234@s.whatsapp.net", fromMe: false },
-      messageTimestamp: Math.floor(Date.now() / 1000),
-      message: { conversation: "Vocês atendem indústrias?" },
-    },
+    object: "whatsapp_business_account", entry: [{ changes: [{ field: "messages", value: {
+      metadata: { phone_number_id: "123456" }, messages: [{
+        from: "5554999991234", id: "wamid.ABC1", timestamp: Math.floor(Date.now() / 1000),
+        type: "text", text: { body: "Vocês atendem indústrias?" },
+      }],
+    } }] }],
   };
 
-  it("aceita apenas mensagem de texto da instância e contato corretos", () => {
-    expect(lerMensagemEvolution(evento, "shift")).toEqual({ id: "ABC1", whatsapp: "5554999991234", texto: "Vocês atendem indústrias?" });
-    expect(lerMensagemEvolution(evento, "outra")).toBeNull();
-    expect(lerMensagemEvolution({ ...evento, data: { ...evento.data, key: { ...evento.data.key, fromMe: true } } }, "shift")).toBeNull();
-    expect(lerMensagemDaShiftEvolution({ ...evento, data: { ...evento.data, key: { ...evento.data.key, fromMe: true } } }, "shift")?.texto).toBe("Vocês atendem indústrias?");
-    expect(lerMensagemDaShiftEvolution({ ...evento, data: { ...evento.data, key: { ...evento.data.key, fromMe: true }, message: { imageMessage: {} } } }, "shift")?.texto).toBe("");
-    expect(lerMensagemEvolution({ ...evento, data: { ...evento.data, key: { ...evento.data.key, remoteJid: "123@g.us" } } }, "shift")).toBeNull();
-    expect(lerMensagemEvolution({ ...evento, data: { ...evento.data, messageTimestamp: 1700000000 } }, "shift")).toBeNull();
-    expect(lerMensagemEvolution({ ...evento, data: { ...evento.data, key: { ...evento.data.key, remoteJid: "123@lid", remoteJidAlt: "5554999991234@s.whatsapp.net" } } }, "shift")?.whatsapp).toBe("5554999991234");
+  it("aceita apenas texto recente destinado ao número oficial", () => {
+    expect(lerMensagensMeta(evento, "123456")).toEqual([{ id: "wamid.ABC1", whatsapp: "5554999991234", texto: "Vocês atendem indústrias?" }]);
+    expect(lerMensagensMeta(evento, "outro")).toEqual([]);
+    const imagem = structuredClone(evento);
+    imagem.entry[0].changes[0].value.messages[0].type = "image";
+    expect(lerMensagensMeta(imagem, "123456")).toEqual([]);
+    const antiga = structuredClone(evento);
+    antiga.entry[0].changes[0].value.messages[0].timestamp = 1700000000;
+    expect(lerMensagensMeta(antiga, "123456")).toEqual([]);
   });
 
   it("encontra conteúdo publicado da Shift sobre o setor perguntado", () => {
@@ -53,18 +54,19 @@ describe("ponte Evolution e base de conhecimento", () => {
     expect(decidirConsentimentoWhatsApp({ ...aviso, enviadoEm: new Date(agora - 2 * 86_400_000) }, mensagem, agora)).toBe("avisar");
   });
 
-  it("envia texto à instância configurada com tempo de digitação", async () => {
-    vi.stubEnv("EVOLUTION_URL", "http://evolution:8080");
-    vi.stubEnv("EVOLUTION_API_KEY", "teste");
-    vi.stubEnv("EVOLUTION_INSTANCIA", "shift");
+  it("envia texto pela Cloud API com o número configurado", async () => {
+    vi.stubEnv("WHATSAPP_META_ACCESS_TOKEN", "teste");
+    vi.stubEnv("WHATSAPP_META_PHONE_NUMBER_ID", "123456");
+    vi.stubEnv("WHATSAPP_META_GRAPH_VERSION", "v24.0");
     const chamadas: { url: string | URL; opcoes: RequestInit }[] = [];
     vi.stubGlobal("fetch", async (url: string | URL, opcoes: RequestInit) => {
       chamadas.push({ url, opcoes });
       return new Response("{}", { status: 200 });
     });
-    await enviarTextoEvolution("5554999991234", "Olá, Shift!");
-    expect(String(chamadas[0].url)).toBe("http://evolution:8080/message/sendText/shift");
-    expect(JSON.parse(String(chamadas[0].opcoes.body))).toMatchObject({ number: "5554999991234", text: "Olá, Shift!", delay: 440 });
+    await enviarTextoMeta("5554999991234", "Olá, Shift!");
+    expect(String(chamadas[0].url)).toBe("https://graph.facebook.com/v24.0/123456/messages");
+    expect(chamadas[0].opcoes.headers).toMatchObject({ Authorization: "Bearer teste" });
+    expect(JSON.parse(String(chamadas[0].opcoes.body))).toMatchObject({ messaging_product: "whatsapp", to: "5554999991234", type: "text", text: { body: "Olá, Shift!" } });
   });
 });
 

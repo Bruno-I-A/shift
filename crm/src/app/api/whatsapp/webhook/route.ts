@@ -4,12 +4,14 @@ import { emTransacao } from "@/lib/banco";
 import { analisarAtendimento } from "@/lib/ia-atendimento";
 import {
   apagarAvisoWhatsApp, autorizarAtendimentoWhatsApp, buscarAtendimentoWhatsApp, buscarAvisoWhatsApp,
-  marcarEnvioWhatsApp, pausarSeRespostaHumana, registrarRespostaWhatsApp,
-  registrarAvisoWhatsApp,
+  marcarEnvioWhatsApp, registrarRespostaWhatsApp, registrarAvisoWhatsApp,
 } from "@/lib/leads";
-import { decidirConsentimentoWhatsApp, enviarTextoEvolution, lerMensagemDaShiftEvolution, lerMensagemEvolution } from "@/lib/whatsapp";
+import { decidirConsentimentoWhatsApp, enviarTextoMeta, lerMensagensMeta, type MensagemRecebida } from "@/lib/whatsapp";
 
 export const runtime = "nodejs";
+
+const AVISO = "Olá! Sou o assistente virtual da Shift Systems. Posso responder dúvidas e encaminhar você à equipe. Para guardar suas informações e usar IA no atendimento, responda *SIM* e depois repita sua pergunta. Veja nossa política: https://shiftsys.com.br/privacidade.html";
+const BOAS_VINDAS = "Obrigado por autorizar. Como posso ajudar? Se quiser conversar sobre sua empresa, me diga seu nome e o processo que mais consome tempo.";
 
 function segredoCorreto(recebido: string, esperado: string): boolean {
   const a = createHash("sha256").update(recebido).digest();
@@ -17,60 +19,49 @@ function segredoCorreto(recebido: string, esperado: string): boolean {
   return timingSafeEqual(a, b);
 }
 
-const AVISO = "Olá! Sou o assistente virtual da Shift Systems. Posso responder dúvidas e encaminhar você à equipe. Para guardar suas informações e usar IA no atendimento, responda *SIM* e depois repita sua pergunta. Veja nossa política: https://shiftsys.com.br/privacidade.html";
-const BOAS_VINDAS = "Obrigado por autorizar. Como posso ajudar? Se quiser conversar sobre sua empresa, me diga seu nome e o processo que mais consome tempo.";
+function assinaturaMetaCorreta(recebida: string, corpo: string, segredo: string): boolean {
+  const esperada = `sha256=${createHmac("sha256", segredo).update(corpo).digest("hex")}`;
+  return segredoCorreto(recebida, esperada);
+}
 
-export async function POST(pedido: Request): Promise<Response> {
-  if (process.env.WHATSAPP_ATIVO !== "sim") return new Response(null, { status: 503 });
-  const segredo = process.env.WHATSAPP_WEBHOOK_SEGREDO;
-  if (!segredo || !segredoCorreto(pedido.headers.get("x-shift-webhook-token") ?? "", segredo)) {
-    return new Response(null, { status: 401 });
-  }
-  if (Number(pedido.headers.get("content-length") ?? 0) > 64_000) return new Response(null, { status: 413 });
-  let corpo: unknown;
+export async function GET(pedido: Request): Promise<Response> {
+  const url = new URL(pedido.url);
+  const modo = url.searchParams.get("hub.mode");
+  const token = url.searchParams.get("hub.verify_token") ?? "";
+  const desafio = url.searchParams.get("hub.challenge");
+  const esperado = process.env.WHATSAPP_META_VERIFY_TOKEN;
+  if (modo !== "subscribe" || !desafio || !esperado || !segredoCorreto(token, esperado)) return new Response(null, { status: 403 });
+  return new Response(desafio, { status: 200, headers: { "Content-Type": "text/plain" } });
+}
+
+async function atenderMensagem(mensagem: MensagemRecebida, segredo: string): Promise<void> {
   let respostaRegistrada = false;
-  try {
-    const bruto = await pedido.text();
-    if (bruto.length > 64_000) return new Response(null, { status: 413 });
-    corpo = JSON.parse(bruto);
-  } catch { return new Response(null, { status: 400 }); }
-  const instancia = process.env.EVOLUTION_INSTANCIA ?? "";
-  const enviadaPelaShift = lerMensagemDaShiftEvolution(corpo, instancia);
-  if (enviadaPelaShift) {
-    try {
-      await emTransacao((tx) => pausarSeRespostaHumana(tx, enviadaPelaShift.whatsapp, enviadaPelaShift.texto));
-      return Response.json({ enviadaPelaShift: true });
-    } catch { return new Response(null, { status: 503 }); }
-  }
-  const mensagem = lerMensagemEvolution(corpo, instancia);
-  if (!mensagem) return Response.json({ ignorado: true });
-
   try {
     let atendimento = await emTransacao((tx) => buscarAtendimentoWhatsApp(tx, mensagem.whatsapp));
     if (atendimento && ["ganho", "perdido"].includes(atendimento.etapa)) atendimento = null;
     if (!atendimento) {
-      const chaveAviso = createHmac("sha256", segredo).update(mensagem.whatsapp).digest("hex");
+      const chaveAviso = createHmac("sha256", segredo).update(`aviso:${mensagem.whatsapp}`).digest("hex");
       const aviso = await emTransacao((tx) => buscarAvisoWhatsApp(tx, chaveAviso));
       const decisao = decidirConsentimentoWhatsApp(aviso, mensagem);
-      if (decisao === "ignorar") return Response.json({ avisoRecente: true });
+      if (decisao === "ignorar") return;
       if (decisao === "avisar") {
-        await enviarTextoEvolution(mensagem.whatsapp, AVISO);
+        await enviarTextoMeta(mensagem.whatsapp, AVISO);
         await emTransacao((tx) => registrarAvisoWhatsApp(tx, chaveAviso, mensagem.id));
-        return Response.json({ aviso: true });
+        return;
       }
       atendimento = await emTransacao((tx) => autorizarAtendimentoWhatsApp(tx, mensagem.whatsapp));
       await emTransacao((tx) => apagarAvisoWhatsApp(tx, chaveAviso));
       const novo = await emTransacao((tx) => registrarRespostaWhatsApp(tx, atendimento!, mensagem.id, {
         resposta: BOAS_VINDAS, nome: "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "", passarParaHumano: false,
       }));
-      if (!novo) return Response.json({ duplicado: true });
+      if (!novo) return;
       respostaRegistrada = true;
-      await enviarTextoEvolution(mensagem.whatsapp, BOAS_VINDAS);
+      await enviarTextoMeta(mensagem.whatsapp, BOAS_VINDAS);
       await emTransacao((tx) => marcarEnvioWhatsApp(tx, mensagem.id, true));
-      return Response.json({ autorizado: true });
+      return;
     }
-    if (atendimento.modo === "humano") return Response.json({ humano: true });
-    if (/^(sim|aceito|autorizo)([.! ]*)$/i.test(mensagem.texto) && !atendimento.resumo) return Response.json({ duplicado: true });
+    if (atendimento.modo === "humano") return;
+    if (/^(sim|aceito|autorizo)([.! ]*)$/i.test(mensagem.texto) && !atendimento.resumo) return;
 
     const analise = await analisarAtendimento(mensagem.texto, atendimento.resumo).catch(() => ({
       resposta: "O atendimento automático está indisponível no momento. Vou deixar seu contato para uma pessoa da Shift continuar por aqui.",
@@ -78,15 +69,36 @@ export async function POST(pedido: Request): Promise<Response> {
       resumo: atendimento.resumo, passarParaHumano: true,
     }));
     const novo = await emTransacao((tx) => registrarRespostaWhatsApp(tx, atendimento!, mensagem.id, analise));
-    if (!novo) return Response.json({ duplicado: true });
+    if (!novo) return;
     respostaRegistrada = true;
-    await enviarTextoEvolution(mensagem.whatsapp, analise.resposta);
+    await enviarTextoMeta(mensagem.whatsapp, analise.resposta);
     await emTransacao((tx) => marcarEnvioWhatsApp(tx, mensagem.id, true));
-    return Response.json({ recebido: true });
   } catch {
     // Nunca registra o texto recebido nem o número do contato em logs.
     console.error("[whatsapp] atendimento falhou; verifique conexão e envios pendentes no CRM.");
     if (respostaRegistrada) await emTransacao((tx) => marcarEnvioWhatsApp(tx, mensagem.id, false)).catch(() => {});
+    throw new Error("atendimento WhatsApp falhou");
+  }
+}
+
+export async function POST(pedido: Request): Promise<Response> {
+  if (process.env.WHATSAPP_ATIVO !== "sim") return new Response(null, { status: 503 });
+  const segredo = process.env.WHATSAPP_META_APP_SECRET;
+  const phoneNumberId = process.env.WHATSAPP_META_PHONE_NUMBER_ID;
+  if (!segredo || !phoneNumberId) return new Response(null, { status: 503 });
+  if (Number(pedido.headers.get("content-length") ?? 0) > 64_000) return new Response(null, { status: 413 });
+
+  const bruto = await pedido.text();
+  if (bruto.length > 64_000) return new Response(null, { status: 413 });
+  if (!assinaturaMetaCorreta(pedido.headers.get("x-hub-signature-256") ?? "", bruto, segredo)) return new Response(null, { status: 401 });
+
+  let corpo: unknown;
+  try { corpo = JSON.parse(bruto); } catch { return new Response(null, { status: 400 }); }
+  const mensagens = lerMensagensMeta(corpo, phoneNumberId);
+  try {
+    for (const mensagem of mensagens) await atenderMensagem(mensagem, segredo);
+    return Response.json({ recebidas: mensagens.length });
+  } catch {
     return new Response(null, { status: 503 });
   }
 }

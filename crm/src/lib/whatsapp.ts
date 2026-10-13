@@ -2,17 +2,23 @@ import "server-only";
 
 import * as z from "zod";
 
-const esquema = z.object({
-  event: z.string(),
-  instance: z.string(),
-  data: z.object({
-    key: z.object({ id: z.string().min(1).max(200), remoteJid: z.string(), remoteJidAlt: z.string().optional(), fromMe: z.boolean() }),
-    messageTimestamp: z.union([z.number(), z.string()]),
-    message: z.object({
-      conversation: z.string().optional(),
-      extendedTextMessage: z.object({ text: z.string() }).optional(),
-    }).optional(),
-  }),
+const esquemaWebhookMeta = z.object({
+  object: z.literal("whatsapp_business_account"),
+  entry: z.array(z.object({
+    changes: z.array(z.object({
+      field: z.literal("messages"),
+      value: z.object({
+        metadata: z.object({ phone_number_id: z.string().min(1).max(100) }),
+        messages: z.array(z.object({
+          from: z.string().regex(/^\d{10,15}$/),
+          id: z.string().min(1).max(200),
+          timestamp: z.union([z.number(), z.string()]),
+          type: z.string(),
+          text: z.object({ body: z.string() }).optional(),
+        })).optional(),
+      }),
+    })),
+  })),
 });
 
 export interface MensagemRecebida { id: string; whatsapp: string; texto: string }
@@ -37,44 +43,33 @@ function recente(valor: number | string): boolean {
   return Math.abs(Date.now() - milissegundos) <= 10 * 60_000;
 }
 
-/** Aceita apenas texto de conversa individual, da instância autorizada. */
-export function lerMensagemEvolution(corpo: unknown, instancia: string): MensagemRecebida | null {
-  const lido = esquema.safeParse(corpo);
-  if (!lido.success) return null;
-  const { event, instance, data } = lido.data;
-  if (event.toLowerCase().replaceAll("_", ".") !== "messages.upsert" || instance !== instancia || data.key.fromMe || !recente(data.messageTimestamp)) return null;
-  const jid = [data.key.remoteJid, data.key.remoteJidAlt].find((valor) => valor && /^\d{10,15}@s\.whatsapp\.net$/.test(valor));
-  if (!jid) return null;
-  const texto = (data.message?.conversation ?? data.message?.extendedTextMessage?.text ?? "").trim();
-  if (!texto || texto.length > 1500) return null;
-  return { id: data.key.id, whatsapp: jid.split("@")[0], texto };
+/** Lê apenas textos recentes recebidos pelo número oficial configurado na Meta. */
+export function lerMensagensMeta(corpo: unknown, phoneNumberId: string): MensagemRecebida[] {
+  const lido = esquemaWebhookMeta.safeParse(corpo);
+  if (!lido.success) return [];
+
+  return lido.data.entry.flatMap((entrada) => entrada.changes).flatMap((mudanca) => {
+    if (mudanca.value.metadata.phone_number_id !== phoneNumberId) return [];
+    return (mudanca.value.messages ?? []).flatMap((mensagem) => {
+      const texto = mensagem.type === "text" ? mensagem.text?.body.trim() : "";
+      if (!texto || texto.length > 1500 || !recente(mensagem.timestamp)) return [];
+      return [{ id: mensagem.id, whatsapp: mensagem.from, texto }];
+    });
+  });
 }
 
-/** Mensagem escrita no aparelho da Shift: pode indicar que uma pessoa assumiu. */
-export function lerMensagemDaShiftEvolution(corpo: unknown, instancia: string): MensagemRecebida | null {
-  const lido = esquema.safeParse(corpo);
-  if (!lido.success) return null;
-  const { event, instance, data } = lido.data;
-  if (event.toLowerCase().replaceAll("_", ".") !== "messages.upsert" || instance !== instancia || !data.key.fromMe || !recente(data.messageTimestamp)) return null;
-  const jid = [data.key.remoteJid, data.key.remoteJidAlt].find((valor) => valor && /^\d{10,15}@s\.whatsapp\.net$/.test(valor));
-  if (!jid) return null;
-  const texto = (data.message?.conversation ?? data.message?.extendedTextMessage?.text ?? "").trim();
-  if (!data.message || texto.length > 4000) return null;
-  return { id: data.key.id, whatsapp: jid.split("@")[0], texto };
-}
+export async function enviarTextoMeta(whatsapp: string, texto: string): Promise<void> {
+  const token = process.env.WHATSAPP_META_ACCESS_TOKEN;
+  const phoneNumberId = process.env.WHATSAPP_META_PHONE_NUMBER_ID;
+  const versao = process.env.WHATSAPP_META_GRAPH_VERSION;
+  if (!token || !phoneNumberId || !versao) throw new Error("Cloud API do WhatsApp não configurada.");
+  if (!/^v\d+\.\d+$/.test(versao)) throw new Error("WHATSAPP_META_GRAPH_VERSION inválida.");
 
-export async function enviarTextoEvolution(whatsapp: string, texto: string): Promise<void> {
-  const endereco = process.env.EVOLUTION_URL;
-  const chave = process.env.EVOLUTION_API_KEY;
-  const instancia = process.env.EVOLUTION_INSTANCIA;
-  if (!endereco || !chave || !instancia) throw new Error("Evolution API não configurada.");
-  const base = new URL(endereco);
-  if (!['http:', 'https:'].includes(base.protocol)) throw new Error("EVOLUTION_URL inválida.");
-  const url = new URL(`message/sendText/${encodeURIComponent(instancia)}`, `${base.href.replace(/\/$/, "")}/`);
-  const resposta = await fetch(url, {
-    method: "POST", headers: { apikey: chave, "Content-Type": "application/json" },
-    body: JSON.stringify({ number: whatsapp, text: texto, delay: Math.min(texto.length * 40, 3000) }),
+  const resposta = await fetch(`https://graph.facebook.com/${versao}/${encodeURIComponent(phoneNumberId)}/messages`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ messaging_product: "whatsapp", to: whatsapp, type: "text", text: { body: texto, preview_url: false } }),
     signal: AbortSignal.timeout(12_000),
   });
-  if (!resposta.ok) throw new Error(`Evolution API indisponível (${resposta.status}).`);
+  if (!resposta.ok) throw new Error(`Cloud API do WhatsApp indisponível (${resposta.status}).`);
 }
