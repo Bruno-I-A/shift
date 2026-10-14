@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GET, POST } from "@/app/api/whatsapp/webhook/route";
 import { emTransacao } from "@/lib/banco";
-import { buscarAtendimentoWhatsApp } from "@/lib/leads";
+import { buscarAtendimentoWhatsApp, listarMensagensWhatsApp, mudarModoAtendimentoWhatsApp } from "@/lib/leads";
 import { bancoDeTeste } from "./banco-de-teste";
 
 vi.mock("@/lib/banco", () => ({ emTransacao: vi.fn() }));
@@ -56,7 +56,7 @@ describe("proteção do webhook oficial do WhatsApp", () => {
       const corpo = JSON.parse(String(opcoes.body));
       if (url.startsWith("https://graph.facebook.com/")) {
         enviados.push(corpo.text.body);
-        return Response.json({});
+        return Response.json({ messages: [{ id: `wamid.ENVIADA${enviados.length}` }] });
       }
       pedidosIa.push(corpo.messages[0].content);
       return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
@@ -86,5 +86,12 @@ describe("proteção do webhook oficial do WhatsApp", () => {
     expect(pedidosIa[1]).toContain("Prazer, Bruno.");
     expect(pedidosIa[1]).toContain("Qual é o nome da sua empresa?");
     expect(await buscarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({ nome: "Bruno", modo: "agente" });
+    const atendimento = (await buscarAtendimentoWhatsApp(tx, '5554999991234'))!;
+    await mudarModoAtendimentoWhatsApp(tx, atendimento.leadId, 'humano');
+    vi.stubEnv('WHATSAPP_ATIVO', 'não');
+    await receber('HUMANO1', 'Posso falar com uma pessoa?');
+    await receber('HUMANO1', 'Posso falar com uma pessoa?');
+    expect(pedidosIa).toHaveLength(2);
+    expect((await listarMensagensWhatsApp(tx, atendimento.leadId)).filter(m => m.id === 'e:HUMANO1')).toHaveLength(1);
   });
 });

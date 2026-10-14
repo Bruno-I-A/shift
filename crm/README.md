@@ -48,9 +48,10 @@ lead em aberto atualiza o lead em vez de criar outro.
 O CRM usa a **Cloud API oficial da Meta** em `POST /api/whatsapp/webhook`. A
 Meta valida o endereço por `GET` com o token de verificação e assina cada
 evento por `X-Hub-Signature-256` com o App Secret. A rota confere a assinatura,
-aceita apenas mensagens de texto recentes destinadas ao ID do número público e
-ignora outros eventos. O serviço inicia **desligado**: `WHATSAPP_ATIVO=sim` é
-necessário para atender.
+aceita mensagens recentes destinadas ao ID do número público e os eventos de
+entrega/leitura. Anexos aparecem como indicação do tipo, sem download do arquivo.
+O serviço inicia **desligado**: `WHATSAPP_ATIVO=sim` é necessário para a IA atender;
+o recebimento de conversas autorizadas e o envio manual continuam funcionando.
 
 O primeiro contato recebe um aviso de privacidade. Só depois de responder
 `SIM`, `ACEITO` ou `AUTORIZO` o CRM cria ou associa um lead. A cada pergunta,
@@ -62,13 +63,40 @@ lead à etapa **Qualificado**. Sem base para responder ou em falha da IA, o
 atendimento passa para uma pessoa. O botão **Assumir atendimento** no lead
 pausa o agente; **Reativar agente** devolve o atendimento automático.
 
-O CRM guarda o resumo e os dados de qualificação, sem transcrição das mensagens
-recebidas. Cada chamada ao Claude recebe nome, empresa, segmento, necessidade,
-prazo, resumo acumulado e a última resposta entregue pelo agente. Isso permite
+O CRM guarda o resumo, os dados de qualificação e o histórico de mensagens
+das conversas autorizadas por até 90 dias. Cada chamada ao Claude recebe nome,
+empresa, segmento, necessidade, prazo, resumo acumulado e a última resposta
+enviada pela Shift (agente ou humano), sem enviar a transcrição inteira. Isso permite
 entender respostas curtas e continuar a conversa usando o que o contato já contou,
 mesmo após reiniciar o CRM. Novos fatos e correções explícitas atualizam o lead;
 campos vazios preservam o cadastro. Documentos, e-mail e telefone são mascarados
 antes da chamada ao modelo.
+
+### Caixa de entrada
+
+Abra **WhatsApp** no menu do CRM (`/whatsapp`). A tela atualiza a cada quatro
+segundos enquanto estiver visível; busca por nome, empresa ou número, filtra
+atendimentos humanos e carrega as mensagens anteriores sob demanda.
+
+- **Assumir conversa** pausa a IA. **Enviar** também assume automaticamente.
+- **Devolver ao agente** faz a IA responder à próxima mensagem do cliente.
+- Respostas livres só são enviadas dentro das 24 horas da última mensagem
+  recebida, com a mesma validação no servidor. Templates fora da janela não
+  estão incluídos nesta versão.
+- O histórico diferencia cliente, agente e humano, e acompanha confirmação,
+  entrega, leitura e falha. Envios sem confirmação não são repetidos automaticamente.
+- Novas recebidas aparecem mesmo em modo humano ou com a IA desligada.
+  Mensagens anteriores ao deploy não podem ser recuperadas; as respostas antigas
+  do agente são aproveitadas pela migração.
+- Anexos são identificados pelo tipo e pela legenda, sem guardar ou abrir o
+  arquivo. A IA encaminha esse atendimento para humano.
+- A retenção de 90 dias é aplicada pelo banco ao receber mensagens e ao abrir
+  a caixa. Corpos não podem ser alterados nem apagados pelo papel da aplicação;
+  somente os estados de envio podem mudar. A limpeza tem permissão limitada aos
+  registros expirados.
+
+A migração `005-caixa-whatsapp.sql` roda automaticamente no deploy, com as
+variáveis existentes. Não há nova chave ou variável para o painel.
 
 O agente usa o primeiro nome quando adequado, responde com frases curtas e faz
 no máximo uma pergunta por vez. Não repete a apresentação nem pede informações

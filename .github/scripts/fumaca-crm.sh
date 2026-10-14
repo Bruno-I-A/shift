@@ -49,7 +49,8 @@ status() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 saude=$(curl -s http://localhost:3000/api/saude)
 echo "saúde: $saude"
 confere "saúde ok" true "$(echo "$saude" | jq -r .ok)"
-confere "migração do WhatsApp aplicada" true "$(echo "$saude" | jq '(.banco.migracoes | length) >= 4 and (.banco.migracoes | index("004-atendimento-whatsapp.sql") != null)')"
+confere "migração da caixa WhatsApp aplicada" true "$(echo "$saude" | jq '(.banco.migracoes | length) >= 5 and (.banco.migracoes | index("005-caixa-whatsapp.sql") != null)')"
+confere "conversas sem sessão" 401 "$(status http://localhost:3000/api/whatsapp/conversas)"
 confere "painel sem sessão vai para o login" 307 "$(status http://localhost:3000/)"
 confere "MCP sem chave" 401 "$(status -X POST -H 'content-type: application/json' -d '{}' http://localhost:3000/api/mcp)"
 

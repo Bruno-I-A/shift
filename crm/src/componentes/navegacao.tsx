@@ -7,6 +7,7 @@ const ITENS = [
   { href: "/", rotulo: "Hoje" },
   { href: "/projetos", rotulo: "Projetos" },
   { href: "/leads", rotulo: "Leads" },
+  { href: "/whatsapp", rotulo: "WhatsApp" },
   { href: "/agentes", rotulo: "Agentes" },
 ];
 
@@ -25,13 +26,13 @@ export function Navegacao({ pendentes, leadsNovos }: { pendentes: number; leadsN
   const ativo = (href: string) => (href === "/" ? caminho === "/" : caminho.startsWith(href));
 
   return (
-    <nav aria-label="Principal" className="flex items-center gap-0.5 sm:gap-1">
+    <nav aria-label="Principal" className="flex min-w-0 items-center gap-0.5 overflow-x-auto sm:gap-1">
       {ITENS.map((item) => (
         <Link
           key={item.href}
           href={item.href}
           aria-current={ativo(item.href) ? "page" : undefined}
-          className={`relative rounded-md px-2 py-1.5 text-sm transition-colors sm:px-3 ${
+          className={`relative shrink-0 rounded-md px-1.5 py-1.5 text-xs transition-colors sm:px-3 sm:text-sm ${
             ativo(item.href) ? "bg-superficie-2 text-texto" : "text-suave hover:text-texto"
           }`}
         >
