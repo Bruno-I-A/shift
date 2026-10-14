@@ -1,12 +1,12 @@
-/**
- * A logo da Shift está sendo redesenhada (set/2026) e o Bruno pediu para não
- * aplicar nada até escolher a versão final. Até lá, o nome em texto.
- */
+import Image from 'next/image';
+import logo from '../../public/brand/shift-logo-linho.png';
+
+/** A mesma assinatura aprovada e aplicada no site institucional. */
 export function Marca() {
   return (
-    <span className="inline-flex items-baseline gap-1.5 select-none">
-      <span className="text-lg font-semibold tracking-tight text-texto">Shift</span>
-      <span className="font-mono text-xs uppercase tracking-[0.18em] text-destaque">crm</span>
+    <span className="inline-flex items-center gap-2 select-none">
+      <Image src={logo} alt="Shift" className="h-auto w-28" sizes="112px" preload />
+      <span className="border-l border-linha-forte pl-2 font-mono text-[10px] uppercase tracking-[0.16em] text-suave">crm</span>
     </span>
   );
 }
