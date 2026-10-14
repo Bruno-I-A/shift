@@ -134,7 +134,7 @@ describe("qualificação pelo WhatsApp", () => {
       expect(texto).not.toContain(memoria.whatsapp);
       return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
         ...analise, nome: "", empresa: "", segmento: "", dor: "", prazo: "",
-        resposta: "Entendi. Como vocês organizam essa conferência na planilha?",
+        resposta: "Entendi. Vamos olhar como essa conferência acontece hoje.",
         resumo: "Quer automatizar a conferência de pedidos; hoje usa Excel.",
       } }] });
     });
@@ -172,6 +172,30 @@ describe("qualificação pelo WhatsApp", () => {
     });
     expect(await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({
       leadId: id, nome: "Ana Maria", empresa: "Indústria Ana", segmento: "Indústria", prazo: "Este mês",
+    });
+  });
+
+  it("guarda a descoberta do site nos detalhes, preserva o quiz e qualifica pelo objetivo", async () => {
+    const { id } = await leads.receberLead(tx, {
+      nome: "Bruno", empresa: "Clínica B", whatsapp: "5554999991234", respostas: { segmento: "Odontologia", controle: "Planilhas" },
+      nivel: null, oferta: null, processo: null, origem: "site",
+    });
+    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    await leads.registrarRespostaWhatsApp(tx, atendimento, "SITE1", {
+      ...analise, nome: "", empresa: "", segmento: "", dor: "", prazo: "Ainda não definido", resumo: "Quer o primeiro site para atrair pacientes.",
+      qualificacao: { interesse: "site", objetivo: "Atrair pacientes", cidade: "Passo Fundo", siteAtual: "Primeiro site", materiais: "Tem logo", investimento: "Prefere não informar", preferenciaContato: "À tarde; ana@example.com" },
+    });
+    expect(await leads.buscarAtendimentoWhatsApp(tx, atendimento.whatsapp)).toMatchObject({
+      qualificacao: { interesse: "site", objetivo: "Atrair pacientes", controle: "Planilhas", materiais: "Tem logo", preferenciaContato: "À tarde; [e-mail]" },
+    });
+    const [lead] = await leads.listarLeads(tx);
+    expect(lead).toMatchObject({ id, etapa: "qualificado", dor: null });
+    await leads.registrarRespostaWhatsApp(tx, atendimento, "SITE2", {
+      ...analise, nome: "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "",
+      qualificacao: { materiais: "Ainda não tem logo", investimento: "" },
+    });
+    expect((await leads.listarLeads(tx))[0].respostas).toMatchObject({
+      materiais: "Ainda não tem logo", investimento: "Prefere não informar", controle: "Planilhas", prazo: "Ainda não definido",
     });
   });
 

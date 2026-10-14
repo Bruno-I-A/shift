@@ -74,6 +74,20 @@ O agente usa o primeiro nome quando adequado, responde com frases curtas e faz
 no máximo uma pergunta por vez. Não repete a apresentação nem pede informações
 já conhecidas. O resumo guarda apenas o contexto útil ao atendimento comercial.
 
+O esclarecimento tem até 280 caracteres; uma única pergunta é acrescentada pelo
+CRM conforme os dados que faltam. Uma resposta extensa do modelo é reescrita antes
+do envio, sem descartar a qualificação já extraída. Para sites, a descoberta cobre
+objetivo, cidade, site atual e materiais; para IA e sistemas, processo, ferramentas
+e equipe. Prazo, participação na decisão, faixa de investimento (opcional) e
+preferência de contato complementam o contexto. Todos ficam em **Detalhes do lead**.
+Respostas como "ainda não sei" ou "prefiro não informar" são registradas para
+evitar insistência. Um lead de site também pode ser qualificado pelo objetivo.
+
+Ao terminar a descoberta, o agente pergunta se pode encaminhar o resumo à equipe.
+O pedido direto de atendimento humano continua disponível a qualquer momento.
+Um agradecimento não confirma o encaminhamento, e o agente não promete agendamento
+ou prazo de retorno de um especialista.
+
 O ID da mensagem impede que um webhook repetido avance o funil. Um
 envio sem confirmação aparece no lead para conferência manual; não é repetido
 automaticamente, pois uma falha de rede pode acontecer depois da entrega ao

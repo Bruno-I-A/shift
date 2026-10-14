@@ -242,6 +242,7 @@ export async function buscarAtendimentoWhatsApp(tx: Consulta, whatsapp: string):
             l.etapa::text as etapa,
             case when l.nome = 'Contato WhatsApp' then '' else l.nome end as nome,
             l.empresa, l.segmento, l.dor, l.respostas->>'prazo' as prazo,
+            l.respostas as qualificacao,
             coalesce((select mw.resposta from crm.mensagem_whatsapp mw
               where mw.lead_id = l.id and mw.estado = 'enviado'
               order by mw.enviado_em desc, mw.id desc limit 1), '') as "ultimaResposta"
@@ -296,18 +297,22 @@ export async function registrarRespostaWhatsApp(
   const segmento = analise.segmento.trim() || null;
   const dor = analise.dor.trim() || null;
   const prazo = analise.prazo.trim() || null;
+  const qualificacao = Object.fromEntries(Object.entries(analise.qualificacao ?? {})
+    .filter(([, valor]) => valor.trim()).map(([campo, valor]) => [campo, mascararDados(valor.trim())]));
   await tx.query(
     `update crm.lead set
        nome = coalesce($2, nome),
        empresa = coalesce($3, empresa), segmento = coalesce($4, segmento), dor = coalesce($5, dor),
-       respostas = case when $6::text is null then respostas else jsonb_set(respostas, '{prazo}', to_jsonb($6::text)) end,
+       respostas = (case when $6::text is null then respostas else jsonb_set(respostas, '{prazo}', to_jsonb($6::text)) end) || $7::jsonb,
        atualizado_em = now()
-     where id = $1`, [atendimento.leadId, nome, empresa, segmento, dor, prazo],
+     where id = $1`, [atendimento.leadId, nome, empresa, segmento, dor, prazo, JSON.stringify(qualificacao)],
   );
   await tx.query(
     `update crm.lead set etapa = 'qualificado', etapa_desde = now()
       where id = $1 and etapa = 'novo' and nome <> 'Contato WhatsApp'
-        and dor is not null and (empresa is not null or segmento is not null)`,
+        and (dor is not null or (nullif(respostas->>'objetivo', '') is not null
+          and respostas->>'objetivo' not in ('Ainda não definido', 'Prefere não informar', 'Não informado')))
+        and (empresa is not null or segmento is not null)`,
     [atendimento.leadId],
   );
   await tx.query(

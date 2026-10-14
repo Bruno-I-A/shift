@@ -60,7 +60,7 @@ describe("proteção do webhook oficial do WhatsApp", () => {
       }
       pedidosIa.push(corpo.messages[0].content);
       return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
-        resposta: pedidosIa.length === 1 ? "Prazer, Bruno. Quer saber como começamos?" : "Começamos entendendo o processo que você quer melhorar.",
+        resposta: pedidosIa.length === 1 ? "Prazer, Bruno." : "Começamos entendendo o processo que você quer melhorar.",
         nome: pedidosIa.length === 1 ? "Bruno" : "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "", passarParaHumano: false,
       } }] });
     });
@@ -83,7 +83,8 @@ describe("proteção do webhook oficial do WhatsApp", () => {
     await receber("SIM2", "SIM");
     expect(pedidosIa).toHaveLength(2);
     expect(pedidosIa[1]).toContain('"nome":"Bruno"');
-    expect(pedidosIa[1]).toContain("Prazer, Bruno. Quer saber como começamos?");
+    expect(pedidosIa[1]).toContain("Prazer, Bruno.");
+    expect(pedidosIa[1]).toContain("Qual é o nome da sua empresa?");
     expect(await buscarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({ nome: "Bruno", modo: "agente" });
   });
 });
