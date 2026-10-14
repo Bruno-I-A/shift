@@ -57,5 +57,7 @@ export async function analisarAtendimento(pergunta: string, contexto: string): P
   if (!resposta.ok) throw new Error(`IA indisponível (${resposta.status}).`);
   const corpo = await resposta.json() as { content?: { type?: string; name?: string; input?: unknown }[] };
   const retorno = corpo.content?.find((parte) => parte.type === "tool_use" && parte.name === "registrar_atendimento");
-  return esquema.parse(retorno?.input);
+  const analise = esquema.safeParse(retorno?.input);
+  if (!analise.success) throw new Error("Resposta da IA fora do formato esperado.");
+  return analise.data;
 }

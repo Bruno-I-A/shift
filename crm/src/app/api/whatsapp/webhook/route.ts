@@ -24,6 +24,13 @@ function assinaturaMetaCorreta(recebida: string, corpo: string, segredo: string)
   return segredoCorreto(recebida, esperada);
 }
 
+function motivoSeguroDaIa(erro: unknown): string {
+  if (!(erro instanceof Error)) return "falha de rede ou timeout.";
+  if (/^IA indisponível \(\d{3}\)\.$/.test(erro.message)) return erro.message;
+  if (["Configuração de IA ausente.", "Resposta da IA fora do formato esperado."].includes(erro.message)) return erro.message;
+  return "falha de rede ou timeout.";
+}
+
 export async function GET(pedido: Request): Promise<Response> {
   const url = new URL(pedido.url);
   const modo = url.searchParams.get("hub.mode");
@@ -63,11 +70,14 @@ async function atenderMensagem(mensagem: MensagemRecebida, segredo: string): Pro
     if (atendimento.modo === "humano") return;
     if (/^(sim|aceito|autorizo)([.! ]*)$/i.test(mensagem.texto) && !atendimento.resumo) return;
 
-    const analise = await analisarAtendimento(mensagem.texto, atendimento.resumo).catch(() => ({
-      resposta: "O atendimento automático está indisponível no momento. Vou deixar seu contato para uma pessoa da Shift continuar por aqui.",
-      nome: "", empresa: "", segmento: "", dor: "", prazo: "",
-      resumo: atendimento.resumo, passarParaHumano: true,
-    }));
+    const analise = await analisarAtendimento(mensagem.texto, atendimento.resumo).catch((erro) => {
+      console.error(`[whatsapp] IA indisponível: ${motivoSeguroDaIa(erro)}`);
+      return {
+        resposta: "O atendimento automático está indisponível no momento. Vou deixar seu contato para uma pessoa da Shift continuar por aqui.",
+        nome: "", empresa: "", segmento: "", dor: "", prazo: "",
+        resumo: atendimento.resumo, passarParaHumano: true,
+      };
+    });
     const novo = await emTransacao((tx) => registrarRespostaWhatsApp(tx, atendimento!, mensagem.id, analise));
     if (!novo) return;
     respostaRegistrada = true;
