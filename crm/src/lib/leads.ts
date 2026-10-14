@@ -209,6 +209,7 @@ export async function mudarEtapaDoLead(tx: Consulta, id: string, para: EtapaLead
 }
 
 export interface AtendimentoWhatsApp extends ContextoAtendimento {
+  revisao: number;
   leadId: string;
   whatsapp: string;
   modo: "agente" | "humano";
@@ -238,14 +239,14 @@ export async function apagarAvisoWhatsApp(tx: Consulta, chave: string): Promise<
 
 export async function buscarAtendimentoWhatsApp(tx: Consulta, whatsapp: string): Promise<AtendimentoWhatsApp | null> {
   const { rows } = await tx.query<AtendimentoWhatsApp>(
-    `select aw.lead_id as "leadId", aw.whatsapp, aw.modo, aw.resumo,
+    `select aw.lead_id as "leadId", aw.whatsapp, aw.modo, aw.resumo, aw.revisao,
             l.etapa::text as etapa,
             case when l.nome = 'Contato WhatsApp' then '' else l.nome end as nome,
             l.empresa, l.segmento, l.dor, l.respostas->>'prazo' as prazo,
             l.respostas as qualificacao,
-            coalesce((select mw.resposta from crm.mensagem_whatsapp mw
-              where mw.lead_id = l.id and mw.estado = 'enviado'
-              order by mw.enviado_em desc, mw.id desc limit 1), '') as "ultimaResposta"
+            coalesce((select mw.texto from crm.conversa_whatsapp mw
+              where mw.lead_id = l.id and mw.estado = 'enviado' and mw.autor <> 'cliente'
+              order by mw.criado_em desc, mw.id desc limit 1), '') as "ultimaResposta"
        from crm.atendimento_whatsapp aw join crm.lead l on l.id = aw.lead_id
       where aw.whatsapp = $1`, [whatsapp],
   );
@@ -291,6 +292,9 @@ export async function registrarRespostaWhatsApp(
     [idMensagem, atendimento.leadId, analise.resposta],
   );
   if (!rows[0]) return false;
+  await tx.query(`insert into crm.conversa_whatsapp (id, lead_id, autor, texto)
+    values ($1, $2, 'agente', $3) on conflict (id) do nothing`,
+    [`s:${idMensagem}`, atendimento.leadId, analise.resposta]);
 
   const nome = analise.nome.trim() || null;
   const empresa = analise.empresa.trim() || null;
@@ -326,6 +330,8 @@ export async function registrarRespostaWhatsApp(
 }
 
 export async function marcarEnvioWhatsApp(tx: Consulta, idMensagem: string, enviado: boolean): Promise<void> {
+  await tx.query(`update crm.conversa_whatsapp set estado = $2 where id = $1`,
+    [`s:${idMensagem}`, enviado ? 'enviado' : 'erro']);
   await tx.query(
     `update crm.mensagem_whatsapp set estado = $2, enviado_em = case when $2 = 'enviado' then now() else null end
       where id = $1`, [idMensagem, enviado ? "enviado" : "erro"],
@@ -335,7 +341,7 @@ export async function marcarEnvioWhatsApp(tx: Consulta, idMensagem: string, envi
 export async function mudarModoAtendimentoWhatsApp(tx: Consulta, leadId: string, modo: "agente" | "humano"): Promise<void> {
   if (!/^[0-9a-f-]{36}$/i.test(leadId)) throw new ErroDeDominio("Lead inválido.");
   const { rows } = await tx.query<{ leadId: string }>(
-    `update crm.atendimento_whatsapp set modo = $2, atualizado_em = now()
+    `update crm.atendimento_whatsapp set modo = $2, revisao = revisao + 1, atualizado_em = now()
       where lead_id = $1 and modo <> $2 returning lead_id as "leadId"`, [leadId, modo],
   );
   if (rows[0]) await registrarEventoDoLead(tx, leadId, "bruno", "whatsapp_modo_mudou", { modo });
@@ -354,4 +360,101 @@ export async function pausarSeRespostaHumana(tx: Consulta, whatsapp: string, tex
   await tx.query("update crm.atendimento_whatsapp set modo = 'humano', atualizado_em = now() where lead_id = $1", [atendimento.leadId]);
   await registrarEventoDoLead(tx, atendimento.leadId, "sistema", "whatsapp_resposta_manual");
   return true;
+}
+
+export interface ConversaWhatsApp {
+  leadId: string; nome: string; empresa: string | null; whatsapp: string;
+  modo: 'agente' | 'humano'; resumo: string; ultimaMensagem: string | null;
+  ultimaEm: Date | null; ultimaRecebidaEm: Date | null;
+}
+
+export interface MensagemConversa {
+  id: string; autor: 'cliente' | 'agente' | 'humano'; texto: string; tipo: string;
+  criadoEm: Date; estado: string;
+}
+
+/** Recebidas continuam disponíveis quando a IA está pausada; repetição não duplica. */
+export async function registrarMensagemRecebidaWhatsApp(
+  tx: Consulta, leadId: string, mensagem: { id: string; texto: string; tipo?: string; recebidoEm?: Date },
+): Promise<void> {
+  await tx.query('select crm.limpar_historico_whatsapp()');
+  await tx.query(`insert into crm.conversa_whatsapp (id, lead_id, autor, texto, tipo, criado_em, estado)
+    values ($1, $2, 'cliente', $3, $4, $5, 'recebido') on conflict (id) do nothing`,
+    [`e:${mensagem.id}`, leadId, mensagem.texto, mensagem.tipo ?? 'text', mensagem.recebidoEm ?? new Date()]);
+}
+
+export async function listarConversasWhatsApp(tx: Consulta): Promise<ConversaWhatsApp[]> {
+  await tx.query('select crm.limpar_historico_whatsapp()');
+  const { rows } = await tx.query<ConversaWhatsApp>(`select aw.lead_id as "leadId", l.nome, l.empresa,
+    aw.whatsapp, aw.modo, aw.resumo, ultima.texto as "ultimaMensagem", ultima.criado_em as "ultimaEm",
+    (select max(criado_em) from crm.conversa_whatsapp where lead_id = aw.lead_id and autor = 'cliente') as "ultimaRecebidaEm"
+    from crm.atendimento_whatsapp aw join crm.lead l on l.id = aw.lead_id
+    left join lateral (select texto, criado_em from crm.conversa_whatsapp where lead_id = aw.lead_id
+      order by criado_em desc, id desc limit 1) ultima on true
+    order by coalesce(ultima.criado_em, aw.atualizado_em) desc limit 200`);
+  return rows;
+}
+
+export async function listarMensagensWhatsApp(tx: Consulta, leadId: string, antesId?: string): Promise<MensagemConversa[]> {
+  if (!z.uuid().safeParse(leadId).success) throw new ErroDeDominio('Conversa inválida.');
+  const { rows } = await tx.query<MensagemConversa>(`select m.id, m.autor, m.texto, m.tipo, m.criado_em as "criadoEm",
+    coalesce(s.estado, m.estado) as estado from crm.conversa_whatsapp m
+    left join lateral (select case estado when 'read' then 'lido' when 'delivered' then 'entregue'
+      when 'failed' then 'erro' else 'enviado' end as estado from crm.status_whatsapp
+      where meta_id = m.meta_id order by
+      case estado when 'read' then 4 when 'delivered' then 3 when 'failed' then 2 else 1 end desc limit 1) s on true
+    where m.lead_id = $1 and ($2::text is null or (m.criado_em, m.id) <
+      (select criado_em, id from crm.conversa_whatsapp where id = $2 and lead_id = $1))
+    order by m.criado_em desc, m.id desc limit 100`, [leadId, antesId ?? null]);
+  return rows.reverse();
+}
+
+export function janelaWhatsAppAberta(ultimaRecebidaEm: Date | null, agora = Date.now()): boolean {
+  if (!ultimaRecebidaEm) return false;
+  const idade = agora - new Date(ultimaRecebidaEm).getTime();
+  return idade >= -60_000 && idade < 86_400_000;
+}
+
+/** Prepara uma única tentativa e pausa a IA antes de chamar a Meta. */
+export async function prepararRespostaHumanaWhatsApp(tx: Consulta, leadId: string, pedidoId: string, texto: string): Promise<string | null> {
+  const dados = z.object({ leadId: z.uuid(), pedidoId: z.uuid(), texto: z.string().trim().min(1).max(4000) }).parse({ leadId, pedidoId, texto });
+  const { rows } = await tx.query<{ whatsapp: string; ultima: Date | null }>(`select aw.whatsapp,
+    (select max(criado_em) from crm.conversa_whatsapp where lead_id = aw.lead_id and autor = 'cliente') as ultima
+    from crm.atendimento_whatsapp aw where aw.lead_id = $1 for update`, [dados.leadId]);
+  if (!rows[0]) throw new ErroDeDominio('Conversa não encontrada.');
+  if (!janelaWhatsAppAberta(rows[0].ultima)) throw new ErroDeDominio('A janela de 24 horas encerrou. Aguarde uma nova mensagem do cliente para responder.');
+  const inserida = await tx.query(`insert into crm.conversa_whatsapp (id, lead_id, autor, texto)
+    values ($1, $2, 'humano', $3) on conflict (id) do nothing returning id`, [`h:${dados.pedidoId}`, dados.leadId, dados.texto]);
+  if (!inserida.rows[0]) return null;
+  await mudarModoAtendimentoWhatsApp(tx, dados.leadId, 'humano');
+  return rows[0].whatsapp;
+}
+
+export async function confirmarMensagemWhatsApp(tx: Consulta, id: string, metaId: string | null): Promise<void> {
+  await tx.query('update crm.conversa_whatsapp set meta_id = $2, estado = $3 where id = $1',
+    [id, metaId, metaId ? 'enviado' : 'erro']);
+}
+
+export async function registrarStatusWhatsApp(tx: Consulta, status: { id: string; estado: string; ocorridoEm: Date }): Promise<void> {
+  await tx.query(`insert into crm.status_whatsapp (meta_id, estado, ocorrido_em) values ($1, $2, $3)
+    on conflict (meta_id, estado) do nothing`, [status.id, status.estado, status.ocorridoEm]);
+}
+
+/** Trava por conversa durante o envio: assumir no painel impede respostas de IA em andamento. */
+export async function responderComAgenteWhatsApp(
+  tx: Consulta, atendimento: AtendimentoWhatsApp, id: string, analise: AnaliseAtendimento,
+  enviar: (whatsapp: string, texto: string) => Promise<string>,
+): Promise<void> {
+  const { rows } = await tx.query<{ modo: string; revisao: number }>(
+    'select modo, revisao from crm.atendimento_whatsapp where lead_id = $1 for update', [atendimento.leadId]);
+  if (!rows[0] || rows[0].modo !== 'agente' || rows[0].revisao !== atendimento.revisao) return;
+  if (!await registrarRespostaWhatsApp(tx, atendimento, id, analise)) return;
+  try {
+    const metaId = await enviar(atendimento.whatsapp, analise.resposta);
+    await confirmarMensagemWhatsApp(tx, `s:${id}`, metaId);
+    await marcarEnvioWhatsApp(tx, id, true);
+  } catch {
+    await marcarEnvioWhatsApp(tx, id, false);
+    console.error('[whatsapp] envio do agente falhou; confira a conversa no CRM.');
+  }
 }

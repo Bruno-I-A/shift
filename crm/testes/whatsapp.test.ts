@@ -62,7 +62,7 @@ describe("ponte oficial da Meta e base de conhecimento", () => {
     const chamadas: { url: string | URL; opcoes: RequestInit }[] = [];
     vi.stubGlobal("fetch", async (url: string | URL, opcoes: RequestInit) => {
       chamadas.push({ url, opcoes });
-      return new Response("{}", { status: 200 });
+      return Response.json({ messages: [{ id: 'wamid.ENVIADA' }] });
     });
     await enviarTextoMeta("5554999991234", "Olá, Shift!");
     expect(String(chamadas[0].url)).toBe("https://graph.facebook.com/v24.0/123456/messages");

@@ -19,7 +19,7 @@ export default async function LayoutPainel({ children }: LayoutProps<"/">) {
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-10 border-b border-linha bg-fundo/95 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:gap-6 sm:px-6">
-          {/* No celular a marca sai: com quatro itens o menu não caberia em 375 px, e "Hoje" já é o início. */}
+          {/* No celular a marca sai para dar espaço ao menu de atendimento. */}
           <Link href="/" aria-label="Shift CRM, início" className="hidden sm:block">
             <Marca />
           </Link>
