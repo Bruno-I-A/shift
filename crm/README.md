@@ -63,7 +63,18 @@ atendimento passa para uma pessoa. O botão **Assumir atendimento** no lead
 pausa o agente; **Reativar agente** devolve o atendimento automático.
 
 O CRM guarda o resumo e os dados de qualificação, sem transcrição das mensagens
-recebidas. O ID da mensagem impede que um webhook repetido avance o funil. Um
+recebidas. Cada chamada ao Claude recebe nome, empresa, segmento, necessidade,
+prazo, resumo acumulado e a última resposta entregue pelo agente. Isso permite
+entender respostas curtas e continuar a conversa usando o que o contato já contou,
+mesmo após reiniciar o CRM. Novos fatos e correções explícitas atualizam o lead;
+campos vazios preservam o cadastro. Documentos, e-mail e telefone são mascarados
+antes da chamada ao modelo.
+
+O agente usa o primeiro nome quando adequado, responde com frases curtas e faz
+no máximo uma pergunta por vez. Não repete a apresentação nem pede informações
+já conhecidas. O resumo guarda apenas o contexto útil ao atendimento comercial.
+
+O ID da mensagem impede que um webhook repetido avance o funil. Um
 envio sem confirmação aparece no lead para conferência manual; não é repetido
 automaticamente, pois uma falha de rede pode acontecer depois da entrega ao
 WhatsApp.
