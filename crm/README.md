@@ -88,6 +88,12 @@ O pedido direto de atendimento humano continua disponível a qualquer momento.
 Um agradecimento não confirma o encaminhamento, e o agente não promete agendamento
 ou prazo de retorno de um especialista.
 
+As ferramentas do Claude usam `strict: true`. O app normaliza metadados opcionais
+nulos ou ausentes e limita os campos ao tamanho aceito no CRM. Uma resposta
+truncada ou sem o esclarecimento obrigatório tem uma tentativa extra antes do
+retorno de contingência. Se isso falhar, o log informa apenas o motivo de parada
+e nomes de campos do contrato, sem valores ou conteúdo da conversa.
+
 O ID da mensagem impede que um webhook repetido avance o funil. Um
 envio sem confirmação aparece no lead para conferência manual; não é repetido
 automaticamente, pois uma falha de rede pode acontecer depois da entrega ao
