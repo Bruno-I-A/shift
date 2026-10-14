@@ -44,4 +44,12 @@ describe("resposta com RAG", () => {
     expect(resultado.passarParaHumano).toBe(true);
     expect(envio).not.toHaveBeenCalled();
   });
+
+  it("informa o status da Anthropic sem incluir conteúdo da conversa", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("credencial recusada", { status: 401 })));
+
+    await expect(analisarAtendimento("Vocês atendem indústrias? Meu e-mail é ana@example.com", "")).rejects.toThrow("IA indisponível (401).");
+  });
 });
