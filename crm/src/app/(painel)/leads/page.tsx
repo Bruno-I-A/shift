@@ -21,6 +21,15 @@ const ROTULOS: Record<string, string> = {
   ia: "Uso de IA",
   equipe: "Equipe",
   prazo: "Prazo",
+  interesse: "Solução de interesse",
+  objetivo: "Objetivo do projeto",
+  cidade: "Cidade de atendimento",
+  papel: "Participação na decisão",
+  ferramentas: "Sistemas e ferramentas atuais",
+  siteAtual: "Site atual",
+  materiais: "Materiais disponíveis",
+  investimento: "Investimento previsto",
+  preferenciaContato: "Preferência de contato",
 };
 
 /** "54999991234" → "(54) 99999-1234". Número fora do padrão sai como veio. */
