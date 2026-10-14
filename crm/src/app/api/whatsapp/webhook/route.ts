@@ -1,7 +1,7 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 import { emTransacao } from "@/lib/banco";
-import { analisarAtendimento } from "@/lib/ia-atendimento";
+import { analisarAtendimento, ErroFormatoAtendimento } from "@/lib/ia-atendimento";
 import {
   apagarAvisoWhatsApp, autorizarAtendimentoWhatsApp, buscarAtendimentoWhatsApp, buscarAvisoWhatsApp,
   marcarEnvioWhatsApp, registrarRespostaWhatsApp, registrarAvisoWhatsApp,
@@ -24,6 +24,7 @@ function assinaturaMetaCorreta(recebida: string, corpo: string, segredo: string)
 }
 
 function motivoSeguroDaIa(erro: unknown): string {
+  if (erro instanceof ErroFormatoAtendimento) return `${erro.message} ${erro.diagnostico}`;
   if (!(erro instanceof Error)) return "falha de rede ou timeout.";
   if (/^IA indisponível \(\d{3}\)\.$/.test(erro.message)) return erro.message;
   if (["Configuração de IA ausente.", "Resposta da IA fora do formato esperado."].includes(erro.message)) return erro.message;
