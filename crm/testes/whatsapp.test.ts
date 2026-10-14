@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Consulta } from "@/lib/consulta";
 import { buscarConhecimento } from "@/lib/conhecimento-shift";
+import { analisarAtendimento } from "@/lib/ia-atendimento";
 import * as leads from "@/lib/leads";
 import { decidirConsentimentoWhatsApp, enviarTextoMeta, lerMensagensMeta } from "@/lib/whatsapp";
 
@@ -105,6 +106,73 @@ describe("qualificação pelo WhatsApp", () => {
     expect((await leads.listarLeads(tx))[0].enviosPendentes).toBe(1);
     await leads.mudarModoAtendimentoWhatsApp(tx, atendimento.leadId, "agente");
     expect(await leads.buscarAtendimentoWhatsApp(tx, atendimento.whatsapp)).toMatchObject({ modo: "agente" });
+  });
+
+  it("lembra os dados salvos e a última resposta entregue, sem misturar contatos", async () => {
+    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    expect(atendimento.nome).toBe("");
+    await leads.registrarRespostaWhatsApp(tx, atendimento, "MEM1", {
+      ...analise, nome: "Ana Maria", resposta: "Ana, em que sistema vocês conferem os pedidos?",
+    });
+    await leads.marcarEnvioWhatsApp(tx, "MEM1", true);
+    // Uma tentativa que não foi entregue não pode virar a pergunta anterior.
+    await leads.registrarRespostaWhatsApp(tx, atendimento, "MEM2", { ...analise, nome: "", resposta: "Qual o prazo?", resumo: "" });
+    await leads.marcarEnvioWhatsApp(tx, "MEM2", false);
+    const memoria = (await leads.buscarAtendimentoWhatsApp(tx, atendimento.whatsapp))!;
+    expect(memoria).toMatchObject({
+      nome: "Ana Maria", empresa: "Indústria Ana", segmento: "Indústria", dor: "Conferência de pedidos",
+      prazo: "Este mês", resumo: analise.resumo, ultimaResposta: "Ana, em que sistema vocês conferem os pedidos?",
+    });
+
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
+    vi.stubGlobal("fetch", async (_url: string, opcoes: RequestInit) => {
+      const texto = JSON.parse(String(opcoes.body)).messages[0].content;
+      expect(texto).toContain('"nome":"Ana Maria"');
+      expect(texto).toContain('"empresa":"Indústria Ana"');
+      expect(texto).toContain("em que sistema vocês conferem os pedidos?");
+      expect(texto).not.toContain(memoria.whatsapp);
+      return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
+        ...analise, nome: "", empresa: "", segmento: "", dor: "", prazo: "",
+        resposta: "Entendi. Como vocês organizam essa conferência na planilha?",
+        resumo: "Quer automatizar a conferência de pedidos; hoje usa Excel.",
+      } }] });
+    });
+    const proxima = await analisarAtendimento("Usamos Excel", memoria);
+    await leads.registrarRespostaWhatsApp(tx, memoria, "MEM3", proxima);
+    expect(await leads.buscarAtendimentoWhatsApp(tx, memoria.whatsapp)).toMatchObject({
+      nome: "Ana Maria", empresa: "Indústria Ana", resumo: proxima.resumo,
+    });
+    const outro = await leads.autorizarAtendimentoWhatsApp(tx, "5554988885678");
+    expect(outro).toMatchObject({ nome: "", empresa: null, resumo: "", ultimaResposta: "" });
+  });
+
+  it("aceita correções explícitas e preserva campos não atualizados", async () => {
+    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    await leads.registrarRespostaWhatsApp(tx, atendimento, "COR1", analise);
+    await leads.registrarRespostaWhatsApp(tx, atendimento, "COR2", {
+      ...analise, nome: "Ana Maria", empresa: "Indústria Nova", dor: "Conferência de notas",
+      segmento: "", prazo: "", resumo: "Quer automatizar a conferência de notas da Indústria Nova.",
+    });
+    expect(await leads.buscarAtendimentoWhatsApp(tx, atendimento.whatsapp)).toMatchObject({
+      nome: "Ana Maria", empresa: "Indústria Nova", dor: "Conferência de notas", segmento: "Indústria", prazo: "Este mês",
+    });
+    await leads.registrarRespostaWhatsApp(tx, atendimento, "COR3", {
+      ...analise, nome: "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "",
+    });
+    expect(await leads.buscarAtendimentoWhatsApp(tx, atendimento.whatsapp)).toMatchObject({
+      nome: "Ana Maria", empresa: "Indústria Nova", resumo: "Quer automatizar a conferência de notas da Indústria Nova.",
+    });
+  });
+
+  it("reaproveita a identificação do diagnóstico ao autorizar o WhatsApp", async () => {
+    const { id } = await leads.receberLead(tx, {
+      nome: "Ana Maria", empresa: "Indústria Ana", whatsapp: "5554999991234", respostas: { segmento: "Indústria", prazo: "Este mês" },
+      nivel: null, oferta: null, processo: null, origem: "site",
+    });
+    expect(await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({
+      leadId: id, nome: "Ana Maria", empresa: "Indústria Ana", segmento: "Indústria", prazo: "Este mês",
+    });
   });
 
   it("pausa ao detectar resposta manual, mas ignora o eco de uma resposta do agente", async () => {

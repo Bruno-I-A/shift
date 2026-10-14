@@ -1,9 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { analisarAtendimento } from "@/lib/ia-atendimento";
+import { analisarAtendimento, type ContextoAtendimento } from "@/lib/ia-atendimento";
 import { mascararDados } from "@/lib/dados-sensiveis";
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
+
+function contexto(extra: Partial<ContextoAtendimento> = {}): ContextoAtendimento {
+  return { nome: "", empresa: null, segmento: null, dor: null, prazo: null, resumo: "", ultimaResposta: "", ...extra };
+}
 
 describe("resposta com RAG", () => {
   it("mascara dados pessoais comuns antes de enviar ao modelo", () => {
@@ -26,7 +30,10 @@ describe("resposta com RAG", () => {
     });
     vi.stubGlobal("fetch", envio);
 
-    const resultado = await analisarAtendimento("Vocês atendem indústrias? Meu e-mail é ana@example.com", "");
+    const resultado = await analisarAtendimento("Vocês atendem indústrias? Meu e-mail é ana@example.com", contexto({
+      resumo: "Retornar por ana@example.com, telefone (54) 99999-1234.",
+      ultimaResposta: "Você pode enviar para ana@example.com.",
+    }));
     expect(resultado.resposta).toMatch(/indústrias/);
     const opcoes = chamadas[0];
     const corpo = JSON.parse(String(opcoes.body));
@@ -37,12 +44,22 @@ describe("resposta com RAG", () => {
     expect(corpo.tools[0].input_schema.additionalProperties).toBe(false);
   });
 
-  it("sem trecho de base, entrega a dúvida a uma pessoa sem chamar a IA", async () => {
-    const envio = vi.fn();
+  it.each(["Bruno", "sim", "não", "Obrigado"])("entende a resposta curta %s usando a memória e a última pergunta", async (texto) => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
+    const envio = vi.fn(async (_url: string, opcoes: RequestInit) => {
+      const corpo = JSON.parse(String(opcoes.body));
+      expect(corpo.messages[0].content).toContain('"empresa":"Scharff"');
+      expect(corpo.messages[0].content).toContain("Como você se chama?");
+      expect(corpo.messages[0].content).toContain(`Mensagem atual: ${texto}`);
+      return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
+        resposta: "Como posso ajudar?", nome: texto === "Bruno" ? "Bruno" : "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "Representa a Scharff.", passarParaHumano: false,
+      } }] });
+    });
     vi.stubGlobal("fetch", envio);
-    const resultado = await analisarAtendimento("Qual é o preço exato de R$ 123?", "");
-    expect(resultado.passarParaHumano).toBe(true);
-    expect(envio).not.toHaveBeenCalled();
+    const resultado = await analisarAtendimento(texto, contexto({ empresa: "Scharff", ultimaResposta: "Como você se chama?" }));
+    expect(resultado.passarParaHumano).toBe(false);
+    expect(envio).toHaveBeenCalledOnce();
   });
 
   it("informa o status da Anthropic sem incluir conteúdo da conversa", async () => {
@@ -50,6 +67,6 @@ describe("resposta com RAG", () => {
     vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
     vi.stubGlobal("fetch", vi.fn(async () => new Response("credencial recusada", { status: 401 })));
 
-    await expect(analisarAtendimento("Vocês atendem indústrias? Meu e-mail é ana@example.com", "")).rejects.toThrow("IA indisponível (401).");
+    await expect(analisarAtendimento("Vocês atendem indústrias? Meu e-mail é ana@example.com", contexto())).rejects.toThrow("IA indisponível (401).");
   });
 });

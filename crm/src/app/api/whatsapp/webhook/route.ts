@@ -10,8 +10,7 @@ import { decidirConsentimentoWhatsApp, enviarTextoMeta, lerMensagensMeta, type M
 
 export const runtime = "nodejs";
 
-const AVISO = "Olá! Sou o assistente virtual da Shift Systems. Posso responder dúvidas e encaminhar você à equipe. Para guardar suas informações e usar IA no atendimento, responda *SIM* e depois repita sua pergunta. Veja nossa política: https://shiftsys.com.br/privacidade.html";
-const BOAS_VINDAS = "Obrigado por autorizar. Como posso ajudar? Se quiser conversar sobre sua empresa, me diga seu nome e o processo que mais consome tempo.";
+const AVISO = "Oi! Sou o assistente virtual da Shift. Posso tirar suas dúvidas e lembrar as informações que você me contar para continuar o atendimento. Você autoriza o uso de IA e o registro dessas informações no CRM? Responda SIM para continuar. Privacidade: https://shiftsys.com.br/privacidade.html";
 
 function segredoCorreto(recebido: string, esperado: string): boolean {
   const a = createHash("sha256").update(recebido).digest();
@@ -58,19 +57,20 @@ async function atenderMensagem(mensagem: MensagemRecebida, segredo: string): Pro
       }
       atendimento = await emTransacao((tx) => autorizarAtendimentoWhatsApp(tx, mensagem.whatsapp));
       await emTransacao((tx) => apagarAvisoWhatsApp(tx, chaveAviso));
+      const boasVindas = atendimento.nome
+        ? `Combinado, ${atendimento.nome.split(/\s+/)[0]}. Como posso ajudar?`
+        : "Combinado. Como você se chama?";
       const novo = await emTransacao((tx) => registrarRespostaWhatsApp(tx, atendimento!, mensagem.id, {
-        resposta: BOAS_VINDAS, nome: "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "", passarParaHumano: false,
+        resposta: boasVindas, nome: "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "", passarParaHumano: false,
       }));
       if (!novo) return;
       respostaRegistrada = true;
-      await enviarTextoMeta(mensagem.whatsapp, BOAS_VINDAS);
+      await enviarTextoMeta(mensagem.whatsapp, boasVindas);
       await emTransacao((tx) => marcarEnvioWhatsApp(tx, mensagem.id, true));
       return;
     }
     if (atendimento.modo === "humano") return;
-    if (/^(sim|aceito|autorizo)([.! ]*)$/i.test(mensagem.texto) && !atendimento.resumo) return;
-
-    const analise = await analisarAtendimento(mensagem.texto, atendimento.resumo).catch((erro) => {
+    const analise = await analisarAtendimento(mensagem.texto, atendimento).catch((erro) => {
       console.error(`[whatsapp] IA indisponível: ${motivoSeguroDaIa(erro)}`);
       return {
         resposta: "O atendimento automático está indisponível no momento. Vou deixar seu contato para uma pessoa da Shift continuar por aqui.",
