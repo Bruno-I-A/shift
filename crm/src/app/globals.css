@@ -41,6 +41,11 @@ body {
   color: var(--color-texto);
 }
 
+/* A caixa ocupa a área útil da janela; a rolagem fica dentro da conversa. */
+main:has([data-caixa-whatsapp]) {
+  padding-block: 0.75rem;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-destaque);
   outline-offset: 2px;
