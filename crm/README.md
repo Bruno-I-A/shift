@@ -56,7 +56,7 @@ O primeiro contato recebe um aviso de privacidade. Só depois de responder
 `SIM`, `ACEITO` ou `AUTORIZO` o CRM cria ou associa um lead. A cada pergunta,
 busca trechos de `conhecimento/shift.md` (cópia versionada de
 `../site/llms-full.txt`) e envia apenas esses trechos e a mensagem mascarada
-para a Responses API da OpenAI. A IA responde e extrai nome, empresa, setor,
+para a Messages API da Anthropic. O Claude responde e extrai nome, empresa, setor,
 dor e prazo quando foram informados. Nome + dor + empresa ou setor levam o
 lead à etapa **Qualificado**. Sem base para responder ou em falha da IA, o
 atendimento passa para uma pessoa. O botão **Assumir atendimento** no lead
@@ -83,7 +83,7 @@ WhatsApp.
 3. No Ambiente do CRM, configure `WHATSAPP_META_PHONE_NUMBER_ID`,
    `WHATSAPP_META_ACCESS_TOKEN`, `WHATSAPP_META_GRAPH_VERSION`,
    `WHATSAPP_META_VERIFY_TOKEN`, `WHATSAPP_META_APP_SECRET`,
-   `OPENAI_API_KEY` e `OPENAI_MODEL`, conforme `.env.exemplo`. Reimplante o
+   `ANTHROPIC_API_KEY` e `ANTHROPIC_MODEL`, conforme `.env.exemplo`. Reimplante o
    CRM e confira `/api/saude`.
 4. Em uma janela de teste, ative `WHATSAPP_ATIVO=sim` e faça uma conversa real
    de outro número: aviso → `SIM` → pergunta sobre a Shift → qualificação no
