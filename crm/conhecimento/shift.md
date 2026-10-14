@@ -1,0 +1,151 @@
+# Shift Systems — conteúdo completo
+
+> Colocamos IA nos processos da sua empresa: automatizamos tarefas, organizamos o trabalho e apoiamos decisões.
+
+Fonte: https://shiftsys.com.br · SHIFT SYSTEMS LTDA. · Getúlio Vargas/RS · Atendimento em todo o Brasil
+
+## Posicionamento
+
+A Shift Systems implanta inteligência artificial nos processos de pequenas e médias empresas de qualquer setor. Automatiza tarefas, organiza o trabalho das equipes, acompanha a operação e apoia decisões da diretoria. Começa por um processo, com a equipe da empresa no controle, e acompanha a evolução da implantação. Essa transformação é chamada de AI-first. A Shift aproveita os sistemas que funcionam, integra IA quando eles permitem e constrói a estrutura que falta quando não há integração ou quando a operação depende de planilhas e WhatsApp.
+
+Na visão da Shift, empresas que colocam IA na operação passam a responder mais rápido, errar menos e decidir com dados, e competir sem IA vai ficar cada vez mais difícil nos próximos anos. A IA não substitui a equipe: tira o trabalho braçal e repetitivo e deixa as pessoas com o que exige relacionamento, julgamento e criatividade.
+
+Desenvolvimento de software é parte da capacidade de entrega, não a oferta central. O objetivo é fazer a IA executar, operar, analisar e recomendar dentro da empresa. Decisões com impacto continuam sob revisão e aprovação humana.
+
+## Os quatro níveis de uma empresa AI-first
+
+### Nível 1 · A IA executa
+
+Tarefas repetitivas saem das mãos da equipe: leitura de documentos, extração e digitação de dados, triagem de demandas, conferências e rascunhos de contratos, relatórios, propostas e e-mails.
+
+### Nível 2 · A IA opera
+
+Agentes conduzem processos completos: recebem a demanda, consultam o sistema, executam etapas, fazem cobranças e follow-ups e chamam uma pessoa quando precisam de aprovação, exceção ou julgamento.
+
+### Nível 3 · A IA analisa
+
+Gestores fazem perguntas em linguagem natural sobre os dados da empresa, acompanham indicadores e recebem alertas quando algo sai do padrão.
+
+### Nível 4 · A IA recomenda
+
+A IA cruza dados, organiza cenários, identifica riscos e recomenda próximos passos com justificativa. A decisão final é humana.
+
+## Como a Shift implanta IA
+
+1. **Mapeamos onde o tempo vaza:** conversa com gestores e com quem executa o processo para localizar trabalho repetitivo e oportunidades.
+2. **Atacamos o processo que mais dói:** escolha de um processo de alto volume e risco controlado para o piloto.
+3. **Conectamos ou construímos:** integração aos sistemas existentes ou construção da base que falta.
+4. **Sua equipe aprova, a IA executa:** revisão humana no início e autonomia gradual apenas onde a empresa autorizar.
+5. **Medimos o resultado:** comparação do processo antes e depois com as métricas disponíveis para o caso real.
+6. **Expandimos e mantemos rodando:** ajustes, melhoria contínua e avanço para novos processos e níveis.
+
+## Modelo comercial
+
+### Diagnóstico
+
+Mapeamento de processos e relatório com oportunidades priorizadas.
+
+### Piloto
+
+Implantação em um processo, com métricas de antes e depois definidas para aquele processo.
+
+### Operação contínua
+
+Acompanhamento mensal, ajustes, melhorias e expansão para outros processos e níveis.
+
+## Ofertas
+
+- **Implantação:** para empresas que ainda não usam IA nos processos.
+- **Consultoria e correção:** para empresas que já usam IA de forma solta ou têm chatbot e automações que não entregam o esperado.
+
+## Soluções por nível
+
+### Executa
+
+- Extração de dados de notas, guias, contratos, boletos e outros documentos.
+- Triagem e encaminhamento de demandas.
+- Geração de rascunhos de contratos, relatórios, propostas e e-mails.
+- Conferência automática entre fontes de dados.
+
+### Opera
+
+- Agentes que conduzem processos de ponta a ponta.
+- Atendimento com memória da empresa e passagem para uma pessoa quando necessário.
+- Cobrança e follow-up automáticos.
+- Inbox de leads inteligente.
+- Gestão de tarefas do time: distribuição, prazos e cobrança do que atrasou.
+- Coordenação do trabalho entre áreas.
+
+### Analisa
+
+- Perguntas em linguagem natural sobre os próprios dados.
+- Alertas quando algo sai do padrão.
+- Painel do dono com indicadores da operação.
+- Visão da equipe: quem está com o quê, o que atrasou e onde há sobrecarga.
+
+### Recomenda
+
+- Análise de cenários.
+- Identificação de riscos.
+- Recomendações com justificativa e decisão final humana.
+- Apoio à diretoria: decisões preparadas com riscos, opções e impacto esperado.
+
+### A base que a IA precisa
+
+Quando o sistema existente não permite a integração necessária, a Shift pode construir sistemas internos sob medida, painéis de execução e integrações. O objetivo é criar a base de dados e operação de que a IA precisa sem descartar o que já funciona.
+
+## Setores
+
+A transformação AI-first vale para qualquer empresa com processos, equipes e decisões. Exemplos: comércio e varejo (pedidos, estoque e atendimento), indústria (ordens de produção, gargalos e compras), prestação de serviços (agenda, execução e cobrança), saúde e clínicas (agendamentos, confirmações e retornos), logística e distribuição (entregas e exceções) e educação (matrículas e acompanhamento de alunos).
+
+Três setores têm exemplos detalhados por nível no site:
+
+### Escritórios contábeis
+
+Leitura de guias e documentos fiscais, conferência de lançamentos, organização das demandas dos clientes, controle de prazos e geração de relatórios mensais.
+
+### Escritórios de advocacia
+
+Triagem de novos casos, organização de documentos, rascunho de peças e contratos, atendimento inicial qualificado e acompanhamento de prazos.
+
+### Imobiliárias
+
+Laudos de vistoria a partir de fotos e áudio, comparação entre vistoria de entrada e saída, análise de documentação e apoio à criação de anúncios.
+
+Qualquer outro setor pode ser atendido: o ponto de partida é onde o tempo e o dinheiro estão vazando na operação.
+
+## Segurança e supervisão humana
+
+- Uma pessoa aprova decisões com impacto.
+- As ações da IA devem ficar registradas.
+- O acesso aos dados segue o mínimo necessário e práticas alinhadas à LGPD.
+- A empresa entende o que a IA faz e pode interromper uma automação.
+
+## Diagnóstico online
+
+Página: https://shiftsys.com.br/diagnostico.html
+
+O diagnóstico tem seis perguntas: segmento, forma de controle do trabalho, tarefa que mais consome tempo, uso atual de IA, tamanho da operação e prazo desejado. O resultado identifica Fundação, Início do Nível 1, Nível 1 ou Nível 2; mostra o próximo passo, o primeiro processo sugerido e recomenda implantação ou consultoria/correção.
+
+Antes do resultado, nome, empresa e WhatsApp podem ser informados de forma opcional. O resultado aparece mesmo se a pessoa pular essa etapa. As respostas e os dados de contato só podem ser enviados ao CRM da Shift com consentimento explícito em checkbox. Sem consentimento, nenhum dado do diagnóstico é enviado automaticamente. O botão de WhatsApp abre uma mensagem preenchida para a pessoa revisar e enviar por decisão própria.
+
+## Presença digital
+
+Página: https://shiftsys.com.br/sites.html
+
+Sites permanecem como solução complementar. A Shift planeja sites institucionais e landing pages a partir do negócio, organiza a mensagem e o caminho até o contato e entrega os arquivos técnicos que ajudam mecanismos de busca e sistemas de IA a compreender o conteúdo.
+
+Projetos publicados apresentados na página:
+
+- Tailine Giacometti — Nutricionista: https://tailinegiacometti.shiftsys.com.br
+- Smart Control Assessoria: https://smartcontrol.net.br
+
+## Contato
+
+- WhatsApp: +55 54 98418-4808 — https://wa.me/5554984184808
+- Instagram: @shift_systemss — https://instagram.com/shift_systemss
+- E-mail: hello@shift.systems
+
+Resposta em até 24h.
+
+Conteúdo livre para citação, desde que atribuído à Shift Systems com link para https://shiftsys.com.br.

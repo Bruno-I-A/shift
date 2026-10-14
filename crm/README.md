@@ -36,12 +36,62 @@ npm run typecheck
 
 ## Leads do site
 
-`POST /api/leads` é a única escrita pública do CRM. O diagnóstico do site manda
+`POST /api/leads` recebe o diagnóstico público do site. O diagnóstico manda
 o corpo como `text/plain` (JSON dentro) para não disparar preflight. Travas:
 origem (`ORIGENS_SITE`, padrão `shiftsys.com.br` e `www`), formato e
 consentimento (`lerEnvioDoSite`), e limite de 5 envios por IP por hora e 100 no
 total. O IP entra no banco só como HMAC, para contar. O mesmo WhatsApp com
 lead em aberto atualiza o lead em vez de criar outro.
+
+## Atendimento no WhatsApp
+
+O CRM usa a **Cloud API oficial da Meta** em `POST /api/whatsapp/webhook`. A
+Meta valida o endereço por `GET` com o token de verificação e assina cada
+evento por `X-Hub-Signature-256` com o App Secret. A rota confere a assinatura,
+aceita apenas mensagens de texto recentes destinadas ao ID do número público e
+ignora outros eventos. O serviço inicia **desligado**: `WHATSAPP_ATIVO=sim` é
+necessário para atender.
+
+O primeiro contato recebe um aviso de privacidade. Só depois de responder
+`SIM`, `ACEITO` ou `AUTORIZO` o CRM cria ou associa um lead. A cada pergunta,
+busca trechos de `conhecimento/shift.md` (cópia versionada de
+`../site/llms-full.txt`) e envia apenas esses trechos e a mensagem mascarada
+para a Responses API da OpenAI. A IA responde e extrai nome, empresa, setor,
+dor e prazo quando foram informados. Nome + dor + empresa ou setor levam o
+lead à etapa **Qualificado**. Sem base para responder ou em falha da IA, o
+atendimento passa para uma pessoa. O botão **Assumir atendimento** no lead
+pausa o agente; **Reativar agente** devolve o atendimento automático.
+
+O CRM guarda o resumo e os dados de qualificação, sem transcrição das mensagens
+recebidas. O ID da mensagem impede que um webhook repetido avance o funil. Um
+envio sem confirmação aparece no lead para conferência manual; não é repetido
+automaticamente, pois uma falha de rede pode acontecer depois da entrega ao
+WhatsApp.
+
+### Ativação com o número público
+
+1. Em **Meta for Developers**, abra o app aprovado da Shift, adicione o produto
+   WhatsApp e associe o número público. Copie o **Phone Number ID**, crie um
+   token permanente para o usuário de sistema e anote a versão da Graph API
+   exibida no painel. Não use o token temporário do início rápido em produção.
+2. Em **WhatsApp > Configuração**, informe
+   `https://crm.shiftsys.com.br/api/whatsapp/webhook` como Callback URL e crie
+   um `WHATSAPP_META_VERIFY_TOKEN` aleatório. A Meta chama o endpoint por GET;
+   depois assine o campo `messages` para o app. O `WHATSAPP_META_APP_SECRET`
+   fica em **Configurações > Básico** do app e autentica os POSTs recebidos. A
+   verificação do callback funciona com o agente desligado.
+3. No Ambiente do CRM, configure `WHATSAPP_META_PHONE_NUMBER_ID`,
+   `WHATSAPP_META_ACCESS_TOKEN`, `WHATSAPP_META_GRAPH_VERSION`,
+   `WHATSAPP_META_VERIFY_TOKEN`, `WHATSAPP_META_APP_SECRET`,
+   `OPENAI_API_KEY` e `OPENAI_MODEL`, conforme `.env.exemplo`. Reimplante o
+   CRM e confira `/api/saude`.
+4. Em uma janela de teste, ative `WHATSAPP_ATIVO=sim` e faça uma conversa real
+   de outro número: aviso → `SIM` → pergunta sobre a Shift → qualificação no
+   painel → **Assumir atendimento**. Se algo falhar, retire a variável para
+   parar o agente e continue o atendimento manualmente.
+
+Para atualizar a base quando o site mudar: copie `site/llms-full.txt` para
+`crm/conhecimento/shift.md`, revise e reimplante o CRM.
 
 ## Deploy
 

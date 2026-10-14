@@ -18,6 +18,9 @@ export async function GET(pedido: Request) {
 
   const faltando = OBRIGATORIAS.filter((nome) => !process.env[nome]);
   if (!process.env.DATABASE_URL_MIGRACAO) faltando.push("DATABASE_URL_MIGRACAO (migrações não rodam)");
+  const whatsappAtivo = process.env.WHATSAPP_ATIVO === "sim";
+  const configuracaoWhatsApp = ["WHATSAPP_META_PHONE_NUMBER_ID", "WHATSAPP_META_ACCESS_TOKEN", "WHATSAPP_META_GRAPH_VERSION", "WHATSAPP_META_VERIFY_TOKEN", "WHATSAPP_META_APP_SECRET", "OPENAI_API_KEY", "OPENAI_MODEL"];
+  if (whatsappAtivo) faltando.push(...configuracaoWhatsApp.filter((nome) => !process.env[nome]));
 
   let banco: { ok: boolean; migracoes?: string[]; erro?: string };
   try {
@@ -27,5 +30,5 @@ export async function GET(pedido: Request) {
   }
 
   const ok = banco.ok && faltando.length === 0;
-  return Response.json({ ok, faltando, banco }, { status: ok ? 200 : 503 });
+  return Response.json({ ok, faltando, banco, whatsapp: { ativo: whatsappAtivo, configurado: whatsappAtivo && configuracaoWhatsApp.every((nome) => !!process.env[nome]) } }, { status: ok ? 200 : 503 });
 }
