@@ -7,8 +7,9 @@ import * as z from "zod";
 import { emTransacao } from "@/lib/banco";
 import * as crm from "@/lib/crm";
 import { ErroDeDominio, IDS_ETAPA, IDS_ETAPA_LEAD, IDS_TIPO } from "@/lib/dominio";
-import { mudarEtapaDoLead, mudarModoAtendimentoWhatsApp, prepararRespostaHumanaWhatsApp, confirmarMensagemWhatsApp } from "@/lib/leads";
+import { mudarEtapaDoLead, mudarModoAtendimentoWhatsApp } from "@/lib/leads";
 import { enviarTextoMeta } from "@/lib/whatsapp";
+import { enviarRespostaHumana } from '@/lib/whatsapp-manual';
 import { conferirSenha, iguais } from "@/lib/segredos";
 import {
   credenciaisDoAdmin,
@@ -228,25 +229,14 @@ export async function responderWhatsApp(_: Resultado, form: FormData): Promise<R
   await exigirSessao();
   const dados = z.object({ leadId: z.uuid(), pedidoId: z.uuid(), texto: texto(4000).min(1, 'Escreva uma mensagem.') }).safeParse(campos(form));
   if (!dados.success) return { erro: dados.error.issues[0]?.message ?? 'Mensagem inválida.', valores: campos(form) };
-  const { leadId, pedidoId, texto: mensagem } = dados.data;
-  let whatsapp: string | null;
   try {
-    whatsapp = await emTransacao(tx => prepararRespostaHumanaWhatsApp(tx, leadId, pedidoId, mensagem));
+    const resultado = await enviarRespostaHumana(emTransacao, enviarTextoMeta, dados.data);
+    revalidatePath('/whatsapp');
+    revalidatePath('/leads');
+    return resultado.estado === 'erro' ? { erro: resultado.mensagem, valores: campos(form) } : { ok: resultado.mensagem };
   } catch (erro) {
     return { erro: erro instanceof ErroDeDominio ? erro.message : 'Não foi possível preparar o envio.', valores: campos(form) };
   }
-  if (!whatsapp) return { ok: 'Esta tentativa já foi registrada. Confira o histórico antes de enviar novamente.' };
-  try {
-    const metaId = await enviarTextoMeta(whatsapp, mensagem);
-    await emTransacao(tx => confirmarMensagemWhatsApp(tx, `h:${pedidoId}`, metaId));
-  } catch {
-    await emTransacao(tx => confirmarMensagemWhatsApp(tx, `h:${pedidoId}`, null)).catch(() => {});
-    revalidatePath('/whatsapp');
-    return { erro: 'O envio não foi confirmado. Confira o histórico antes de repetir; o agente continua pausado.', valores: campos(form) };
-  }
-  revalidatePath('/whatsapp');
-  revalidatePath('/leads');
-  return { ok: 'Mensagem enviada. Você está no controle desta conversa.' };
 }
 
 // -----------------------------------------------------------------------------

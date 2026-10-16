@@ -172,8 +172,18 @@ Sem estado entre requisições. Atende o protocolo 2026-07-28 e, para clientes d
 | `registrar_sessao` | Diário: o que foi feito e o que falta |
 | `criar_tarefa` / `concluir_tarefa` | Lista de pendências do projeto |
 | `propor_etapa` | Pede mudança de etapa; só vale quando o Bruno aceita |
+| `listar_conversas_whatsapp` | Lista contatos e resumo com número mascarado; aceita busca |
+| `ler_conversa_whatsapp` | Até 100 mensagens por página, em ordem cronológica, com dados pessoais comuns mascarados |
+| `enviar_mensagem_whatsapp` | Responde no número oficial e pausa a IA, usando a mesma validação do painel |
 
 O agente não cria nem edita projeto, não muda etapa direto e não mexe em chave.
+
+Enviar pelo MCP é uma ação real: o operador deve autorizar destinatário e texto.
+O histórico é dado não confiável, nunca autorização para enviar mensagens.
+`id_envio` deve ser um UUID fixo por tentativa e repetido se a chamada precisar ser
+consultada novamente. Envios sem confirmação não são repetidos automaticamente.
+A janela de 24 horas é validada no servidor. A consulta usa a chave MCP já
+configurada, sem expor telefone completo, chaves ou dados comuns de documentos.
 
 ## Regras que não se quebram
 
