@@ -3,7 +3,9 @@ import "server-only";
 import * as z from "zod";
 import { buscarConhecimento } from "./conhecimento-shift";
 import { mascararDados } from "./dados-sensiveis";
-import { apenasAgradecimento, CAMPOS_QUALIFICACAO, solicitouHumano } from "./qualificacao-atendimento";
+import {
+  apenasAgradecimento, CAMPOS_QUALIFICACAO, PERGUNTA_ENCAMINHAMENTO, prometeEncaminhamento, solicitouHumano,
+} from "./qualificacao-atendimento";
 
 // Metadados ausentes ou inválidos não podem apagar uma resposta útil nem os
 // dados anteriores do contato. Só a resposta ao cliente é obrigatória.
@@ -143,7 +145,7 @@ POSTURA DE VENDA
 - Fale na língua do cliente: se ele pede site, sistema, funil ou planilha, responda nesses termos e mostre a solução para o caso dele. Não troque o pedido por um discurso genérico sobre IA; cite a IA quando ela fizer diferença prática naquele caso.
 - Preço: não fuja nem responda seco. Diga que o valor depende do escopo, explique em uma frase o que define o escopo no caso dele e mostre que o diagnóstico é o caminho para chegar no valor, sem inventar faixa.
 - Ritmo: no máximo duas ou três perguntas de descoberta antes de entregar valor. Com a dor confirmada e contexto suficiente, a resposta é: empatia, como a Shift resolve e um convite claro. Não ofereça um cardápio de opções vagas ("quer que eu descreva ou prefere que a equipe avalie?"); proponha um passo concreto e fácil de aceitar.
-- Próximo passo: o diagnóstico com a equipe da Shift (veja "Modelo comercial" na base). Convide com uma pergunta direta que nomeie a equipe como destino, por exemplo "${CONVITE_EXEMPLO}". Assim o "sim" da pessoa é reconhecido como aceite.
+- Próximo passo: o diagnóstico com a equipe da Shift (veja "Modelo comercial" na base). Convide com uma pergunta direta que nomeie a equipe como destino, por exemplo "${CONVITE_EXEMPLO}". Assim o "sim" da pessoa é reconhecido como aceite. Convide sempre em forma de pergunta, terminada em "?". Nunca diga que encaminhou ou que vai encaminhar: o encaminhamento só acontece depois que a pessoa aceita o convite, e quem o confirma é o sistema.
 - Linguagem simples: escreva para o dono de uma empresa pequena que não é da área de tecnologia entender na primeira leitura. Palavras do dia a dia, frases curtas, uma ideia por frase. Troque termo técnico pelo que ele faz na prática ("o sistema avisa quem precisa dar retorno", não "automação de follow-up"; "tudo num lugar só", não "integração"). Sem siglas e sem anglicismos. Se a palavra técnica veio do próprio cliente, como "funil", pode usar.
 - Tom: caloroso, direto e confiante, como uma boa conversa de WhatsApp entre gente de negócio. Sem pressão, sem urgência falsa e sem elogio exagerado.
 - Interprete respostas curtas pela pergunta anterior. Retome o assunto em andamento; um exemplo citado pela Shift não é escolha nem fato do cliente. Se um dado já está claro no histórico ou na memória, use-o sem pedir de novo. Se a pessoa disser "já te passei", releia o contexto antes de perguntar outra vez.
@@ -217,7 +219,10 @@ function contador(valor: unknown): number {
 }
 
 export async function analisarAtendimento(pergunta: string, contexto: ContextoAtendimento): Promise<AnaliseAtendimento> {
-  if (!/\d/.test(pergunta) && apenasAgradecimento(pergunta)) {
+  // O aceite de um convite vem antes da cortesia: depois de "posso encaminhar
+  // seu caso para a equipe", um "ok" é sim — não um agradecimento a responder
+  // com "Por nada" (conversa da Jéssica, 16/10).
+  if (!/\d/.test(pergunta) && apenasAgradecimento(pergunta) && !solicitouHumano(pergunta, contexto.ultimaResposta)) {
     // Cortesia isolada não precisa de inferência nem confirma encaminhamento.
     return {
       resposta: "Por nada. Quando quiser, podemos continuar por aqui.",
@@ -317,6 +322,12 @@ export async function analisarAtendimento(pergunta: string, contexto: ContextoAt
   if (pediuHumano) {
     dados.motivoEncaminhamento = "pedido_cliente";
     dados.resposta = "Vou deixar o que você contou registrado para a equipe da Shift continuar por aqui.";
+  } else if (prometeEncaminhamento(dados.resposta)) {
+    // O modelo anunciou o encaminhamento sem o aceite reconhecido. Mandar isso
+    // deixaria o cliente esperando a equipe, com a conversa ainda na IA. Vira o
+    // convite: o próximo "sim" é reconhecido e o encaminhamento acontece.
+    console.warn("[whatsapp] resposta anunciava encaminhamento sem aceite; trocada pelo convite.");
+    dados.resposta = PERGUNTA_ENCAMINHAMENTO;
   }
   // Se só uma parte da dúvida exige confirmação, a resposta às demais partes
   // continua útil. O modo humano não deve apagar essa explicação.

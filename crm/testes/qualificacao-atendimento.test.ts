@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { CONVITE_EXEMPLO } from "@/lib/ia-atendimento";
-import { apenasAgradecimento, PERGUNTA_ENCAMINHAMENTO, proximaPergunta, solicitouHumano } from "@/lib/qualificacao-atendimento";
+import {
+  apenasAgradecimento, PERGUNTA_ENCAMINHAMENTO, prometeEncaminhamento, proximaPergunta, solicitouHumano,
+} from "@/lib/qualificacao-atendimento";
 
 const contato = {
   nome: "Bruno", empresa: "Clínica B", segmento: "Odontologia", dor: null, prazo: null,
@@ -27,7 +29,7 @@ describe("organização da descoberta do projeto", () => {
     expect(proximaPergunta(completo)).toBe(PERGUNTA_ENCAMINHAMENTO);
   });
 
-  it.each(["Show, obrigado", "Ótimo, valeu!", "Ok", "Até mais", "Muito obrigada"])("não trata %s como aceite de encaminhamento", (texto) => {
+  it.each(["Show, obrigado", "Ótimo, valeu!", "Ok, obrigado", "Até mais", "Muito obrigada"])("não trata %s como aceite de encaminhamento", (texto) => {
     expect(apenasAgradecimento(texto)).toBe(true);
     expect(solicitouHumano(texto, PERGUNTA_ENCAMINHAMENTO)).toBe(false);
   });
@@ -125,5 +127,38 @@ describe("organização da descoberta do projeto", () => {
   ])("considera a última intenção humana relevante no lote: %s", (texto, esperado) => {
     expect(solicitouHumano(texto, PERGUNTA_ENCAMINHAMENTO)).toBe(esperado);
     expect(solicitouHumano(texto, "Você já tem um site?")).toBe(esperado);
+  });
+});
+
+// As mensagens reais da conversa da Jéssica (16/10/2026), que expuseram a falha.
+const OFERTA_JESSICA = 'Ótimo, Jéssica! Então posso encaminhar seu caso para a equipe da Shift desenhar esse site com você, já com as três ações (ver trabalhos, agendar e WhatsApp) e o prazo que você quer. A equipe confirma se o prazo de dois ou três dias é viável e te passa o investimento.';
+const PROMESSA_JESSICA = 'Perfeito, Jéssica! Vou encaminhar seu caso para a equipe da Shift. Eles vão desenhar o site com você, com as três ações (ver trabalhos, agendar e WhatsApp), e confirmar o prazo de dois ou três dias e o investimento.';
+
+describe("convite em forma de afirmação e concordância curta", () => {
+  it("reconhece o convite sem ponto de interrogação", () => {
+    expect(solicitouHumano("ok", OFERTA_JESSICA)).toBe(true);
+    expect(solicitouHumano("sim", OFERTA_JESSICA)).toBe(true);
+  });
+
+  it.each(["ok", "Ok!", "beleza", "fechado", "pode ser", "bora", "claro", "ok sim"])("%s sozinho depois de um convite é aceite", (texto) => {
+    expect(solicitouHumano(texto, PERGUNTA_ENCAMINHAMENTO)).toBe(true);
+  });
+
+  it("concordância sem convite antes não encaminha", () => {
+    expect(solicitouHumano("sim", "Por nada. Quando quiser, podemos continuar por aqui.")).toBe(false);
+    expect(solicitouHumano("ok", "Você já tem um site?")).toBe(false);
+  });
+});
+
+describe("promessa de encaminhamento sem aceite", () => {
+  it("detecta o anúncio do encaminhamento", () => {
+    expect(prometeEncaminhamento(PROMESSA_JESSICA)).toBe(true);
+    expect(prometeEncaminhamento("Já encaminhei para a equipe.")).toBe(true);
+  });
+
+  it("convite em forma de pergunta não é promessa", () => {
+    expect(prometeEncaminhamento(PERGUNTA_ENCAMINHAMENTO)).toBe(false);
+    expect(prometeEncaminhamento(CONVITE_EXEMPLO)).toBe(false);
+    expect(prometeEncaminhamento("Vamos passar seu caso para a equipe?")).toBe(false);
   });
 });

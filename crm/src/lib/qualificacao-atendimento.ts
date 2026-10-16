@@ -75,14 +75,33 @@ export function solicitouHumano(texto: string, ultimaResposta: string): boolean 
   if (/\b(mas|porem|antes|primeiro|so depois|so se)\b/.test(mensagem) || mensagem.includes("?")) return false;
   // A pergunta agora é escrita conforme o diálogo: pode usar “encaminhe”,
   // “envie”, “encaminharmos” etc. Só um convite da própria Shift, com destino
-  // humano explícito e interrogação, dá contexto para aceitar um “sim”.
-  const oferta = /\b(posso|podemos|quer|queria|prefere|gostaria|vamos|autoriza|tudo bem se)\b[^?]{0,100}\b(encaminh(?:ar|e|o|emos|armos|asse)|conect(?:ar|e|o|emos|armos|asse)|pass(?:ar|e|o|emos|armos|asse)|cham(?:ar|e|o|emos|armos|asse)|env(?:iar|ie|io|iemos|iarmos|iasse)|mand(?:ar|e|o|emos|armos|asse)|falar|conversar)\b[^?]{0,100}\b(equipe|especialista|humano|pessoa|atendente|bruno)\b[^?]*\?/.test(normalizar(ultimaResposta));
+  // humano explícito, dá contexto para aceitar um “sim”. Sem exigir “?”: em
+  // 16/10 o modelo convidou em forma de afirmação (“Então posso encaminhar seu
+  // caso para a equipe...”), a Jéssica respondeu “ok” e depois “sim”, e nenhum
+  // dos dois foi reconhecido.
+  const oferta = /\b(posso|podemos|quer|queria|prefere|gostaria|vamos|autoriza|tudo bem se)\b[^?]{0,100}\b(encaminh(?:ar|e|o|emos|armos|asse)|conect(?:ar|e|o|emos|armos|asse)|pass(?:ar|e|o|emos|armos|asse)|cham(?:ar|e|o|emos|armos|asse)|env(?:iar|ie|io|iemos|iarmos|iasse)|mand(?:ar|e|o|emos|armos|asse)|falar|conversar)\b[^?]{0,100}\b(equipe|especialista|humano|pessoa|atendente|bruno)\b/.test(normalizar(ultimaResposta));
   // Um vocativo ou comentário junto do aceite não o anula. Cada mensagem do
   // lote pode conter a confirmação, mas ela só vale após o convite acima.
   const confirmou = mensagem.split(/\n+/).some((linha) => {
     const confirmacao = linha.replace(/[,.!]+/g, " ").replace(/\s+/g, " ").trim();
     return /^(?:si+m+|pode\s+si+m+|ja\s+(?:falei|disse|confirmei)\s+que\s+(?:si+m+|pode))\b/.test(confirmacao)
-      || /^(?:pode|quero|quero sim|pode encaminhar|pode passar)$/.test(confirmacao);
+      || /^(?:pode|quero|quero sim|pode encaminhar|pode passar)$/.test(confirmacao)
+      // Concordâncias curtas só valem sozinhas: “ok” depois de um convite é
+      // aceite; “ok, obrigado” continua sendo cortesia.
+      || /^(?:ok+|okay|oks|beleza|blz|fechado|combinado|pode ser|bora|vamos|claro|com certeza|perfeito|certo|isso|positivo|manda|por favor)(?: sim)?$/.test(confirmacao);
   });
   return oferta && confirmou;
+}
+
+/**
+ * A resposta anuncia um encaminhamento como feito ou certo (“vou encaminhar
+ * seu caso para a equipe”) em vez de convidar. Só o sistema encaminha, depois
+ * do aceite; anunciar sem aceite deixa o cliente esperando alguém que não foi
+ * avisado. Frases terminadas em “?” são convite e não contam.
+ */
+export function prometeEncaminhamento(resposta: string): boolean {
+  return normalizar(resposta).split(/(?<=[.!?\n])/).some((frase) => !frase.trim().endsWith("?") && (
+    /\b(vou|vamos|irei|iremos|ja)\s+(?:te\s+)?(?:encaminh|pass|repass|envi|mand)\w*\b[^.?!]{0,80}\b(equipe|especialista|humano|pessoa|atendente|bruno)\b/.test(frase)
+    || /\b(encaminhei|ja encaminhamos|passei seu caso)\b/.test(frase)
+  ));
 }

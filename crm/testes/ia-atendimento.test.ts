@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { analisarAtendimento, ErroFormatoAtendimento, type ContextoAtendimento } from "@/lib/ia-atendimento";
+import { PERGUNTA_ENCAMINHAMENTO } from "@/lib/qualificacao-atendimento";
 import { mascararDados } from "@/lib/dados-sensiveis";
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.restoreAllMocks(); });
@@ -451,5 +452,30 @@ describe("resposta com RAG", () => {
     vi.stubGlobal("fetch", envio);
     await expect(analisarAtendimento("Uma pergunta", contexto())).rejects.toBeInstanceOf(ErroFormatoAtendimento);
     expect(envio).toHaveBeenCalledOnce();
+  });
+});
+
+describe("fechamento: aceite e promessa de encaminhamento", () => {
+  function iaResponde(resposta: string) {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json({
+      stop_reason: "tool_use",
+      content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta } }],
+    })));
+  }
+
+  it("um ok depois do convite encaminha, em vez de responder Por nada", async () => {
+    iaResponde("Combinado!");
+    const ultimaResposta = 'Ótimo, Jéssica! Então posso encaminhar seu caso para a equipe da Shift desenhar esse site com você, já com as três ações (ver trabalhos, agendar e WhatsApp) e o prazo que você quer. A equipe confirma se o prazo de dois ou três dias é viável e te passa o investimento.';
+    const resultado = await analisarAtendimento("ok", contexto({ ultimaResposta }));
+    expect(resultado.passarParaHumano).toBe(true);
+    expect(resultado.resposta).not.toContain("Por nada");
+  });
+
+  it("anúncio de encaminhamento sem aceite vira convite", async () => {
+    iaResponde('Perfeito, Jéssica! Vou encaminhar seu caso para a equipe da Shift. Eles vão desenhar o site com você, com as três ações (ver trabalhos, agendar e WhatsApp), e confirmar o prazo de dois ou três dias e o investimento.');
+    const resultado = await analisarAtendimento("sim", contexto({ ultimaResposta: "Por nada. Quando quiser, podemos continuar por aqui." }));
+    expect(resultado.passarParaHumano).toBe(false);
+    expect(resultado.resposta).toBe(PERGUNTA_ENCAMINHAMENTO);
   });
 });
