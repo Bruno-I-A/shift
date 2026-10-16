@@ -482,7 +482,7 @@ export async function enfileirarMensagemWhatsApp(
     on conflict (lead_id) do update set
       mensagens = crm.fila_whatsapp.mensagens || excluded.mensagens,
       versao = crm.fila_whatsapp.versao + 1,
-      disponivel_em = now() + interval '7 seconds', tentativas = 0`,
+      disponivel_em = now() + interval '10 seconds', tentativas = 0`,
     [atendimento.leadId, `e:${mensagem.id}`]);
   return true;
 }

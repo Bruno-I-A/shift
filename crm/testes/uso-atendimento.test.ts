@@ -9,6 +9,13 @@ describe('uso da IA sem conteúdo pessoal', () => {
     expect(estimarCustoAtendimento(uso)).toBeCloseTo(0.00285);
     expect(estimarCustoAtendimento({ ...uso, modelo: 'desconhecido' })).toBeNull();
   });
+  it('mede o Haiku 5.5 com sua tarifa e inclui cache no limiar de contexto longo', () => {
+    const uso = { modelo: 'claude-haiku-5-5', inputTokens: 1000, outputTokens: 100, cacheReadTokens: 1000, cacheCreationTokens: 1000 };
+    expect(estimarCustoAtendimento(uso)).toBeCloseTo(0.000285, 8);
+    expect(estimarCustoAtendimento({ ...uso, inputTokens: 100_000, cacheReadTokens: 0, cacheCreationTokens: 0 })).toBeCloseTo(0.01005, 8);
+    expect(estimarCustoAtendimento({ ...uso, inputTokens: 100_001, cacheReadTokens: 0, cacheCreationTokens: 0 })).toBeCloseTo(0.0502505, 8);
+    expect(estimarCustoAtendimento({ ...uso, inputTokens: 1, cacheReadTokens: 100_000, cacheCreationTokens: 0 })).toBeCloseTo(0.0052505, 8);
+  });
   it('registra chamadas e soma tokens com o papel restrito, sem poder alterar o histórico', async () => {
     const { tx } = await bancoDeTeste();
     const a = await autorizarAtendimentoWhatsApp(tx, '5554999991234');

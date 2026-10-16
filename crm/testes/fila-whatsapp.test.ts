@@ -12,13 +12,19 @@ const analise = {
 describe('fila durável do atendimento WhatsApp', () => {
   it('espera silêncio, junta mensagens na ordem recebida e não cobra duplicatas de webhook', async () => {
     const { tx } = await bancoDeTeste();
+    // Fixa now() na transação para simular a pausa sem sleep ou flutuação do relógio.
+    await tx.query('begin');
     const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.registrarRespostaWhatsApp(tx, a, 'ABERTURA', { ...analise, resposta: 'Como posso ajudar?' });
     await leads.marcarEnvioWhatsApp(tx, 'ABERTURA', true);
     const instante = new Date();
     expect(await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'ZZ', texto: 'Sou Bruno', recebidoEm: instante })).toBe(true);
+    // Nos chats reais houve complementos nove segundos depois: ainda é um turno.
+    await tx.query("update crm.fila_whatsapp set disponivel_em = disponivel_em - interval '9 seconds'");
     expect(await leads.reservarLoteWhatsApp(tx)).toBeNull();
     expect(await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'AA', texto: 'Tenho uma clínica', recebidoEm: instante })).toBe(true);
+    await tx.query("update crm.fila_whatsapp set disponivel_em = disponivel_em - interval '9 seconds'");
+    expect(await leads.reservarLoteWhatsApp(tx)).toBeNull();
     expect(await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'AA', texto: 'Tenho uma clínica', recebidoEm: instante })).toBe(false);
     expect((await tx.query('select versao from crm.fila_whatsapp')).rows).toEqual([{ versao: 2 }]);
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
@@ -35,6 +41,7 @@ describe('fila durável do atendimento WhatsApp', () => {
     expect(enviar).toHaveBeenCalledTimes(1);
     expect(await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'AA', texto: 'Tenho uma clínica' })).toBe(false);
     expect((await tx.query('select * from crm.fila_whatsapp')).rows).toHaveLength(0);
+    await tx.query('commit');
   });
 
   it('descarta análise obsoleta e reagrupa quando chega texto durante a IA', async () => {

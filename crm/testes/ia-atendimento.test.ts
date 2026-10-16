@@ -124,8 +124,15 @@ describe("resposta com RAG", () => {
     vi.stubEnv("ANTHROPIC_MODEL", "");
     vi.stubGlobal("fetch", vi.fn(async (_url: string, opcoes: RequestInit) => {
       const corpo = JSON.parse(String(opcoes.body));
-      expect(corpo.model).toBe("claude-haiku-4-5-20251001");
-      expect(corpo.system[0].cache_control).toBeUndefined();
+      expect(corpo.model).toBe("claude-haiku-5-5");
+      expect(corpo.system[0].cache_control).toEqual({ type: "ephemeral" });
+      expect(corpo.thinking).toEqual({ type: "disabled" });
+      expect(corpo).not.toHaveProperty("temperature");
+      expect(corpo).not.toHaveProperty("top_p");
+      expect(corpo).not.toHaveProperty("top_k");
+      expect(corpo.messages.at(-1).role).toBe("user");
+      expect(corpo.tools[0].strict).toBe(true);
+      expect(corpo.tool_choice).toEqual({ type: "tool", name: "registrar_atendimento" });
       const anteriores = corpo.messages.slice(1, -1);
       expect(anteriores.length).toBeLessThanOrEqual(12);
       expect(anteriores.map((m: { content: string }) => m.content).join("").length).toBeLessThanOrEqual(8000);
@@ -137,6 +144,21 @@ describe("resposta com RAG", () => {
     await analisarAtendimento(`${"Texto do projeto. ".repeat(600)}Este é o fim do turno.`, contexto({
       historico: Array.from({ length: 30 }, (_, i) => ({ autor: "cliente" as const, texto: `antiga-${i} ${"Contexto anterior. ".repeat(100)}` })),
     }));
+  });
+
+  it("preserva o Haiku 4.5 configurado explicitamente sem inflar seu prompt para cache", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    vi.stubEnv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001");
+    const envio = vi.fn(async (_url: string, opcoes: RequestInit) => {
+      const corpo = JSON.parse(String(opcoes.body));
+      expect(corpo.model).toBe("claude-haiku-4-5-20251001");
+      expect(corpo.system[0].cache_control).toBeUndefined();
+      expect(corpo.thinking).toEqual({ type: "disabled" });
+      return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta: "Podemos avaliar o processo." } }] });
+    });
+    vi.stubGlobal("fetch", envio);
+    expect((await analisarAtendimento("Quero organizar um processo", contexto())).resposta).toBe("Podemos avaliar o processo.");
+    expect(envio).toHaveBeenCalledOnce();
   });
 
   it("conta a identificação humana no orçamento do histórico que começa pela equipe", async () => {
@@ -265,8 +287,50 @@ describe("resposta com RAG", () => {
     } }] })));
     const resultado = await analisarAtendimento("Sim, pode", contexto({ nome: "Bruno", ultimaResposta: "Quer que eu encaminhe seu resumo para nossa equipe?" }));
     expect(resultado.passarParaHumano).toBe(true);
+    expect(resultado.motivoEncaminhamento).toBe("pedido_cliente");
     expect(resultado.resposta).not.toContain("?");
     expect(resultado.resposta).not.toContain("em breve");
+  });
+
+  it("preserva a parte respondida quando outra informação precisa da equipe", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    const resposta = "A Shift cria sites institucionais e sistemas para empresas. O preço e as medidas específicas de segurança precisam ser confirmados pela equipe; vou deixar essas dúvidas registradas para ela.";
+    const envio = vi.fn(async () => Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
+      resposta, passarParaHumano: true, motivoEncaminhamento: "informacao_indisponivel", resumo: "Quer entender preço e segurança antes de seguir com o projeto.",
+    } }] }));
+    vi.stubGlobal("fetch", envio);
+    const resultado = await analisarAtendimento("Vocês fazem sites e sistemas? Quanto custa e como funciona a segurança?", contexto());
+    expect(resultado.passarParaHumano).toBe(true);
+    expect(resultado.motivoEncaminhamento).toBe("informacao_indisponivel");
+    expect(resultado.resposta).toBe(resposta);
+    expect(envio).toHaveBeenCalledOnce();
+  });
+
+  it("um cumprimento recebe a memória anterior incluindo recusa e histórico, sem reiniciar o contato", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    const envio = vi.fn(async (_url: string, opcoes: RequestInit) => {
+      const corpo = JSON.parse(String(opcoes.body));
+      const memoria = corpo.messages[0].content;
+      expect(memoria).toContain('"empresa":"Clínica B"');
+      expect(memoria).toContain("Prefere não informar o nome.");
+      expect(memoria).toContain('"objetivo":"Agendar consultas"');
+      expect(corpo.messages.slice(1, -1)).toEqual([
+        { role: "user", content: "Prefiro não dar meu nome." },
+        { role: "assistant", content: "Tudo bem. Podemos conversar sobre o site da clínica." },
+      ]);
+      expect(corpo.messages.at(-1).content).toContain("Oi");
+      return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta: "Oi! Podemos continuar com o site da clínica." } }] });
+    });
+    vi.stubGlobal("fetch", envio);
+    const resultado = await analisarAtendimento("Oi", contexto({
+      empresa: "Clínica B", resumo: "Quer o primeiro site da clínica. Prefere não informar o nome.", qualificacao: { interesse: "site", objetivo: "Agendar consultas" },
+      historico: [{ autor: "cliente", texto: "Prefiro não dar meu nome." }, { autor: "agente", texto: "Tudo bem. Podemos conversar sobre o site da clínica." }],
+      ultimaResposta: "Tudo bem. Podemos conversar sobre o site da clínica.",
+    }));
+    expect(resultado.resposta).toBe("Oi! Podemos continuar com o site da clínica.");
+    expect(resultado.nome).toBe("");
+    expect(resultado.passarParaHumano).toBe(false);
+    expect(envio).toHaveBeenCalledOnce();
   });
 
   it("aceita campos nulos, limita o resumo e aproveita os campos úteis de qualificação", async () => {

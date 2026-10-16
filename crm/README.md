@@ -116,7 +116,7 @@ evitar insistência. Um lead de site também pode ser qualificado pelo objetivo.
 
 As mensagens autorizadas entram numa fila PostgreSQL, e o webhook confirma o
 recebimento sem esperar a IA. O worker do servidor Next persistente do Easypanel
-aguarda sete segundos de silêncio para juntar as mensagens do contato. IDs
+aguarda dez segundos de silêncio para juntar as mensagens do contato. IDs
 repetidos não viram novas chamadas. O estado é recuperado depois de reiniciar;
 uma mensagem nova durante a análise invalida a resposta antiga e mantém o lote
 para reagrupar. Assumir no painel cancela os pendentes.
@@ -127,11 +127,15 @@ Cortesias isoladas não chamam o modelo. O prompt e o retorno estruturado foram
 reduzidos; só uma saída truncada ou inválida permite uma tentativa adicional.
 
 `ANTHROPIC_MODEL` explícito é respeitado. Se estiver vazio, o padrão é
-`claude-haiku-4-5-20251001`. Para trocar o Sonnet já configurado no Easypanel,
+`claude-haiku-5-5`. Para trocar o Sonnet já configurado no Easypanel,
 altere essa variável. O custo real depende dos tokens e de quantas chamadas
-forem necessárias; o preço por token do Haiku 4.5 é menor que o do Sonnet 4.6.
-O prefixo estático pode usar cache com Sonnet; não aumentamos o prompt para
-atingir o mínimo de cache do Haiku.
+forem necessárias; o Haiku 5.5 tem tarifa padrão de US$ 0,10 de entrada e
+US$ 0,50 de saída por milhão de tokens em prompts até 100 mil tokens. O contexto
+do app é limitado em caracteres e as métricas usam os tokens reais do provedor.
+O prefixo estático pode usar cache com Haiku 5.5 e Sonnet 4. O Haiku 4.5 explícito
+continua aceito, sem inflar o prompt para atingir seu mínimo de cache.
+Fontes: [preços](https://platform.claude.com/docs/en/about-claude/pricing) e
+[migração Haiku 5.5](https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide).
 
 Chamadas com contadores de uso retornados pela API ficam registradas por até
 90 dias, inclusive tentativas e respostas descartadas por mensagem nova. O MCP

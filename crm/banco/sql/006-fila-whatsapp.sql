@@ -4,7 +4,7 @@ create table crm.fila_whatsapp (
   lead_id uuid primary key references crm.atendimento_whatsapp(lead_id),
   mensagens text[] not null default '{}',
   versao integer not null default 1,
-  disponivel_em timestamptz not null default (now() + interval '7 seconds'),
+  disponivel_em timestamptz not null default (now() + interval '10 seconds'),
   reserva uuid,
   reserva_ate timestamptz,
   tentativas integer not null default 0,

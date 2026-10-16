@@ -9,7 +9,10 @@ const esquema = z.object({ modelo: z.string().regex(/^[a-zA-Z0-9_.:-]{1,100}$/),
 
 /** Preços padrão por milhão; cache de escrita de 5 min. Não é a fatura da Anthropic. */
 export function estimarCustoAtendimento(uso: z.infer<typeof esquema>): number | null {
-  const valores = uso.modelo.startsWith('claude-haiku-4-5') ? [1, 5]
+  // O limiar do Haiku 5.5 conta toda a entrada, incluindo os tokens de cache.
+  const entradaTotal = uso.inputTokens + uso.cacheReadTokens + uso.cacheCreationTokens;
+  const valores = uso.modelo === 'claude-haiku-5-5' ? (entradaTotal > 100_000 ? [0.5, 2.5] : [0.1, 0.5])
+    : uso.modelo.startsWith('claude-haiku-4-5') ? [1, 5]
     : uso.modelo.startsWith('claude-sonnet-4-6') ? [3, 15] : null;
   if (!valores) return null;
   return (uso.inputTokens * valores[0] + uso.outputTokens * valores[1]
