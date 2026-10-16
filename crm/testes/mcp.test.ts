@@ -59,7 +59,7 @@ async function chamar(nome: string, args: Record<string, unknown>) {
 }
 
 describe("MCP", () => {
-  it("se apresenta com as instruções e as dez ferramentas", async () => {
+  it("se apresenta com as instruções e as onze ferramentas", async () => {
     const init = await rpc("initialize", {
       protocolVersion: "2025-06-18",
       capabilities: {},
@@ -81,6 +81,7 @@ describe("MCP", () => {
       "projeto_atual",
       "propor_etapa",
       "registrar_sessao",
+      "resumir_uso_whatsapp",
     ]);
     expect(tools.find((t: { name: string }) => t.name === "ler_conversa_whatsapp").annotations).toMatchObject({ readOnlyHint: true });
     expect(tools.find((t: { name: string }) => t.name === "enviar_mensagem_whatsapp").annotations).toMatchObject({

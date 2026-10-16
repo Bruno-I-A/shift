@@ -1,11 +1,10 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 import { emTransacao } from "@/lib/banco";
-import { analisarAtendimento, ErroFormatoAtendimento } from "@/lib/ia-atendimento";
 import {
   apagarAvisoWhatsApp, autorizarAtendimentoWhatsApp, buscarAtendimentoWhatsApp, buscarAvisoWhatsApp,
   registrarAvisoWhatsApp,
-  registrarMensagemRecebidaWhatsApp, responderComAgenteWhatsApp, registrarStatusWhatsApp,
+  enfileirarMensagemWhatsApp, registrarMensagemRecebidaWhatsApp, responderComAgenteWhatsApp, registrarStatusWhatsApp,
 } from "@/lib/leads";
 import { decidirConsentimentoWhatsApp, enviarTextoMeta, lerMensagensMeta, lerStatusMeta, type MensagemRecebida } from "@/lib/whatsapp";
 
@@ -22,14 +21,6 @@ function segredoCorreto(recebido: string, esperado: string): boolean {
 function assinaturaMetaCorreta(recebida: string, corpo: string, segredo: string): boolean {
   const esperada = `sha256=${createHmac("sha256", segredo).update(corpo).digest("hex")}`;
   return segredoCorreto(recebida, esperada);
-}
-
-function motivoSeguroDaIa(erro: unknown): string {
-  if (erro instanceof ErroFormatoAtendimento) return `${erro.message} ${erro.diagnostico}`;
-  if (!(erro instanceof Error)) return "falha de rede ou timeout.";
-  if (/^IA indisponível \(\d{3}\)\.$/.test(erro.message)) return erro.message;
-  if (["Configuração de IA ausente.", "Resposta da IA fora do formato esperado."].includes(erro.message)) return erro.message;
-  return "falha de rede ou timeout.";
 }
 
 export async function GET(pedido: Request): Promise<Response> {
@@ -68,24 +59,7 @@ async function atenderMensagem(mensagem: MensagemRecebida, segredo: string): Pro
       }, enviarTextoMeta));
       return;
     }
-    await emTransacao((tx) => registrarMensagemRecebidaWhatsApp(tx, atendimento!.leadId, mensagem));
-    if (atendimento.modo === 'humano' || process.env.WHATSAPP_ATIVO !== 'sim') return;
-    if (mensagem.tipo && mensagem.tipo !== 'text') {
-      await emTransacao((tx) => responderComAgenteWhatsApp(tx, atendimento!, mensagem.id, {
-        resposta: 'Recebi sua mensagem. Vou deixar para uma pessoa da Shift conferir e continuar por aqui.',
-        nome: '', empresa: '', segmento: '', dor: '', prazo: '', resumo: '', passarParaHumano: true,
-      }, enviarTextoMeta));
-      return;
-    }
-    const analise = await analisarAtendimento(mensagem.texto.slice(0, 1500), atendimento).catch((erro) => {
-      console.error(`[whatsapp] IA indisponível: ${motivoSeguroDaIa(erro)}`);
-      return {
-        resposta: "O atendimento automático está indisponível no momento. Vou deixar seu contato para uma pessoa da Shift continuar por aqui.",
-        nome: "", empresa: "", segmento: "", dor: "", prazo: "",
-        resumo: atendimento.resumo, passarParaHumano: true,
-      };
-    });
-    await emTransacao((tx) => responderComAgenteWhatsApp(tx, atendimento!, mensagem.id, analise, enviarTextoMeta));
+    await emTransacao((tx) => enfileirarMensagemWhatsApp(tx, atendimento!, mensagem, process.env.WHATSAPP_ATIVO === 'sim'));
   } catch {
     // Nunca registra o texto recebido nem o número do contato em logs.
     console.error("[whatsapp] atendimento falhou; verifique conexão e envios pendentes no CRM.");

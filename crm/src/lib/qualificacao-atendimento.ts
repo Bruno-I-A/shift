@@ -52,12 +52,37 @@ export function apenasAgradecimento(texto: string): boolean {
 
 export function solicitouHumano(texto: string, ultimaResposta: string): boolean {
   const mensagem = normalizar(texto);
-  const recusou = /\bnao (quero|queria|preciso|prefiro|gostaria|pode|chame|encaminhe|passe)\b/.test(mensagem);
-  const direto = /\b(falar|conversar|cham(?:a|e|ar)|encaminh(?:a|e|ar)|pass(?:a|e|ar))\b.{0,60}\b(humano|pessoa|equipe|especialista|atendente|bruno)\b/.test(mensagem)
-    || /\b(quero|preciso|prefiro)\s+(um |uma |o |a )?(humano|pessoa|atendente|especialista)\b/.test(mensagem);
-  const equipePropria = /\b(minha|nossa|meu|nosso)\s+(equipe|atendente|especialista)\b/.test(mensagem);
-  if (direto && !recusou && !equipePropria) return true;
-  const oferta = /\b(encaminhar|conectar|passar|chamar)\b.{0,70}\b(equipe|especialista|humano|pessoa|atendente)\b/i.test(normalizar(ultimaResposta)) && ultimaResposta.includes("?");
-  const confirmacao = mensagem.replace(/[,.!]+/g, " ").replace(/\s+/g, " ").trim();
-  return oferta && /^(sim|pode|pode sim|sim pode|quero|quero sim|pode encaminhar|pode passar)$/.test(confirmacao);
+  // A recusa impede o aceite contextual mesmo se o lote também contém “sim”.
+  const recusa = (trecho: string) => /\bnao\s+(quero|queria|preciso|precisa|prefiro|gostaria|pode|chame|encaminhe|encaminhar|passe)\b/.test(trecho)
+    || /\b(mas|porem|so que)\s+nao\b/.test(trecho)
+    || /(?:^|\n)\s*(?:agora\s+)?nao[,.! ]*(?:obrigad[oa])?\s*(?:$|\n)/.test(trecho);
+  // O pedido ou revogação humana mais recente vence no lote. Uma recusa de
+  // orçamento em outra frase não anula um pedido explícito de atendente.
+  let direto: boolean | undefined;
+  for (const trecho of mensagem.split(/[,.!?;\n]+/)) {
+    const pediu = /\b(falar|conversar|cham(?:a|e|ar)|encaminh(?:a|e|ar)|pass(?:a|e|ar))\b.{0,60}\b(humano|pessoa|equipe|especialista|atendente|bruno)\b/.test(trecho)
+      || /\b(quero|preciso|prefiro)\s+(um |uma |o |a )?(humano|pessoa|atendente|especialista)\b/.test(trecho);
+    const equipePropria = /\b(minha|nossa|meu|nosso)\s+(equipe|atendente|especialista)\b/.test(trecho);
+    const negouHumano = recusa(trecho) && (/\b(falar|conversar|cham(?:a|e|ar)|encaminh(?:a|e|ar)|pass(?:a|e|ar)|humano|pessoa|equipe|especialista|atendente|bruno)\b/.test(trecho)
+      || /^\s*(?:agora\s+)?nao\s*$/.test(trecho));
+    if (negouHumano) direto = false;
+    else if (pediu && !recusa(trecho) && !equipePropria) direto = true;
+  }
+  if (direto !== undefined) return direto;
+  if (recusa(mensagem)) return false;
+  // “Sim, mas antes...” ainda pede esclarecimento. Não pausa o atendimento
+  // nem substitui a resposta à dúvida por uma mensagem de encaminhamento.
+  if (/\b(mas|porem|antes|primeiro|so depois|so se)\b/.test(mensagem) || mensagem.includes("?")) return false;
+  // A pergunta agora é escrita conforme o diálogo: pode usar “encaminhe”,
+  // “envie”, “encaminharmos” etc. Só um convite da própria Shift, com destino
+  // humano explícito e interrogação, dá contexto para aceitar um “sim”.
+  const oferta = /\b(posso|podemos|quer|queria|prefere|gostaria|vamos|autoriza|tudo bem se)\b[^?]{0,100}\b(encaminh(?:ar|e|o|emos|armos|asse)|conect(?:ar|e|o|emos|armos|asse)|pass(?:ar|e|o|emos|armos|asse)|cham(?:ar|e|o|emos|armos|asse)|env(?:iar|ie|io|iemos|iarmos|iasse)|mand(?:ar|e|o|emos|armos|asse)|falar|conversar)\b[^?]{0,100}\b(equipe|especialista|humano|pessoa|atendente)\b[^?]*\?/.test(normalizar(ultimaResposta));
+  // Um vocativo ou comentário junto do aceite não o anula. Cada mensagem do
+  // lote pode conter a confirmação, mas ela só vale após o convite acima.
+  const confirmou = mensagem.split(/\n+/).some((linha) => {
+    const confirmacao = linha.replace(/[,.!]+/g, " ").replace(/\s+/g, " ").trim();
+    return /^(?:si+m+|pode\s+si+m+|ja\s+(?:falei|disse|confirmei)\s+que\s+(?:si+m+|pode))\b/.test(confirmacao)
+      || /^(?:pode|quero|quero sim|pode encaminhar|pode passar)$/.test(confirmacao);
+  });
+  return oferta && confirmou;
 }
