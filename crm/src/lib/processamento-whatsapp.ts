@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { emTransacao } from './banco';
-import { analisarAtendimento, ErroFormatoAtendimento, type AnaliseAtendimento } from './ia-atendimento';
+import { analisarAtendimento, ErroChamadaAtendimento, ErroFormatoAtendimento, type AnaliseAtendimento } from './ia-atendimento';
 import {
   concluirLoteWhatsApp, enviarLotePreparadoWhatsApp, liberarLoteWhatsApp, marcarEnvioWhatsApp,
   mudarModoAtendimentoWhatsApp, reservarLoteWhatsApp, type LoteWhatsApp,
@@ -11,10 +11,11 @@ import { enviarTextoMeta } from './whatsapp';
 
 function motivoSeguroDaIa(erro: unknown): string {
   if (erro instanceof ErroFormatoAtendimento) return `${erro.message} ${erro.diagnostico}`;
+  if (erro instanceof ErroChamadaAtendimento) return erro.diagnostico;
   if (!(erro instanceof Error)) return 'falha de rede ou timeout.';
   if (/^IA indisponível \(\d{3}\)\.$/.test(erro.message)) return erro.message;
   if (['Configuração de IA ausente.', 'Configuração de IA ausente ou inválida.', 'Resposta da IA fora do formato esperado.'].includes(erro.message)) return erro.message;
-  return 'falha de rede ou timeout.';
+  return 'falha interna sem diagnóstico de transporte.';
 }
 
 async function processar(lote: LoteWhatsApp): Promise<void> {

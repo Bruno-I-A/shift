@@ -125,6 +125,10 @@ A IA usa fatos do cadastro, resumo e histórico com autoria. O turno agrupado
 tem até 12 mil caracteres; lotes maiores são divididos sem descartar as entradas.
 Cortesias isoladas não chamam o modelo. O prompt e o retorno estruturado foram
 reduzidos; só uma saída truncada ou inválida permite uma tentativa adicional.
+Cada tentativa tem até 45 segundos, com limite total de 75 segundos para análise
+e recuperação. Falhas de transporte não geram outra chamada automática. O log
+informa categoria fixa (timeout, DNS, TLS, conexão ou resposta inválida), modelo,
+tentativa, fase e duração, sem conteúdo da conversa nem detalhes brutos do erro.
 
 `ANTHROPIC_MODEL` explícito é respeitado. Se estiver vazio, o padrão é
 `claude-haiku-5-5`. Para trocar o Sonnet já configurado no Easypanel,

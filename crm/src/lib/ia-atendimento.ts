@@ -53,6 +53,31 @@ export class ErroFormatoAtendimento extends Error {
   }
 }
 
+/** Somente categorias fixas: mensagens/cause do fetch podem conter dados privados. */
+export class ErroChamadaAtendimento extends Error {
+  constructor(readonly diagnostico: string) {
+    super("Falha na chamada da IA.");
+  }
+}
+
+function categoriaDeTransporte(erro: unknown, sinal: AbortSignal): string {
+  if (sinal.aborted || (erro instanceof Error && ["TimeoutError", "AbortError"].includes(erro.name))) return "timeout";
+  const codigos: string[] = [];
+  function examinar(valor: unknown, profundidade = 0) {
+    if (!valor || typeof valor !== "object" || profundidade > 3) return;
+    const item = valor as { code?: unknown; cause?: unknown; errors?: unknown[] };
+    if (typeof item.code === "string") codigos.push(item.code);
+    examinar(item.cause, profundidade + 1);
+    if (Array.isArray(item.errors)) item.errors.slice(0, 6).forEach(e => examinar(e, profundidade + 1));
+  }
+  examinar(erro);
+  if (codigos.some(c => ["ENOTFOUND", "EAI_AGAIN"].includes(c))) return "dns";
+  if (codigos.some(c => ["CERT_HAS_EXPIRED", "DEPTH_ZERO_SELF_SIGNED_CERT", "UNABLE_TO_VERIFY_LEAF_SIGNATURE", "ERR_TLS_CERT_ALTNAME_INVALID"].includes(c))) return "tls";
+  if (codigos.some(c => ["UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT", "UND_ERR_BODY_TIMEOUT", "ETIMEDOUT"].includes(c))) return "timeout";
+  if (codigos.some(c => ["ECONNRESET", "ECONNREFUSED", "ENETUNREACH", "EHOSTUNREACH", "UND_ERR_SOCKET"].includes(c))) return "conexao";
+  return erro instanceof SyntaxError ? "resposta_invalida" : "transporte";
+}
+
 interface RetornoIa {
   stop_reason?: string;
   content?: { type?: string; name?: string; input?: unknown }[];
@@ -218,14 +243,29 @@ export async function analisarAtendimento(pergunta: string, contexto: ContextoAt
     }],
     tool_choice: { type: "tool", name: "registrar_atendimento" },
   };
-  const sinal = AbortSignal.timeout(20_000);
+  // A reserva do lote dura 120 s. Limita o conjunto a 75 s e cada tentativa
+  // a 45 s, deixando tempo para confirmar no banco e enviar à Meta.
+  const limiteTotal = AbortSignal.timeout(75_000);
+  let tentativa = 0;
   const chamarIa = async (solicitacao: unknown) => {
-    const resposta = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST", headers: { "x-api-key": chave, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
-      body: JSON.stringify(solicitacao), signal: sinal,
-    });
-    if (!resposta.ok) throw new Error(`IA indisponível (${resposta.status}).`);
-    const corpo = await resposta.json() as RetornoIa;
+    tentativa++;
+    const inicio = Date.now();
+    const sinal = AbortSignal.any([limiteTotal, AbortSignal.timeout(45_000)]);
+    let fase = "conexao";
+    let resposta: Response;
+    let corpo: RetornoIa;
+    try {
+      resposta = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST", headers: { "x-api-key": chave, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
+        body: JSON.stringify(solicitacao), signal: sinal,
+      });
+      fase = "leitura";
+      if (!resposta.ok) throw new Error(`IA indisponível (${resposta.status}).`);
+      corpo = await resposta.json() as RetornoIa;
+    } catch (erro) {
+      if (erro instanceof Error && /^IA indisponível \(\d{3}\)\.$/.test(erro.message)) throw erro;
+      throw new ErroChamadaAtendimento(`tipo=${categoriaDeTransporte(erro, sinal)}; modelo=${modelo}; tentativa=${tentativa}; fase=${fase}; duracao_ms=${Date.now() - inicio}`);
+    }
     if (corpo.usage) {
       const uso: UsoAtendimento = {
         modelo, inputTokens: contador(corpo.usage.input_tokens), outputTokens: contador(corpo.usage.output_tokens),
