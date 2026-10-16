@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { emTransacao } from '@/lib/banco';
-import { analisarAtendimento } from '@/lib/ia-atendimento';
+import { analisarAtendimento, ErroChamadaAtendimento } from '@/lib/ia-atendimento';
 import * as leads from '@/lib/leads';
 import { processarFilaWhatsApp } from '@/lib/processamento-whatsapp';
 import { bancoDeTeste } from './banco-de-teste';
@@ -45,6 +45,20 @@ async function preparar() {
 }
 
 describe('worker do WhatsApp', () => {
+  it('preserva o diagnóstico seguro no log e encaminha a falha sem repetir a IA', async () => {
+    const { tx, atendimento } = await preparar();
+    const diagnostico = 'tipo=dns; modelo=claude-haiku-5-5; tentativa=1; fase=conexao; duracao_ms=12';
+    vi.mocked(analisarAtendimento).mockRejectedValueOnce(new ErroChamadaAtendimento(diagnostico));
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ messages: [{ id: 'wamid.CONTINGENCIA' }] })));
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await processarFilaWhatsApp();
+      expect(log).toHaveBeenCalledWith(`[whatsapp] IA indisponível: ${diagnostico}`);
+      expect((await leads.buscarAtendimentoWhatsApp(tx, atendimento.whatsapp))?.modo).toBe('humano');
+      expect(analisarAtendimento).toHaveBeenCalledOnce();
+      expect((await tx.query('select * from crm.fila_whatsapp')).rows).toHaveLength(0);
+    } finally { log.mockRestore(); }
+  });
   it('faz uma análise para o lote, confirma intenção antes do HTTP e não repete o envio', async () => {
     const { tx, atendimento } = await preparar();
     const fetch = vi.fn(async () => {

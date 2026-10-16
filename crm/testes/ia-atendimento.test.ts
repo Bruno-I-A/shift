@@ -3,13 +3,49 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { analisarAtendimento, ErroFormatoAtendimento, type ContextoAtendimento } from "@/lib/ia-atendimento";
 import { mascararDados } from "@/lib/dados-sensiveis";
 
-afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
+afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.restoreAllMocks(); });
 
 function contexto(extra: Partial<ContextoAtendimento> = {}): ContextoAtendimento {
   return { nome: "", empresa: null, segmento: null, dor: null, prazo: null, resumo: "", ultimaResposta: "", ...extra };
 }
 
 describe("resposta com RAG", () => {
+  it.each([
+    [new DOMException('texto privado', 'TimeoutError'), 'timeout'],
+    [new TypeError('chave privada', { cause: { code: 'ENOTFOUND' } }), 'dns'],
+    [new TypeError('texto privado', { cause: { code: 'ECONNRESET' } }), 'conexao'],
+    [new TypeError('texto privado', { cause: { code: 'CERT_HAS_EXPIRED' } }), 'tls'],
+  ])('distingue falha de transporte sem expor a mensagem original: %s', async (erro, tipo) => {
+    vi.stubEnv('ANTHROPIC_API_KEY', 'chave-que-nao-pode-vazar');
+    const envio = vi.fn(async () => { throw erro; });
+    vi.stubGlobal('fetch', envio);
+    const falha = await analisarAtendimento('Como funciona?', contexto()).catch(e => e);
+    expect(falha.diagnostico).toContain(`tipo=${tipo};`);
+    expect(falha.diagnostico).toContain('tentativa=1; fase=conexao; duracao_ms=');
+    expect(JSON.stringify(falha)).not.toMatch(/texto privado|chave privada|chave-que-nao/);
+    expect(envio).toHaveBeenCalledOnce();
+  });
+
+  it('identifica resposta JSON inválida separadamente de rede', async () => {
+    vi.stubEnv('ANTHROPIC_API_KEY', 'teste');
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('conteudo privado', { status: 200 })));
+    await expect(analisarAtendimento('Como funciona?', contexto())).rejects.toMatchObject({ diagnostico: expect.stringContaining('tipo=resposta_invalida;') });
+  });
+
+  it('a recuperação tem prazo próprio dentro do limite total e não reutiliza o sinal anterior', async () => {
+    vi.stubEnv('ANTHROPIC_API_KEY', 'teste');
+    const prazos: number[] = [];
+    vi.spyOn(AbortSignal, 'timeout').mockImplementation(ms => { prazos.push(ms); return new AbortController().signal; });
+    const sinais: AbortSignal[] = [];
+    vi.stubGlobal('fetch', vi.fn(async (_url: string, opcoes: RequestInit) => {
+      sinais.push(opcoes.signal as AbortSignal);
+      return Response.json(sinais.length === 1 ? { stop_reason: 'max_tokens', content: [] }
+        : { content: [{ type: 'tool_use', name: 'registrar_atendimento', input: { resposta: 'Posso explicar. Qual é sua dúvida?' } }] });
+    }));
+    expect((await analisarAtendimento('Como funciona?', contexto())).resposta).toContain('Posso explicar');
+    expect(prazos).toEqual([75_000, 45_000, 45_000]);
+    expect(sinais[0]).not.toBe(sinais[1]);
+  });
   it("mascara dados pessoais comuns antes de enviar ao modelo", () => {
     const texto = mascararDados("Meu e-mail é ana@example.com, CPF 123.456.789-00, WhatsApp (54) 99999-1234.");
     expect(texto).not.toContain("ana@example.com");
