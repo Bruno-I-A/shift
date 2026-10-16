@@ -328,7 +328,7 @@ describe("resposta com RAG", () => {
     expect(resultado.resposta).not.toContain("em breve");
   });
 
-  it("preserva a parte respondida quando outra informação precisa da equipe", async () => {
+  it("preserva a explicação e continua triagem quando há informação pendente, sem transferir sozinho", async () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "teste");
     const resposta = "A Shift cria sites institucionais e sistemas para empresas. O preço e as medidas específicas de segurança precisam ser confirmados pela equipe; vou deixar essas dúvidas registradas para ela.";
     const envio = vi.fn(async () => Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
@@ -336,8 +336,8 @@ describe("resposta com RAG", () => {
     } }] }));
     vi.stubGlobal("fetch", envio);
     const resultado = await analisarAtendimento("Vocês fazem sites e sistemas? Quanto custa e como funciona a segurança?", contexto());
-    expect(resultado.passarParaHumano).toBe(true);
-    expect(resultado.motivoEncaminhamento).toBe("informacao_indisponivel");
+    expect(resultado.passarParaHumano).toBe(false);
+    expect(resultado.motivoEncaminhamento).toBe("nenhum");
     expect(resultado.resposta).toBe(resposta);
     expect(envio).toHaveBeenCalledOnce();
   });

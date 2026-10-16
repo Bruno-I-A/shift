@@ -98,3 +98,30 @@ export async function enviarTextoMeta(whatsapp: string, texto: string): Promise<
   if (!corpo.success) throw new Error('A Meta não confirmou o envio.');
   return corpo.data.messages[0].id;
 }
+
+/** Indicador real da Cloud API; falha cosmética não interrompe o atendimento. */
+export async function iniciarDigitandoMeta(mensagemId: string): Promise<() => void> {
+  let encerrado = false;
+  let ocupado = false;
+  const indicar = async () => {
+    if (encerrado || ocupado) return;
+    ocupado = true;
+    try {
+      const token = process.env.WHATSAPP_META_ACCESS_TOKEN;
+      const numero = process.env.WHATSAPP_META_PHONE_NUMBER_ID;
+      const versao = process.env.WHATSAPP_META_GRAPH_VERSION;
+      if (!token || !numero || !/^v\d+\.\d+$/.test(versao ?? '')) return;
+      const resposta = await fetch(`https://graph.facebook.com/${versao}/${encodeURIComponent(numero)}/messages`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messaging_product: 'whatsapp', status: 'read', message_id: mensagemId, typing_indicator: { type: 'text' } }),
+        signal: AbortSignal.timeout(3000),
+      });
+      if (!resposta.ok) console.warn(`[whatsapp] indicador de digitação indisponível; status=${resposta.status}.`);
+    } catch { console.warn('[whatsapp] indicador de digitação indisponível.'); }
+    finally { ocupado = false; }
+  };
+  await indicar();
+  const timer = setInterval(() => { void indicar(); }, 20_000);
+  timer.unref?.();
+  return () => { encerrado = true; clearInterval(timer); };
+}

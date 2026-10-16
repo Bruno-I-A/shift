@@ -7,6 +7,9 @@ import { processarFilaWhatsApp } from '@/lib/processamento-whatsapp';
 import { bancoDeTeste } from './banco-de-teste';
 
 vi.mock('@/lib/banco', () => ({ emTransacao: vi.fn() }));
+vi.mock('@/lib/whatsapp', async importar => ({
+  ...await importar<typeof import('@/lib/whatsapp')>(), iniciarDigitandoMeta: vi.fn(async () => vi.fn()),
+}));
 vi.mock('@/lib/ia-atendimento', async importar => ({
   ...await importar<typeof import('@/lib/ia-atendimento')>(), analisarAtendimento: vi.fn(),
 }));
@@ -45,6 +48,31 @@ async function preparar() {
 }
 
 describe('worker do WhatsApp', () => {
+  it.each([false, true])('confirma cada caixa separadamente sem repetir a primeira; falha na segunda=%s', async (falharSegunda) => {
+    const { tx, atendimento } = await preparar();
+    vi.mocked(analisarAtendimento).mockResolvedValue({ ...analise, resposta: 'Podemos organizar os tratamentos no site.\n\nQual tratamento é prioridade para a clínica?' });
+    let chamadas = 0;
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      chamadas++;
+      if (chamadas === 2) {
+        expect((await leads.listarMensagensWhatsApp(tx, atendimento.leadId)).filter(m => m.autor === 'agente').map(m => m.estado)).toEqual(['enviado', 'pendente']);
+        if (falharSegunda) throw new Error('confirmação incerta');
+      }
+      return Response.json({ messages: [{ id: chamadas === 1 ? 'META.PRIMEIRA' : 'META.SEGUNDA' }] });
+    }));
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await processarFilaWhatsApp();
+      const mensagens = (await leads.listarMensagensWhatsApp(tx, atendimento.leadId)).filter(m => m.autor === 'agente');
+      expect(mensagens.map(m => m.texto)).toEqual(['Podemos organizar os tratamentos no site.', 'Qual tratamento é prioridade para a clínica?']);
+      expect(mensagens.map(m => m.estado)).toEqual(['enviado', falharSegunda ? 'erro' : 'enviado']);
+      expect((await tx.query<{ meta_id: string }>("select meta_id from crm.conversa_whatsapp where id = 's:B'")).rows[0].meta_id).toBe('META.PRIMEIRA');
+      expect((await tx.query<{ estado: string }>("select estado from crm.mensagem_whatsapp where id = 'B'")).rows[0].estado).toBe(falharSegunda ? 'erro' : 'enviado');
+      await processarFilaWhatsApp();
+      expect(chamadas).toBe(2);
+      expect(analisarAtendimento).toHaveBeenCalledOnce();
+    } finally { log.mockRestore(); }
+  });
   it('preserva o diagnóstico seguro no log e encaminha a falha sem repetir a IA', async () => {
     const { tx, atendimento } = await preparar();
     const diagnostico = 'tipo=dns; modelo=claude-haiku-5-5; tentativa=1; fase=conexao; duracao_ms=12';
