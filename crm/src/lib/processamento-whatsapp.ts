@@ -7,7 +7,7 @@ import {
   mudarModoAtendimentoWhatsApp, reservarLoteWhatsApp, type LoteWhatsApp,
 } from './leads';
 import { registrarUsoAtendimento } from './uso-atendimento';
-import { enviarTextoMeta } from './whatsapp';
+import { enviarTextoMeta, iniciarDigitandoMeta } from './whatsapp';
 
 function motivoSeguroDaIa(erro: unknown): string {
   if (erro instanceof ErroFormatoAtendimento) return `${erro.message} ${erro.diagnostico}`;
@@ -19,6 +19,7 @@ function motivoSeguroDaIa(erro: unknown): string {
 }
 
 async function processar(lote: LoteWhatsApp): Promise<void> {
+  const pararDigitando = await iniciarDigitandoMeta(lote.ids.at(-1)!.slice(2));
   try {
     const analise: AnaliseAtendimento = lote.temMidia ? {
       resposta: 'Recebi sua mensagem. Vou deixar para uma pessoa da Shift conferir e continuar por aqui.',
@@ -39,18 +40,20 @@ async function processar(lote: LoteWhatsApp): Promise<void> {
     // A tentativa já está confirmada no banco e o lote foi consumido. Nem uma
     // queda após a Meta receber o HTTP recoloca esta resposta na fila.
     try {
-      await emTransacao(tx => enviarLotePreparadoWhatsApp(tx, lote, envio, enviarTextoMeta));
+      for (let indice = 0; indice < envio.partes.length; indice++) {
+        if (!await emTransacao(tx => enviarLotePreparadoWhatsApp(tx, lote, envio, enviarTextoMeta, indice))) break;
+      }
     } catch {
       console.error('[whatsapp] envio sem confirmação; confira a conversa no CRM antes de responder novamente.');
       await emTransacao(async tx => {
-        await marcarEnvioWhatsApp(tx, envio.id, false);
+        await marcarEnvioWhatsApp(tx, envio.id, false, envio.partes.map(p => p.id));
         await mudarModoAtendimentoWhatsApp(tx, lote.leadId, 'humano');
       }).catch(() => {});
     }
   } catch {
     console.error('[whatsapp] processamento interrompido; a fila tentará recuperar o atendimento.');
     await emTransacao(tx => liberarLoteWhatsApp(tx, lote)).catch(() => {});
-  }
+  } finally { pararDigitando(); }
 }
 
 /** Uma passagem é exportada para ensaiar reinício/concorrência sem timers no teste. */

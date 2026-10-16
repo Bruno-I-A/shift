@@ -14,6 +14,7 @@ import { ErroDeDominio } from "./dominio";
 import type { EtapaLead } from "./dominio";
 import type { AnaliseAtendimento, ContextoAtendimento } from "./ia-atendimento";
 import { mascararDados } from "./dados-sensiveis";
+import { separarRespostaAtendimento } from './mensagens-atendimento';
 
 export interface Lead {
   id: string;
@@ -290,6 +291,7 @@ export async function autorizarAtendimentoWhatsApp(tx: Consulta, whatsapp: strin
 export async function registrarRespostaWhatsApp(
   tx: Consulta, atendimento: AtendimentoWhatsApp, idMensagem: string,
   analise: AnaliseAtendimento,
+  partes = [analise.resposta],
 ): Promise<boolean> {
   const { rows } = await tx.query<{ id: string }>(
     `insert into crm.mensagem_whatsapp (id, lead_id, resposta)
@@ -297,9 +299,11 @@ export async function registrarRespostaWhatsApp(
     [idMensagem, atendimento.leadId, analise.resposta],
   );
   if (!rows[0]) return false;
-  await tx.query(`insert into crm.conversa_whatsapp (id, lead_id, autor, texto)
-    values ($1, $2, 'agente', $3) on conflict (id) do nothing`,
-    [`s:${idMensagem}`, atendimento.leadId, analise.resposta]);
+  for (const [indice, texto] of partes.entries()) {
+    await tx.query(`insert into crm.conversa_whatsapp (id, lead_id, autor, texto, criado_em)
+      values ($1, $2, 'agente', $3, now() + ($4 * interval '1 millisecond')) on conflict (id) do nothing`,
+      [indice === 0 ? `s:${idMensagem}` : `s:${idMensagem}:p${String(indice).padStart(2, '0')}`, atendimento.leadId, texto, indice]);
+  }
 
   const nome = analise.nome.trim() || null;
   const empresa = analise.empresa.trim() || null;
@@ -334,8 +338,9 @@ export async function registrarRespostaWhatsApp(
   return true;
 }
 
-export async function marcarEnvioWhatsApp(tx: Consulta, idMensagem: string, enviado: boolean): Promise<void> {
-  await tx.query(`update crm.conversa_whatsapp set estado = $2 where id = $1`,
+export async function marcarEnvioWhatsApp(tx: Consulta, idMensagem: string, enviado: boolean, partes: string[] = []): Promise<void> {
+  if (!enviado && partes.length) await tx.query("update crm.conversa_whatsapp set estado = 'erro' where id = any($1::text[]) and estado = 'pendente'", [partes]);
+  await tx.query(`update crm.conversa_whatsapp set estado = $2 where id = $1 and ($2 <> 'erro' or estado <> 'enviado')`,
     [`s:${idMensagem}`, enviado ? 'enviado' : 'erro']);
   await tx.query(
     `update crm.mensagem_whatsapp set estado = $2, enviado_em = case when $2 = 'enviado' then now() else null end
@@ -563,6 +568,7 @@ export interface EnvioLoteWhatsApp {
   id: string;
   whatsapp: string;
   texto: string;
+  partes: { id: string; texto: string }[];
 }
 
 /**
@@ -591,7 +597,8 @@ export async function concluirLoteWhatsApp(
     return 'reagrupar';
   }
   const id = lote.ids.at(-1)!.slice(2);
-  const preparada = await registrarRespostaWhatsApp(tx, lote.atendimento, id, analise);
+  const partes = separarRespostaAtendimento(analise.resposta);
+  const preparada = await registrarRespostaWhatsApp(tx, lote.atendimento, id, analise, partes);
   if (analise.passarParaHumano) {
     await tx.query('delete from crm.fila_whatsapp where lead_id = $1', [lote.leadId]);
   } else {
@@ -602,7 +609,8 @@ export async function concluirLoteWhatsApp(
       where lead_id = $1 and cardinality(mensagens) > cardinality($2::text[])`, [lote.leadId, lote.ids]);
     await tx.query('delete from crm.fila_whatsapp where lead_id = $1 and reserva = $2', [lote.leadId, lote.reserva]);
   }
-  return preparada ? { id, whatsapp: lote.atendimento.whatsapp, texto: analise.resposta } : 'cancelado';
+  return preparada ? { id, whatsapp: lote.atendimento.whatsapp, texto: analise.resposta,
+    partes: partes.map((texto, indice) => ({ id: indice === 0 ? `s:${id}` : `s:${id}:p${String(indice).padStart(2, '0')}`, texto })) } : 'cancelado';
 }
 
 /**
@@ -613,7 +621,10 @@ export async function concluirLoteWhatsApp(
 export async function enviarLotePreparadoWhatsApp(
   tx: Consulta, lote: LoteWhatsApp, envio: EnvioLoteWhatsApp,
   enviar: (whatsapp: string, texto: string) => Promise<string>,
-): Promise<void> {
+  indice = 0,
+): Promise<boolean> {
+  const parte = envio.partes[indice];
+  if (!parte) return false;
   const { rows } = await tx.query<{ revisao: number; etapa: string; ultima: Date | null; novas: boolean }>(
     `select aw.revisao, l.etapa::text as etapa,
       (select max(criado_em) from crm.conversa_whatsapp where lead_id = aw.lead_id and autor = 'cliente') as ultima,
@@ -623,12 +634,15 @@ export async function enviarLotePreparadoWhatsApp(
       where aw.lead_id = $1 for update of aw`, [lote.leadId, lote.idsAgrupados]);
   if (!rows[0] || rows[0].revisao !== lote.atendimento.revisao
     || rows[0].novas || ['ganho', 'perdido'].includes(rows[0].etapa) || !janelaWhatsAppAberta(rows[0].ultima)) {
-    await marcarEnvioWhatsApp(tx, envio.id, false);
-    return;
+    await marcarEnvioWhatsApp(tx, envio.id, false, envio.partes.map(p => p.id));
+    return false;
   }
-  const metaId = await enviar(envio.whatsapp, envio.texto);
-  await confirmarMensagemWhatsApp(tx, `s:${envio.id}`, metaId);
-  await marcarEnvioWhatsApp(tx, envio.id, true);
+  const { rows: estados } = await tx.query<{ estado: string }>('select estado from crm.conversa_whatsapp where id = $1', [parte.id]);
+  if (estados[0]?.estado !== 'pendente') return false;
+  const metaId = await enviar(envio.whatsapp, parte.texto);
+  await confirmarMensagemWhatsApp(tx, parte.id, metaId);
+  if (indice === envio.partes.length - 1) await marcarEnvioWhatsApp(tx, envio.id, true);
+  return true;
 }
 
 /** Falha operacional tem espera e limite; não fica chamando IA em ciclo infinito. */

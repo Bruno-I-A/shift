@@ -10,6 +10,22 @@ const analise = {
 };
 
 describe('fila durável do atendimento WhatsApp', () => {
+  it('confirma a primeira caixa e permite tomada humana antes da segunda', async () => {
+    const { tx } = await bancoDeTeste();
+    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'CAIXAS', texto: 'Quero um site' });
+    await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
+    const lote = (await leads.reservarLoteWhatsApp(tx))!;
+    const envio = await leads.concluirLoteWhatsApp(tx, lote, { ...analise, resposta: 'Podemos planejar o site juntos.\n\nQual é a prioridade do projeto?' });
+    expect(typeof envio).not.toBe('string');
+    if (typeof envio === 'string') return;
+    const enviar = vi.fn(async () => 'META.CAIXA1');
+    expect(await leads.enviarLotePreparadoWhatsApp(tx, lote, envio, enviar, 0)).toBe(true);
+    await leads.mudarModoAtendimentoWhatsApp(tx, a.leadId, 'humano');
+    expect(await leads.enviarLotePreparadoWhatsApp(tx, lote, envio, enviar, 1)).toBe(false);
+    expect(enviar).toHaveBeenCalledOnce();
+    expect((await leads.listarMensagensWhatsApp(tx, a.leadId)).filter(m => m.autor === 'agente').map(m => m.estado)).toEqual(['enviado', 'erro']);
+  });
   it('espera silêncio, junta mensagens na ordem recebida e não cobra duplicatas de webhook', async () => {
     const { tx } = await bancoDeTeste();
     // Fixa now() na transação para simular a pausa sem sleep ou flutuação do relógio.

@@ -149,6 +149,15 @@ fatura, impostos ou contratos da Anthropic. Prompts e respostas não entram no l
 de custo.
 
 Ao terminar a descoberta, o agente pergunta se pode encaminhar o resumo à equipe.
+Cumprimentos não recapitulam o cadastro nem oferecem transferência. Dúvidas de
+preço ou detalhes fora da base ficam pendentes no resumo; a IA continua a triagem
+e só pausa por pedido/aceite explícito, falha técnica ou mídia que precisa da equipe.
+As respostas são distribuídas em caixas de até 320 caracteres, preservando o
+conteúdo e separando explicação e pergunta quando houver parágrafos. Cada caixa
+tem sua intenção durável e confirmação; uma falha parcial não repete as anteriores.
+Durante a análise, a Cloud API recebe o indicador real de digitação e confirmação
+de leitura. O indicador é renovado enquanto houver processamento e para de ser
+renovado ao terminar; se esse recurso falhar, a resposta continua normalmente.
 O pedido direto de atendimento humano continua disponível a qualquer momento.
 Um agradecimento não confirma o encaminhamento, e o agente não promete agendamento
 ou prazo de retorno de um especialista.
