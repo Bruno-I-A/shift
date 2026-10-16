@@ -57,7 +57,10 @@ export function solicitouHumano(texto: string, ultimaResposta: string): boolean 
     || /\b(quero|preciso|prefiro)\s+(um |uma |o |a )?(humano|pessoa|atendente|especialista)\b/.test(mensagem);
   const equipePropria = /\b(minha|nossa|meu|nosso)\s+(equipe|atendente|especialista)\b/.test(mensagem);
   if (direto && !recusou && !equipePropria) return true;
-  const oferta = /\b(encaminhar|conectar|passar|chamar)\b.{0,70}\b(equipe|especialista|humano|pessoa|atendente)\b/i.test(normalizar(ultimaResposta)) && ultimaResposta.includes("?");
+  // A pergunta agora é escrita conforme o diálogo: pode usar “encaminhe”,
+  // “envie”, “encaminharmos” etc. Só um convite da própria Shift, com destino
+  // humano explícito e interrogação, dá contexto para aceitar um “sim”.
+  const oferta = /\b(posso|podemos|quer|queria|prefere|gostaria|vamos|autoriza|tudo bem se)\b[^?]{0,100}\b(encaminh(?:ar|e|o|emos|armos|asse)|conect(?:ar|e|o|emos|armos|asse)|pass(?:ar|e|o|emos|armos|asse)|cham(?:ar|e|o|emos|armos|asse)|env(?:iar|ie|io|iemos|iarmos|iasse)|mand(?:ar|e|o|emos|armos|asse)|falar|conversar)\b[^?]{0,100}\b(equipe|especialista|humano|pessoa|atendente)\b[^?]*\?/.test(normalizar(ultimaResposta));
   const confirmacao = mensagem.replace(/[,.!]+/g, " ").replace(/\s+/g, " ").trim();
   return oferta && /^(sim|pode|pode sim|sim pode|quero|quero sim|pode encaminhar|pode passar)$/.test(confirmacao);
 }

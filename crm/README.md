@@ -56,7 +56,7 @@ o recebimento de conversas autorizadas e o envio manual continuam funcionando.
 O primeiro contato recebe um aviso de privacidade. Só depois de responder
 `SIM`, `ACEITO` ou `AUTORIZO` o CRM cria ou associa um lead. A cada pergunta,
 busca trechos de `conhecimento/shift.md` (cópia versionada de
-`../site/llms-full.txt`) e envia apenas esses trechos e a mensagem mascarada
+`../site/llms-full.txt`) e envia esses trechos, o histórico recente e as mensagens mascaradas
 para a Messages API da Anthropic. O Claude responde e extrai nome, empresa, setor,
 dor e prazo quando foram informados. Nome + dor + empresa ou setor levam o
 lead à etapa **Qualificado**. Sem base para responder ou em falha da IA, o
@@ -66,7 +66,7 @@ pausa o agente; **Reativar agente** devolve o atendimento automático.
 O CRM guarda o resumo, os dados de qualificação e o histórico de mensagens
 das conversas autorizadas por até 90 dias. Cada chamada ao Claude recebe nome,
 empresa, segmento, necessidade, prazo, resumo acumulado e a última resposta
-enviada pela Shift (agente ou humano), sem enviar a transcrição inteira. Isso permite
+enviada pela Shift (agente ou humano), mais até 12 mensagens recentes limitadas a 8 mil caracteres. Isso permite
 entender respostas curtas e continuar a conversa usando o que o contato já contou,
 mesmo após reiniciar o CRM. Novos fatos e correções explícitas atualizam o lead;
 campos vazios preservam o cadastro. Documentos, e-mail e telefone são mascarados
@@ -102,14 +102,43 @@ O agente usa o primeiro nome quando adequado, responde com frases curtas e faz
 no máximo uma pergunta por vez. Não repete a apresentação nem pede informações
 já conhecidas. O resumo guarda apenas o contexto útil ao atendimento comercial.
 
-O esclarecimento tem até 280 caracteres; uma única pergunta é acrescentada pelo
-CRM conforme os dados que faltam. Uma resposta extensa do modelo é reescrita antes
-do envio, sem descartar a qualificação já extraída. Para sites, a descoberta cobre
+O modelo responde à dúvida usando o diálogo recente e recebe orientação para
+mensagens curtas e uma pergunta contextual por vez. A qualificação orienta a
+descoberta, sem anexar uma pergunta fixa nem pagar outra inferência para encurtar
+o texto. Para sites, a descoberta cobre
 objetivo, cidade, site atual e materiais; para IA e sistemas, processo, ferramentas
 e equipe. Prazo, participação na decisão, faixa de investimento (opcional) e
 preferência de contato complementam o contexto. Todos ficam em **Detalhes do lead**.
 Respostas como "ainda não sei" ou "prefiro não informar" são registradas para
 evitar insistência. Um lead de site também pode ser qualificado pelo objetivo.
+
+### Mensagens em sequência e custo
+
+As mensagens autorizadas entram numa fila PostgreSQL, e o webhook confirma o
+recebimento sem esperar a IA. O worker do servidor Next persistente do Easypanel
+aguarda sete segundos de silêncio para juntar as mensagens do contato. IDs
+repetidos não viram novas chamadas. O estado é recuperado depois de reiniciar;
+uma mensagem nova durante a análise invalida a resposta antiga e mantém o lote
+para reagrupar. Assumir no painel cancela os pendentes.
+
+A IA usa fatos do cadastro, resumo e histórico com autoria. O turno agrupado
+tem até 12 mil caracteres; lotes maiores são divididos sem descartar as entradas.
+Cortesias isoladas não chamam o modelo. O prompt e o retorno estruturado foram
+reduzidos; só uma saída truncada ou inválida permite uma tentativa adicional.
+
+`ANTHROPIC_MODEL` explícito é respeitado. Se estiver vazio, o padrão é
+`claude-haiku-4-5-20251001`. Para trocar o Sonnet já configurado no Easypanel,
+altere essa variável. O custo real depende dos tokens e de quantas chamadas
+forem necessárias; o preço por token do Haiku 4.5 é menor que o do Sonnet 4.6.
+O prefixo estático pode usar cache com Sonnet; não aumentamos o prompt para
+atingir o mínimo de cache do Haiku.
+
+Chamadas com contadores de uso retornados pela API ficam registradas por até
+90 dias, inclusive tentativas e respostas descartadas por mensagem nova. O MCP
+`resumir_uso_whatsapp` soma os tokens e estima o valor por modelo com os preços
+padrão conhecidos. Não recupera o gasto anterior à atualização nem substitui a
+fatura, impostos ou contratos da Anthropic. Prompts e respostas não entram no log
+de custo.
 
 Ao terminar a descoberta, o agente pergunta se pode encaminhar o resumo à equipe.
 O pedido direto de atendimento humano continua disponível a qualquer momento.
@@ -142,7 +171,7 @@ WhatsApp.
 3. No Ambiente do CRM, configure `WHATSAPP_META_PHONE_NUMBER_ID`,
    `WHATSAPP_META_ACCESS_TOKEN`, `WHATSAPP_META_GRAPH_VERSION`,
    `WHATSAPP_META_VERIFY_TOKEN`, `WHATSAPP_META_APP_SECRET`,
-   `ANTHROPIC_API_KEY` e `ANTHROPIC_MODEL`, conforme `.env.exemplo`. Reimplante o
+   `ANTHROPIC_API_KEY` e, opcionalmente, `ANTHROPIC_MODEL`, conforme `.env.exemplo`. Reimplante o
    CRM e confira `/api/saude`.
 4. Em uma janela de teste, ative `WHATSAPP_ATIVO=sim` e faça uma conversa real
    de outro número: aviso → `SIM` → pergunta sobre a Shift → qualificação no
@@ -175,6 +204,7 @@ Sem estado entre requisições. Atende o protocolo 2026-07-28 e, para clientes d
 | `listar_conversas_whatsapp` | Lista contatos e resumo com número mascarado; aceita busca |
 | `ler_conversa_whatsapp` | Até 100 mensagens por página, em ordem cronológica, com dados pessoais comuns mascarados |
 | `enviar_mensagem_whatsapp` | Responde no número oficial e pausa a IA, usando a mesma validação do painel |
+| `resumir_uso_whatsapp` | Chamadas, tokens e estimativa por modelo, sem conteúdo das mensagens |
 
 O agente não cria nem edita projeto, não muda etapa direto e não mexe em chave.
 

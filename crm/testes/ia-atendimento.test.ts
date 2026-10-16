@@ -17,6 +17,19 @@ describe("resposta com RAG", () => {
     expect(texto).not.toContain("99999-1234");
   });
 
+  it.each([
+    ["ana@example.com", "[e-mail]"], ["123.456.789-00", "[CPF]"],
+    ["12.345.678/0001-90", "[CNPJ]"], ["(54) 99999-1234", "[telefone]"],
+  ])("mascara %s antes de aplicar o limite do texto", (dado, marcador) => {
+    const prefixo = `${"x".repeat(20)} `;
+    expect(mascararDados(`${prefixo}${dado}`, 25)).toBe(`${prefixo}${marcador}`.slice(0, 25));
+  });
+
+  it("preserva os números de orçamento, prazo e equipe usados na qualificação", () => {
+    const texto = "Tenho R$ 3.500 para o projeto, somos 8 pessoas e pensamos em 30 dias.";
+    expect(mascararDados(texto)).toBe(texto);
+  });
+
   it("envia só os trechos recuperados à API da Anthropic", async () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "teste");
     vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
@@ -37,8 +50,8 @@ describe("resposta com RAG", () => {
     expect(resultado.resposta).toMatch(/indústrias/);
     const opcoes = chamadas[0];
     const corpo = JSON.parse(String(opcoes.body));
-    expect(corpo.messages[0].content).toContain("[e-mail]");
-    expect(corpo.messages[0].content).not.toContain("ana@example.com");
+    expect(JSON.stringify(corpo.messages)).toContain("[e-mail]");
+    expect(JSON.stringify(corpo.messages)).not.toContain("ana@example.com");
     expect(corpo.messages[0].content).toContain("Trechos da base");
     expect(corpo.tool_choice).toEqual({ type: "tool", name: "registrar_atendimento" });
     expect(corpo.tools[0].input_schema.additionalProperties).toBe(false);
@@ -46,14 +59,14 @@ describe("resposta com RAG", () => {
     expect(JSON.stringify(corpo.tools)).not.toContain("maxLength");
   });
 
-  it.each(["Bruno", "sim", "não", "Obrigado"])("entende a resposta curta %s usando a memória e a última pergunta", async (texto) => {
+  it.each(["Bruno", "sim", "não"])("entende a resposta curta %s usando a memória e a última pergunta", async (texto) => {
     vi.stubEnv("ANTHROPIC_API_KEY", "teste");
     vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
     const envio = vi.fn(async (_url: string, opcoes: RequestInit) => {
       const corpo = JSON.parse(String(opcoes.body));
       expect(corpo.messages[0].content).toContain('"empresa":"Scharff"');
       expect(corpo.messages[0].content).toContain("Como você se chama?");
-      expect(corpo.messages[0].content).toContain(`Mensagem atual: ${texto}`);
+      expect(corpo.messages.at(-1).content).toContain(texto);
       return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
         resposta: "Entendi.", nome: texto === "Bruno" ? "Bruno" : "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "Representa a Scharff.", passarParaHumano: false,
       } }] });
@@ -72,56 +85,176 @@ describe("resposta com RAG", () => {
     await expect(analisarAtendimento("Vocês atendem indústrias? Meu e-mail é ana@example.com", contexto())).rejects.toThrow("IA indisponível (401).");
   });
 
-  it("encurta uma resposta extensa sem perder os fatos extraídos do cliente", async () => {
+  it("usa o histórico em ordem com autoria e preserva a complementação de um turno longo mascarado", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    vi.stubEnv("ANTHROPIC_MODEL", "claude-sonnet-4-6");
+    const turno = `Quero organizar a entrada de documentos. ${"A equipe recebe muitos documentos. ".repeat(55)}\nA correção importante: somos três, não oito. Retorno: ana@example.com`;
+    const envio = vi.fn(async (_url: string, opcoes: RequestInit) => {
+      const corpo = JSON.parse(String(opcoes.body));
+      expect(corpo.messages.slice(1, -1)).toEqual([
+        { role: "user", content: "Represento a Scharff e quero organizar documentos." },
+        { role: "assistant", content: "Que ferramenta vocês usam hoje?" },
+        { role: "user", content: "Usamos uma planilha, com oito pessoas. [e-mail]" },
+        { role: "assistant", content: "[Equipe humana da Shift] Retomamos o assunto da entrada de documentos." },
+      ]);
+      expect(corpo.messages.at(-1).content).toContain("somos três, não oito");
+      expect(corpo.messages.at(-1).content).toContain("[e-mail]");
+      expect(JSON.stringify(corpo.messages)).not.toContain("ana@example.com");
+      expect(corpo.thinking).toEqual({ type: "disabled" });
+      expect(corpo.system[0].cache_control).toEqual({ type: "ephemeral" });
+      return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
+        resposta: "Entendi, são três pessoas. Em que etapa a planilha mais atrapalha?", qualificacao: { equipe: "3" },
+      } }] });
+    });
+    vi.stubGlobal("fetch", envio);
+    const resultado = await analisarAtendimento(turno, contexto({
+      nome: "Bruno", empresa: "Scharff", historico: [
+        { autor: "cliente", texto: "Represento a Scharff e quero organizar documentos." },
+        { autor: "agente", texto: "Que ferramenta vocês usam hoje?" },
+        { autor: "cliente", texto: "Usamos uma planilha, com oito pessoas. ana@example.com" },
+        { autor: "humano", texto: "Retomamos o assunto da entrada de documentos." },
+      ],
+    }));
+    expect(resultado.qualificacao?.equipe).toBe("3");
+    expect(envio).toHaveBeenCalledOnce();
+  });
+
+  it("limita o histórico às mensagens recentes sem perder o fim do turno atual", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    vi.stubEnv("ANTHROPIC_MODEL", "");
+    vi.stubGlobal("fetch", vi.fn(async (_url: string, opcoes: RequestInit) => {
+      const corpo = JSON.parse(String(opcoes.body));
+      expect(corpo.model).toBe("claude-haiku-4-5-20251001");
+      expect(corpo.system[0].cache_control).toBeUndefined();
+      const anteriores = corpo.messages.slice(1, -1);
+      expect(anteriores.length).toBeLessThanOrEqual(12);
+      expect(anteriores.map((m: { content: string }) => m.content).join("").length).toBeLessThanOrEqual(8000);
+      expect(JSON.stringify(anteriores)).not.toContain("antiga-0 ");
+      expect(anteriores.at(-1).content).toContain("antiga-29");
+      expect(corpo.messages.at(-1).content).toContain("Este é o fim do turno.");
+      return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta: "Entendi." } }] });
+    }));
+    await analisarAtendimento(`${"Texto do projeto. ".repeat(600)}Este é o fim do turno.`, contexto({
+      historico: Array.from({ length: 30 }, (_, i) => ({ autor: "cliente" as const, texto: `antiga-${i} ${"Contexto anterior. ".repeat(100)}` })),
+    }));
+  });
+
+  it("conta a identificação humana no orçamento do histórico que começa pela equipe", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    vi.stubGlobal("fetch", vi.fn(async (_url: string, opcoes: RequestInit) => {
+      const corpo = JSON.parse(String(opcoes.body));
+      const anteriores = corpo.messages.slice(1, -1);
+      expect(corpo.messages[0].role).toBe("user");
+      expect(anteriores[0].role).toBe("assistant");
+      expect(anteriores.every((m: { content: string }) => m.content.startsWith("[Equipe humana da Shift] "))).toBe(true);
+      expect(anteriores.map((m: { content: string }) => m.content).join("").length).toBeLessThanOrEqual(8000);
+      expect(anteriores.at(-1).content).toContain("Último detalhe relevante.");
+      return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta: "Podemos continuar de onde vocês pararam." } }] });
+    }));
+    await analisarAtendimento("Podemos retomar?", contexto({
+      historico: Array.from({ length: 12 }, () => ({ autor: "humano" as const, texto: `${"Contexto anterior. ".repeat(100)}Último detalhe relevante.` })),
+    }));
+  });
+
+  it("contabiliza cada tentativa pela usage da API sem aceitar valores do conteúdo", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    vi.stubEnv("ANTHROPIC_MODEL", "claude-sonnet-4-6");
+    const registro = vi.fn();
+    const log = vi.spyOn(console, "info").mockImplementation(() => {});
+    try {
+      vi.stubGlobal("fetch", vi.fn()
+        .mockResolvedValueOnce(Response.json({ stop_reason: "max_tokens", usage: { input_tokens: 1200, output_tokens: 1000 }, content: [] }))
+        .mockResolvedValueOnce(Response.json({ stop_reason: "tool_use", usage: { input_tokens: 1300, output_tokens: 190, cache_read_input_tokens: 1100, cache_creation_input_tokens: -3 }, content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta: "Sim, podemos avaliar.", inputTokens: 999999, resumo: "ana@example.com" } }] })));
+      await analisarAtendimento("O e-mail é ana@example.com", contexto({ onUso: registro }));
+      expect(registro.mock.calls).toEqual([
+        [{ modelo: "claude-sonnet-4-6", inputTokens: 1200, outputTokens: 1000, cacheReadTokens: 0, cacheCreationTokens: 0 }],
+        [{ modelo: "claude-sonnet-4-6", inputTokens: 1300, outputTokens: 190, cacheReadTokens: 1100, cacheCreationTokens: 0 }],
+      ]);
+      expect(JSON.stringify(log.mock.calls)).not.toContain("ana@example.com");
+    } finally { log.mockRestore(); }
+  });
+
+  it("não apresenta consumo ausente como se fosse uma chamada de custo zero", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    const registro = vi.fn();
+    const aviso = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      vi.stubGlobal("fetch", vi.fn(async () => Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta: "Podemos avaliar." } }] })));
+      expect((await analisarAtendimento("Quero um sistema", contexto({ onUso: registro }))).resposta).toBe("Podemos avaliar.");
+      expect(registro).not.toHaveBeenCalled();
+      expect(aviso).toHaveBeenCalledWith("[whatsapp] uso_ia indisponível na resposta do provedor.");
+    } finally { aviso.mockRestore(); }
+  });
+
+  it("não confunde uma dúvida acompanhada de agradecimento com encerramento", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    const envio = vi.fn(async () => Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta: "Sim, fazemos sites." } }] }));
+    vi.stubGlobal("fetch", envio);
+    expect((await analisarAtendimento("Vocês fazem sites? Obrigado", contexto())).resposta).toBe("Sim, fazemos sites.");
+    expect(envio).toHaveBeenCalledOnce();
+  });
+
+  it("não ignora o valor informado junto a uma cortesia", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    const envio = vi.fn(async () => Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta: "Entendi a faixa de investimento.", qualificacao: { investimento: "R$ 3.500" } } }] }));
+    vi.stubGlobal("fetch", envio);
+    const resultado = await analisarAtendimento("Show, 3500", contexto({ ultimaResposta: "Já tem uma faixa de investimento em mente?" }));
+    expect(resultado.qualificacao?.investimento).toBe("R$ 3.500");
+    expect(envio).toHaveBeenCalledOnce();
+  });
+
+  it("limita uma resposta extensa sem segunda inferência nem perda dos fatos extraídos", async () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "teste");
     vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
     const envio = vi.fn()
       .mockResolvedValueOnce(Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
         resposta: "A Shift cria sites institucionais. ".repeat(15), nome: "Bruno", empresa: "Clínica B", segmento: "Odontologia", dor: "", prazo: "", resumo: "Bruno quer o primeiro site da Clínica B.", passarParaHumano: false,
         qualificacao: { interesse: "site", cidade: "Passo Fundo", siteAtual: "Primeiro site" },
-      } }] }))
-      .mockResolvedValueOnce(Response.json({ content: [{ type: "tool_use", name: "resumir_resposta", input: { resposta: "Sim, criamos sites institucionais e ajudamos a organizar o conteúdo." } }] }));
+      } }] }));
     vi.stubGlobal("fetch", envio);
     const resultado = await analisarAtendimento("Quero um site para a clínica", contexto());
-    expect(resultado.resposta.length).toBeLessThanOrEqual(420);
-    expect(resultado.resposta).toContain("O que você quer alcançar com o site?");
-    expect(resultado.resposta.match(/\?/g)).toHaveLength(1);
+    expect(resultado.resposta.length).toBeLessThanOrEqual(600);
+    expect(resultado.resposta).toContain("A Shift cria sites institucionais.");
+    expect(resultado.resposta).not.toContain("Qual é o nome");
     expect(resultado.qualificacao).toMatchObject({ interesse: "site", cidade: "Passo Fundo" });
     expect(resultado.nome).toBe("Bruno");
-    expect(envio).toHaveBeenCalledTimes(2);
+    expect(envio).toHaveBeenCalledOnce();
   });
 
-  it("um agradecimento não confirma a oferta de encaminhamento nem promete contato", async () => {
-    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
-    vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
-    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
-      resposta: "Em breve um especialista vai entrar em contato.", nome: "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "Quer site para a clínica.", passarParaHumano: true,
-      motivoEncaminhamento: "pedido_cliente", coletarDados: true,
-    } }] })));
+  it("um agradecimento responde sem custo de IA e não confirma encaminhamento", async () => {
+    const envio = vi.fn();
+    vi.stubGlobal("fetch", envio);
     const resultado = await analisarAtendimento("Show, obrigado", contexto({ nome: "Bruno", resumo: "Bruno quer o primeiro site da clínica.", ultimaResposta: "Posso encaminhar esse resumo à equipe da Shift para continuar com você?" }));
     expect(resultado.passarParaHumano).toBe(false);
     expect(resultado.resposta).toBe("Por nada. Quando quiser, podemos continuar por aqui.");
     expect(resultado.resumo).toBe("Bruno quer o primeiro site da clínica.");
     expect(resultado.qualificacao).toEqual({});
+    expect(envio).not.toHaveBeenCalled();
   });
 
-  it("uma falha na reescrita mantém a qualificação extraída e o agente ativo", async () => {
+  it("preserva uma pergunta contextual e não acrescenta outra pergunta fixa", async () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "teste");
     vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
-    const aviso = vi.spyOn(console, "warn").mockImplementation(() => {});
-    try {
-      vi.stubGlobal("fetch", vi.fn()
-        .mockResolvedValueOnce(Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
-          resposta: "Uma explicação longa sobre sites. ".repeat(20), nome: "Bruno", empresa: "Clínica B", segmento: "Odontologia", dor: "", prazo: "", resumo: "Quer um site.", passarParaHumano: false,
-          qualificacao: { interesse: "site", objetivo: "Atrair pacientes" },
-        } }] }))
-        .mockResolvedValueOnce(new Response(null, { status: 429 })));
-      const resultado = await analisarAtendimento("Quero um site", contexto());
-      expect(resultado.passarParaHumano).toBe(false);
-      expect(resultado.qualificacao).toMatchObject({ objetivo: "Atrair pacientes" });
-      expect(resultado.resposta).toContain("Em qual cidade sua empresa atende?");
-      expect(resultado.resposta.length).toBeLessThanOrEqual(420);
-    } finally { aviso.mockRestore(); }
+    const envio = vi.fn(async () => Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
+      resposta: "Entendi, vocês querem atrair pacientes. Qual tratamento querem destacar primeiro?", qualificacao: { interesse: "site", objetivo: "Atrair pacientes" },
+    } }] }));
+    vi.stubGlobal("fetch", envio);
+    const resultado = await analisarAtendimento("Quero um site", contexto());
+    expect(resultado.resposta).toBe("Entendi, vocês querem atrair pacientes. Qual tratamento querem destacar primeiro?");
+    expect(resultado.qualificacao).toMatchObject({ objetivo: "Atrair pacientes" });
+    expect(envio).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    'Você perguntou "o que preciso enviar?". Podemos ajudar a organizar textos, fotos e informações do negócio.',
+    "Quer começar pelo site? Podemos organizar primeiro o objetivo e os materiais que você já tem.",
+    `Podemos avaliar a integração com a ferramenta da empresa. ${"O fluxo depende dos acessos disponíveis. ".repeat(18)}A equipe precisa confirmar os detalhes antes de garantir essa integração.`,
+  ])("preserva a explicação depois de uma interrogação e respostas úteis acima de 600 caracteres", async (resposta) => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "teste");
+    const envio = vi.fn(async () => Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: { resposta } }] }));
+    vi.stubGlobal("fetch", envio);
+    expect((await analisarAtendimento("O que preciso para começar?", contexto())).resposta).toBe(resposta);
+    expect(envio).toHaveBeenCalledOnce();
   });
 
   it("uma confirmação explícita encaminha sem garantir prazo de retorno", async () => {
@@ -130,7 +263,7 @@ describe("resposta com RAG", () => {
     vi.stubGlobal("fetch", vi.fn(async () => Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
       resposta: "Tudo certo.", nome: "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "Quer site para a clínica.", passarParaHumano: false,
     } }] })));
-    const resultado = await analisarAtendimento("Sim, pode", contexto({ nome: "Bruno", ultimaResposta: "Posso encaminhar esse resumo à equipe da Shift para continuar com você?" }));
+    const resultado = await analisarAtendimento("Sim, pode", contexto({ nome: "Bruno", ultimaResposta: "Quer que eu encaminhe seu resumo para nossa equipe?" }));
     expect(resultado.passarParaHumano).toBe(true);
     expect(resultado.resposta).not.toContain("?");
     expect(resultado.resposta).not.toContain("em breve");
@@ -151,7 +284,7 @@ describe("resposta com RAG", () => {
     expect(resultado.resumo.length).toBe(1000);
     expect(resultado.qualificacao).toEqual({ interesse: "IA nos processos", equipe: "8", materiais: "Não" });
     expect(resultado.passarParaHumano).toBe(false);
-    expect(resultado.resposta).toContain("Qual processo");
+    expect(resultado.resposta).toBe("Podemos olhar esse processo juntos.");
     expect(envio).toHaveBeenCalledOnce();
   });
 
@@ -165,7 +298,7 @@ describe("resposta com RAG", () => {
     expect(resultado.qualificacao).toEqual({});
     expect(resultado.nome).toBe("");
     expect(resultado.resumo).toBe("");
-    expect(resultado.resposta).toContain("O que você quer alcançar com o site?");
+    expect(resultado.resposta).toBe("Sim, criamos sites institucionais.");
   });
 
   it("repete uma resposta truncada com mais tokens sem usar os dados parciais", async () => {

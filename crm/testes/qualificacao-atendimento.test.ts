@@ -39,4 +39,23 @@ describe("organização da descoberta do projeto", () => {
     expect(solicitouHumano("Preciso conversar com minha equipe", "Você decide sobre esse projeto?")).toBe(false);
     expect(apenasAgradecimento("Obrigado, pode encaminhar para a equipe")).toBe(false);
   });
+
+  it.each([
+    "Quer que eu encaminhe seu resumo para nossa equipe?",
+    "Gostaria que eu enviasse os detalhes para um especialista?",
+    "Tudo bem se encaminharmos esse resumo para a equipe?",
+    "Você quer que eu envie o resumo para nossa equipe?",
+    "Posso mandar o contexto para um atendente?",
+    "Quer falar com uma pessoa da equipe?",
+  ])("aceita sim após um convite natural de encaminhamento: %s", (oferta) => {
+    expect(solicitouHumano("Sim", oferta)).toBe(true);
+    expect(solicitouHumano("Show, obrigado", oferta)).toBe(false);
+    expect(solicitouHumano("Não quero", oferta)).toBe(false);
+  });
+
+  it("não confunde dúvidas sobre envio de material nem sim sem convite com encaminhamento", () => {
+    expect(solicitouHumano("Pode encaminhar o documento para mim?", "O material ajuda a definir o projeto.")).toBe(false);
+    expect(solicitouHumano("Sim", "Você já enviou o material para sua equipe?")).toBe(false);
+    expect(solicitouHumano("Sim", "Nossa equipe pode organizar o material. Você já tem fotos?")).toBe(false);
+  });
 });

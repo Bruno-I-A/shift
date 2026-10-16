@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { GET, POST } from "@/app/api/whatsapp/webhook/route";
 import { emTransacao } from "@/lib/banco";
 import { buscarAtendimentoWhatsApp, listarMensagensWhatsApp, mudarModoAtendimentoWhatsApp } from "@/lib/leads";
+import { processarFilaWhatsApp } from '@/lib/processamento-whatsapp';
 import { bancoDeTeste } from "./banco-de-teste";
 
 vi.mock("@/lib/banco", () => ({ emTransacao: vi.fn() }));
@@ -50,6 +51,7 @@ describe("proteção do webhook oficial do WhatsApp", () => {
     vi.stubEnv("WHATSAPP_META_GRAPH_VERSION", "v24.0");
     vi.stubEnv("ANTHROPIC_API_KEY", "ia-teste");
     vi.stubEnv("ANTHROPIC_MODEL", "modelo-de-teste");
+    vi.stubEnv('DATABASE_URL', 'postgres://teste');
     const enviados: string[] = [];
     const pedidosIa: string[] = [];
     vi.stubGlobal("fetch", async (url: string, opcoes: RequestInit) => {
@@ -58,7 +60,7 @@ describe("proteção do webhook oficial do WhatsApp", () => {
         enviados.push(corpo.text.body);
         return Response.json({ messages: [{ id: `wamid.ENVIADA${enviados.length}` }] });
       }
-      pedidosIa.push(corpo.messages[0].content);
+      pedidosIa.push(JSON.stringify(corpo.messages));
       return Response.json({ content: [{ type: "tool_use", name: "registrar_atendimento", input: {
         resposta: pedidosIa.length === 1 ? "Prazer, Bruno." : "Começamos entendendo o processo que você quer melhorar.",
         nome: pedidosIa.length === 1 ? "Bruno" : "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "", passarParaHumano: false,
@@ -79,12 +81,17 @@ describe("proteção do webhook oficial do WhatsApp", () => {
     await receber("SIM1", "SIM");
     expect(enviados.at(-1)).toBe("Combinado. Como você se chama?");
     await receber("NOME1", "Bruno");
+    expect(pedidosIa).toHaveLength(0); // O webhook confirma antes de chamar a IA.
+    await receber('NOME1', 'Bruno'); // Duplicata da Meta não produz outra cobrança.
+    await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
+    await processarFilaWhatsApp();
     expect(pedidosIa[0]).toContain("Como você se chama?");
     await receber("SIM2", "SIM");
+    await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
+    await processarFilaWhatsApp();
     expect(pedidosIa).toHaveLength(2);
-    expect(pedidosIa[1]).toContain('"nome":"Bruno"');
+    expect(pedidosIa[1]).toContain('Bruno');
     expect(pedidosIa[1]).toContain("Prazer, Bruno.");
-    expect(pedidosIa[1]).toContain("Qual é o nome da sua empresa?");
     expect(await buscarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({ nome: "Bruno", modo: "agente" });
     const atendimento = (await buscarAtendimentoWhatsApp(tx, '5554999991234'))!;
     await mudarModoAtendimentoWhatsApp(tx, atendimento.leadId, 'humano');

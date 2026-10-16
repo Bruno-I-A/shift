@@ -198,6 +198,7 @@ export async function contarLeadsPorEtapa(tx: Consulta): Promise<Record<string, 
 
 export async function mudarEtapaDoLead(tx: Consulta, id: string, para: EtapaLead, ator: Ator): Promise<void> {
   if (!/^[0-9a-f-]{36}$/i.test(id)) throw new ErroDeDominio("Lead inválido.");
+  await tx.query('select lead_id from crm.atendimento_whatsapp where lead_id = $1 for update', [id]);
   const { rows } = await tx.query<{ de: string }>(
     `update crm.lead l set etapa = $2::crm.etapa_lead, etapa_desde = now(), atualizado_em = now()
        from (select id, etapa from crm.lead where id = $1 for update) antes
@@ -205,6 +206,7 @@ export async function mudarEtapaDoLead(tx: Consulta, id: string, para: EtapaLead
       returning antes.etapa::text as de`,
     [id, para],
   );
+  if (['ganho', 'perdido'].includes(para)) await tx.query('delete from crm.fila_whatsapp where lead_id = $1', [id]);
   if (rows[0]) await registrarEventoDoLead(tx, id, ator, "lead_etapa_mudou", { de: rows[0].de, para });
 }
 
@@ -257,6 +259,8 @@ export async function buscarAtendimentoWhatsApp(tx: Consulta, whatsapp: string):
 export async function autorizarAtendimentoWhatsApp(tx: Consulta, whatsapp: string): Promise<AtendimentoWhatsApp> {
   if (!/^\d{10,15}$/.test(whatsapp)) throw new ErroDeDominio("WhatsApp inválido.");
   await tx.query("select pg_advisory_xact_lock(hashtext($1))", [whatsapp]);
+  // Mesma ordem do ingresso e da conclusão: atendimento, depois fila.
+  await tx.query('select lead_id from crm.atendimento_whatsapp where whatsapp = $1 for update', [whatsapp]);
   const anterior = await buscarAtendimentoWhatsApp(tx, whatsapp);
   if (anterior && !["ganho", "perdido"].includes(anterior.etapa)) return anterior;
   const { rows: existentes } = await tx.query<{ id: string; etapa: EtapaLead }>(
@@ -272,6 +276,7 @@ export async function autorizarAtendimentoWhatsApp(tx: Consulta, whatsapp: strin
     leadId = rows[0].id;
     await registrarEventoDoLead(tx, leadId, "sistema", "lead_recebido", { origem: "whatsapp" });
   }
+  if (anterior) await tx.query('delete from crm.fila_whatsapp where lead_id = $1', [anterior.leadId]);
   await tx.query(
     `insert into crm.atendimento_whatsapp (lead_id, whatsapp) values ($1, $2)
       on conflict (whatsapp) do update set lead_id = excluded.lead_id,
@@ -340,11 +345,13 @@ export async function marcarEnvioWhatsApp(tx: Consulta, idMensagem: string, envi
 
 export async function mudarModoAtendimentoWhatsApp(tx: Consulta, leadId: string, modo: "agente" | "humano"): Promise<void> {
   if (!/^[0-9a-f-]{36}$/i.test(leadId)) throw new ErroDeDominio("Lead inválido.");
-  const { rows } = await tx.query<{ leadId: string }>(
-    `update crm.atendimento_whatsapp set modo = $2, revisao = revisao + 1, atualizado_em = now()
-      where lead_id = $1 and modo <> $2 returning lead_id as "leadId"`, [leadId, modo],
+  const { rows } = await tx.query<{ anterior: string }>(
+    `with antes as (select lead_id, modo from crm.atendimento_whatsapp where lead_id = $1 for update)
+      update crm.atendimento_whatsapp aw set modo = $2, revisao = revisao + 1, atualizado_em = now()
+      from antes where aw.lead_id = antes.lead_id returning antes.modo as anterior`, [leadId, modo],
   );
-  if (rows[0]) await registrarEventoDoLead(tx, leadId, "bruno", "whatsapp_modo_mudou", { modo });
+  if (modo === 'humano') await tx.query('delete from crm.fila_whatsapp where lead_id = $1', [leadId]);
+  if (rows[0] && rows[0].anterior !== modo) await registrarEventoDoLead(tx, leadId, "bruno", "whatsapp_modo_mudou", { modo });
 }
 
 /** Uma resposta manual pelo aparelho pausa o agente; eco da própria API não pausa. */
@@ -376,11 +383,12 @@ export interface MensagemConversa {
 /** Recebidas continuam disponíveis quando a IA está pausada; repetição não duplica. */
 export async function registrarMensagemRecebidaWhatsApp(
   tx: Consulta, leadId: string, mensagem: { id: string; texto: string; tipo?: string; recebidoEm?: Date },
-): Promise<void> {
+): Promise<boolean> {
   await tx.query('select crm.limpar_historico_whatsapp()');
-  await tx.query(`insert into crm.conversa_whatsapp (id, lead_id, autor, texto, tipo, criado_em, estado)
-    values ($1, $2, 'cliente', $3, $4, $5, 'recebido') on conflict (id) do nothing`,
+  const { rows } = await tx.query(`insert into crm.conversa_whatsapp (id, lead_id, autor, texto, tipo, criado_em, estado)
+    values ($1, $2, 'cliente', $3, $4, $5, 'recebido') on conflict (id) do nothing returning id`,
     [`e:${mensagem.id}`, leadId, mensagem.texto, mensagem.tipo ?? 'text', mensagem.recebidoEm ?? new Date()]);
+  return rows.length > 0;
 }
 
 export async function listarConversasWhatsApp(tx: Consulta): Promise<ConversaWhatsApp[]> {
@@ -457,4 +465,183 @@ export async function responderComAgenteWhatsApp(
     await marcarEnvioWhatsApp(tx, id, false);
     console.error('[whatsapp] envio do agente falhou; confira a conversa no CRM.');
   }
+}
+
+/** Gravar e enfileirar são a mesma transação: ACK nunca depende da chamada de IA. */
+export async function enfileirarMensagemWhatsApp(
+  tx: Consulta, atendimento: AtendimentoWhatsApp,
+  mensagem: { id: string; texto: string; tipo?: string; recebidoEm?: Date }, ativo = true,
+): Promise<boolean> {
+  // Ordem única para a tomada humana, ingresso e conclusão: atendimento, depois fila.
+  const { rows } = await tx.query<{ modo: string; etapa: string }>(
+    `select aw.modo, l.etapa::text as etapa from crm.atendimento_whatsapp aw
+      join crm.lead l on l.id = aw.lead_id where aw.lead_id = $1 for update of aw`, [atendimento.leadId]);
+  const nova = await registrarMensagemRecebidaWhatsApp(tx, atendimento.leadId, mensagem);
+  if (!nova || !ativo || rows[0]?.modo !== 'agente' || ['ganho', 'perdido'].includes(rows[0].etapa)) return false;
+  await tx.query(`insert into crm.fila_whatsapp (lead_id, mensagens) values ($1, array[$2]::text[])
+    on conflict (lead_id) do update set
+      mensagens = crm.fila_whatsapp.mensagens || excluded.mensagens,
+      versao = crm.fila_whatsapp.versao + 1,
+      disponivel_em = now() + interval '7 seconds', tentativas = 0`,
+    [atendimento.leadId, `e:${mensagem.id}`]);
+  return true;
+}
+
+export interface LoteWhatsApp {
+  leadId: string;
+  reserva: string;
+  versao: number;
+  ids: string[];
+  idsAgrupados: string[];
+  texto: string;
+  temMidia: boolean;
+  atendimento: AtendimentoWhatsApp;
+}
+
+/** SKIP LOCKED e reserva expirada permitem vários processos sem atender duas vezes. */
+export async function reservarLoteWhatsApp(tx: Consulta): Promise<LoteWhatsApp | null> {
+  // Reinícios durante a IA também contam: uma reserva que expirou três vezes
+  // vai para humano em vez de cobrar indefinidamente sem chegar a liberar().
+  const { rows: esgotadas } = await tx.query<{ leadId: string }>(
+    `select aw.lead_id as "leadId" from crm.atendimento_whatsapp aw
+      join crm.fila_whatsapp f on f.lead_id = aw.lead_id
+      where f.tentativas >= 3 and (f.reserva_ate is null or f.reserva_ate < now())
+      limit 20 for update of aw skip locked`);
+  for (const esgotada of esgotadas) await mudarModoAtendimentoWhatsApp(tx, esgotada.leadId, 'humano');
+  // Trabalho antigo não pode produzir resposta livre fora da janela da Meta.
+  await tx.query(`delete from crm.fila_whatsapp f where not exists (
+    select 1 from crm.conversa_whatsapp m where m.lead_id = f.lead_id
+      and m.autor = 'cliente' and m.criado_em > now() - interval '24 hours')`);
+  const { rows } = await tx.query<{ leadId: string; reserva: string; versao: number; mensagens: string[]; whatsapp: string }>(
+    `with proxima as (
+      select f.lead_id from crm.fila_whatsapp f
+      join crm.atendimento_whatsapp aw on aw.lead_id = f.lead_id
+      join crm.lead l on l.id = f.lead_id
+      where f.disponivel_em <= now() and (f.reserva_ate is null or f.reserva_ate < now()) and f.tentativas < 3
+        and aw.modo = 'agente' and l.etapa not in ('ganho', 'perdido')
+      order by f.disponivel_em limit 1 for update of f skip locked
+    )
+    update crm.fila_whatsapp f set reserva = gen_random_uuid(),
+      reserva_ate = now() + interval '2 minutes', tentativas = tentativas + 1
+    from proxima p, crm.atendimento_whatsapp aw
+    where f.lead_id = p.lead_id and aw.lead_id = f.lead_id
+    returning f.lead_id as "leadId", f.reserva, f.versao, f.mensagens, aw.whatsapp`);
+  const reserva = rows[0];
+  if (!reserva) return null;
+  const atendimento = await buscarAtendimentoWhatsApp(tx, reserva.whatsapp);
+  if (!atendimento) return null;
+  const { rows: recebidas } = await tx.query<{ id: string; texto: string; tipo: string }>(
+    `select m.id, m.texto, m.tipo from unnest($2::text[]) with ordinality as entrada(id, ordem)
+      join crm.conversa_whatsapp m on m.id = entrada.id where m.lead_id = $1
+      order by m.criado_em, entrada.ordem`, [reserva.leadId, reserva.mensagens]);
+  if (!recebidas.length) {
+    await tx.query('delete from crm.fila_whatsapp where lead_id = $1 and reserva = $2', [reserva.leadId, reserva.reserva]);
+    return null;
+  }
+  const selecionadas: typeof recebidas = [];
+  let tamanho = 0;
+  for (const mensagem of recebidas) {
+    if (selecionadas.length && tamanho + mensagem.texto.length + 1 > 12_000) break;
+    selecionadas.push(mensagem);
+    tamanho += mensagem.texto.length + 1;
+  }
+  const { rows: historico } = await tx.query<{ autor: 'cliente' | 'agente' | 'humano'; texto: string }>(
+    `select autor, texto from crm.conversa_whatsapp where lead_id = $1
+      and not (id = any($2::text[])) and estado in ('recebido', 'enviado')
+      and criado_em <= (select min(criado_em) from crm.conversa_whatsapp where id = any($2::text[]))
+      order by criado_em desc, id desc limit 12`, [reserva.leadId, reserva.mensagens]);
+  atendimento.historico = historico.reverse();
+  return {
+    leadId: reserva.leadId, reserva: reserva.reserva, versao: reserva.versao,
+    idsAgrupados: reserva.mensagens,
+    ids: selecionadas.map(m => m.id), texto: selecionadas.map(m => m.texto).join('\n'),
+    temMidia: selecionadas.some(m => m.tipo !== 'text'), atendimento,
+  };
+}
+
+export interface EnvioLoteWhatsApp {
+  id: string;
+  whatsapp: string;
+  texto: string;
+}
+
+/**
+ * Revalida depois da IA e prepara uma única tentativa durável. O chamador precisa
+ * confirmar esta transação ANTES de chamar a Meta: uma queda durante o HTTP deixa
+ * a resposta pendente para conferência, sem recolocá-la na fila e reenviar.
+ */
+export async function concluirLoteWhatsApp(
+  tx: Consulta, lote: LoteWhatsApp, analise: AnaliseAtendimento,
+): Promise<EnvioLoteWhatsApp | 'reagrupar' | 'cancelado'> {
+  const { rows: atendimentos } = await tx.query<{ modo: string; revisao: number; etapa: string; ultima: Date | null }>(
+    `select aw.modo, aw.revisao, l.etapa::text as etapa,
+      (select max(criado_em) from crm.conversa_whatsapp where lead_id = aw.lead_id and autor = 'cliente') as ultima
+      from crm.atendimento_whatsapp aw join crm.lead l on l.id = aw.lead_id
+      where aw.lead_id = $1 for update of aw`, [lote.leadId]);
+  const { rows } = await tx.query<{ versao: number; reserva: string | null; valida: boolean }>(
+    `select versao, reserva, reserva_ate > now() as valida from crm.fila_whatsapp where lead_id = $1 for update`, [lote.leadId]);
+  if (!rows[0] || rows[0].reserva !== lote.reserva || !rows[0].valida) return 'cancelado';
+  if (atendimentos[0]?.modo !== 'agente' || atendimentos[0]?.revisao !== lote.atendimento.revisao
+    || ['ganho', 'perdido'].includes(atendimentos[0].etapa) || !janelaWhatsAppAberta(atendimentos[0].ultima)) {
+    await tx.query('delete from crm.fila_whatsapp where lead_id = $1', [lote.leadId]);
+    return 'cancelado';
+  }
+  if (rows[0].versao !== lote.versao) {
+    await tx.query('update crm.fila_whatsapp set reserva = null, reserva_ate = null where lead_id = $1', [lote.leadId]);
+    return 'reagrupar';
+  }
+  const id = lote.ids.at(-1)!.slice(2);
+  const preparada = await registrarRespostaWhatsApp(tx, lote.atendimento, id, analise);
+  if (analise.passarParaHumano) {
+    await tx.query('delete from crm.fila_whatsapp where lead_id = $1', [lote.leadId]);
+  } else {
+    // Lotes excepcionalmente grandes são divididos sem perder as próximas entradas.
+    await tx.query(`update crm.fila_whatsapp set mensagens = array(
+      select id from unnest(mensagens) as id where not (id = any($2::text[]))),
+      reserva = null, reserva_ate = null, tentativas = 0
+      where lead_id = $1 and cardinality(mensagens) > cardinality($2::text[])`, [lote.leadId, lote.ids]);
+    await tx.query('delete from crm.fila_whatsapp where lead_id = $1 and reserva = $2', [lote.leadId, lote.reserva]);
+  }
+  return preparada ? { id, whatsapp: lote.atendimento.whatsapp, texto: analise.resposta } : 'cancelado';
+}
+
+/**
+ * Executada em uma SEGUNDA transação, depois de confirmar a intenção durável.
+ * A trava curta impede a tomada humana durante o HTTP; seu rollback nunca
+ * ressuscita o lote. O timeout da Meta limita o tempo em que a conversa espera.
+ */
+export async function enviarLotePreparadoWhatsApp(
+  tx: Consulta, lote: LoteWhatsApp, envio: EnvioLoteWhatsApp,
+  enviar: (whatsapp: string, texto: string) => Promise<string>,
+): Promise<void> {
+  const { rows } = await tx.query<{ revisao: number; etapa: string; ultima: Date | null; novas: boolean }>(
+    `select aw.revisao, l.etapa::text as etapa,
+      (select max(criado_em) from crm.conversa_whatsapp where lead_id = aw.lead_id and autor = 'cliente') as ultima,
+      exists(select 1 from crm.fila_whatsapp f where f.lead_id = aw.lead_id
+        and not (f.mensagens <@ $2::text[])) as novas
+      from crm.atendimento_whatsapp aw join crm.lead l on l.id = aw.lead_id
+      where aw.lead_id = $1 for update of aw`, [lote.leadId, lote.idsAgrupados]);
+  if (!rows[0] || rows[0].revisao !== lote.atendimento.revisao
+    || rows[0].novas || ['ganho', 'perdido'].includes(rows[0].etapa) || !janelaWhatsAppAberta(rows[0].ultima)) {
+    await marcarEnvioWhatsApp(tx, envio.id, false);
+    return;
+  }
+  const metaId = await enviar(envio.whatsapp, envio.texto);
+  await confirmarMensagemWhatsApp(tx, `s:${envio.id}`, metaId);
+  await marcarEnvioWhatsApp(tx, envio.id, true);
+}
+
+/** Falha operacional tem espera e limite; não fica chamando IA em ciclo infinito. */
+export async function liberarLoteWhatsApp(tx: Consulta, lote: LoteWhatsApp): Promise<void> {
+  await tx.query('select lead_id from crm.atendimento_whatsapp where lead_id = $1 for update', [lote.leadId]);
+  const { rows } = await tx.query<{ tentativas: number }>(
+    'select tentativas from crm.fila_whatsapp where lead_id = $1 and reserva = $2 for update', [lote.leadId, lote.reserva]);
+  if (!rows[0]) return;
+  if (rows[0].tentativas >= 3) {
+    await mudarModoAtendimentoWhatsApp(tx, lote.leadId, 'humano');
+    return;
+  }
+  await tx.query(`update crm.fila_whatsapp set reserva = null, reserva_ate = null,
+    disponivel_em = greatest(disponivel_em, now() + interval '30 seconds')
+    where lead_id = $1 and reserva = $2`, [lote.leadId, lote.reserva]);
 }
