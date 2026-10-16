@@ -76,7 +76,7 @@ export function solicitouHumano(texto: string, ultimaResposta: string): boolean 
   // A pergunta agora é escrita conforme o diálogo: pode usar “encaminhe”,
   // “envie”, “encaminharmos” etc. Só um convite da própria Shift, com destino
   // humano explícito e interrogação, dá contexto para aceitar um “sim”.
-  const oferta = /\b(posso|podemos|quer|queria|prefere|gostaria|vamos|autoriza|tudo bem se)\b[^?]{0,100}\b(encaminh(?:ar|e|o|emos|armos|asse)|conect(?:ar|e|o|emos|armos|asse)|pass(?:ar|e|o|emos|armos|asse)|cham(?:ar|e|o|emos|armos|asse)|env(?:iar|ie|io|iemos|iarmos|iasse)|mand(?:ar|e|o|emos|armos|asse)|falar|conversar)\b[^?]{0,100}\b(equipe|especialista|humano|pessoa|atendente)\b[^?]*\?/.test(normalizar(ultimaResposta));
+  const oferta = /\b(posso|podemos|quer|queria|prefere|gostaria|vamos|autoriza|tudo bem se)\b[^?]{0,100}\b(encaminh(?:ar|e|o|emos|armos|asse)|conect(?:ar|e|o|emos|armos|asse)|pass(?:ar|e|o|emos|armos|asse)|cham(?:ar|e|o|emos|armos|asse)|env(?:iar|ie|io|iemos|iarmos|iasse)|mand(?:ar|e|o|emos|armos|asse)|falar|conversar)\b[^?]{0,100}\b(equipe|especialista|humano|pessoa|atendente|bruno)\b[^?]*\?/.test(normalizar(ultimaResposta));
   // Um vocativo ou comentário junto do aceite não o anula. Cada mensagem do
   // lote pode conter a confirmação, mas ela só vale após o convite acima.
   const confirmou = mensagem.split(/\n+/).some((linha) => {

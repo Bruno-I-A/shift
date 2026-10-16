@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CONVITE_EXEMPLO } from "@/lib/ia-atendimento";
 import { apenasAgradecimento, PERGUNTA_ENCAMINHAMENTO, proximaPergunta, solicitouHumano } from "@/lib/qualificacao-atendimento";
 
 const contato = {
@@ -38,6 +39,18 @@ describe("organização da descoberta do projeto", () => {
     expect(solicitouHumano("Sim", "Você já tem um site?")).toBe(false);
     expect(solicitouHumano("Preciso conversar com minha equipe", "Você decide sobre esse projeto?")).toBe(false);
     expect(apenasAgradecimento("Obrigado, pode encaminhar para a equipe")).toBe(false);
+  });
+
+  it("o convite que o roteiro ensina é reconhecido quando o cliente aceita", () => {
+    expect(solicitouHumano("Sim", CONVITE_EXEMPLO)).toBe(true);
+    expect(solicitouHumano("Pode sim", CONVITE_EXEMPLO)).toBe(true);
+    expect(solicitouHumano("Não, obrigado", CONVITE_EXEMPLO)).toBe(false);
+  });
+
+  it("oferta que nomeia o Bruno também vale como convite", () => {
+    expect(solicitouHumano("Sim", "Quer que eu passe seu caso para o Bruno te mostrar como ficaria?")).toBe(true);
+    // Citar o Bruno sem oferecer encaminhamento não transforma um "sim" em aceite.
+    expect(solicitouHumano("Sim", "Você já conversou com o Bruno antes?")).toBe(false);
   });
 
   it.each([
