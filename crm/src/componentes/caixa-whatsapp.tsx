@@ -5,13 +5,16 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { mudarModoWhatsApp, responderWhatsApp } from '@/app/acoes';
 import type { ConversaWhatsApp, MensagemConversa } from '@/lib/leads';
+import { ReabrirComModelo, type ModeloAprovado } from './reabrir-com-modelo';
 
 const hora = (valor: Date) => new Date(valor).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
 const data = (valor: Date) => new Date(valor).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', timeZone: 'America/Sao_Paulo' });
 const botao = 'rounded-md border border-linha-forte px-2.5 py-1.5 text-xs hover:bg-superficie-2 disabled:opacity-50';
 const estados: Record<string, string> = { recebido: 'Recebida', pendente: 'Aguardando confirmação', enviado: 'Enviada', entregue: 'Entregue', lido: 'Lida', erro: 'Envio não confirmado' };
 
-export function CaixaWhatsApp({ iniciais, agenteAtivo }: { iniciais: ConversaWhatsApp[]; agenteAtivo: boolean }) {
+export function CaixaWhatsApp({ iniciais, agenteAtivo, modelos = [], erroModelos }: {
+  iniciais: ConversaWhatsApp[]; agenteAtivo: boolean; modelos?: ModeloAprovado[]; erroModelos?: string;
+}) {
   const router = useRouter();
   const [agora, setAgora] = useState(0);
   const [conversas, setConversas] = useState(iniciais);
@@ -137,7 +140,7 @@ export function CaixaWhatsApp({ iniciais, agenteAtivo }: { iniciais: ConversaWha
   return <div data-caixa-whatsapp className="flex h-[calc(100dvh-81px)] min-h-0 flex-col">
     <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
       <h1 className="text-lg font-semibold tracking-tight">WhatsApp</h1>
-      <span className="text-[11px] text-apagado" role="status">{conexao}</span>
+      <span className="flex items-center gap-3"><Link href="/whatsapp/modelos" className="text-[11px] text-suave hover:text-texto">Modelos</Link><span className="text-[11px] text-apagado" role="status">{conexao}</span></span>
     </div>
     {!agenteAtivo && <p className="mb-2 shrink-0 text-xs text-destaque">Agente desligado · atendimento manual disponível</p>}
     <div className="grid min-h-0 grid-cols-1 flex-1 overflow-hidden rounded-xl border border-linha bg-superficie lg:grid-cols-[260px_minmax(0,1fr)]">
@@ -187,8 +190,9 @@ export function CaixaWhatsApp({ iniciais, agenteAtivo }: { iniciais: ConversaWha
               </div>
             </div>)}
           </div>
-          <form onSubmit={e => { e.preventDefault(); enviar(); }} className="shrink-0 border-t border-linha bg-superficie px-3 py-2">
-            {!podeResponder && <p className="mb-1.5 text-[11px] text-apagado">Janela encerrada. Aguarde uma nova mensagem do cliente para responder.</p>}
+          {/* Janela fechada: só modelo aprovado. Antes do primeiro carregamento (agora = 0) não há como saber. */}
+          {agora > 0 && !podeResponder ? <ReabrirComModelo key={contato.leadId} leadId={contato.leadId} nomeContato={contato.nome} modelos={modelos} erroModelos={erroModelos} />
+          : <form onSubmit={e => { e.preventDefault(); enviar(); }} className="shrink-0 border-t border-linha bg-superficie px-3 py-2">
             <label htmlFor="resposta-whatsapp" className="sr-only">Sua mensagem</label>
             <div className="flex items-end gap-2"><textarea ref={campoResposta} id="resposta-whatsapp" required maxLength={4000} rows={1} disabled={!podeResponder || pendente} value={rascunhos[contato.leadId] ?? ''}
               onChange={e => { setRascunhos({ ...rascunhos, [contato.leadId]: e.target.value }); delete pedidos.current[contato.leadId]; }}
@@ -196,7 +200,7 @@ export function CaixaWhatsApp({ iniciais, agenteAtivo }: { iniciais: ConversaWha
               <button type="submit" disabled={!podeResponder || pendente || !(rascunhos[contato.leadId] ?? '').trim()} className="h-9 rounded-md bg-destaque px-3 text-xs font-semibold text-fundo hover:bg-destaque-forte disabled:opacity-50">{pendente ? 'Aguarde…' : 'Enviar'}</button></div>
             {erro && <p role="alert" className="mt-1.5 text-xs text-perigo">{erro}</p>}
             {aviso && <p role="status" className="mt-1.5 max-h-20 overflow-y-auto text-xs text-sucesso">{aviso}</p>}
-          </form>
+          </form>}
         </> : <div className="m-auto max-w-sm p-8 text-center"><span className="text-4xl text-destaque">↗</span><h2 className="mt-4 text-xl font-medium">Uma conversa de cada vez</h2><p className="mt-3 text-sm leading-relaxed text-suave">Escolha um contato para acompanhar o histórico, responder ou assumir o atendimento.</p></div>}
       </section>
     </div>

@@ -9,7 +9,8 @@ import * as crm from "@/lib/crm";
 import { ErroDeDominio, IDS_ETAPA, IDS_ETAPA_LEAD, IDS_TIPO } from "@/lib/dominio";
 import { mudarEtapaDoLead, mudarModoAtendimentoWhatsApp } from "@/lib/leads";
 import { enviarTextoMeta } from "@/lib/whatsapp";
-import { enviarRespostaHumana } from '@/lib/whatsapp-manual';
+import { enviarModeloHumano, enviarRespostaHumana } from '@/lib/whatsapp-manual';
+import { criarModeloMeta, enviarModeloMeta, listarModelosMeta } from '@/lib/modelos-whatsapp';
 import { conferirSenha, iguais } from "@/lib/segredos";
 import {
   credenciaisDoAdmin,
@@ -236,6 +237,49 @@ export async function responderWhatsApp(_: Resultado, form: FormData): Promise<R
     return resultado.estado === 'erro' ? { erro: resultado.mensagem, valores: campos(form) } : { ok: resultado.mensagem };
   } catch (erro) {
     return { erro: erro instanceof ErroDeDominio ? erro.message : 'Não foi possível preparar o envio.', valores: campos(form) };
+  }
+}
+
+export async function enviarModeloWhatsApp(_: Resultado, form: FormData): Promise<Resultado> {
+  await exigirSessao();
+  const valores = campos(form);
+  const dados = z.object({
+    leadId: z.uuid(), pedidoId: z.uuid(),
+    modelo: z.string().min(1, 'Escolha um modelo.'),
+    parametros: z.array(z.string()),
+  }).safeParse({ ...valores, parametros: form.getAll('parametro').map(String) });
+  if (!dados.success) return { erro: dados.error.issues[0]?.message ?? 'Envio inválido.', valores };
+  try {
+    // O texto e a aprovação vêm da Meta, não da tela: o histórico mostra o que
+    // o cliente recebeu, e modelo recusado ou pausado não sai.
+    const [nome, idioma] = dados.data.modelo.split('|');
+    const modelo = (await listarModelosMeta()).find(m => m.nome === nome && m.idioma === idioma);
+    if (!modelo) return { erro: 'Modelo não encontrado na Meta.', valores };
+    if (modelo.status !== 'APPROVED') return { erro: 'Esse modelo ainda não foi aprovado pela Meta.', valores };
+    const resultado = await enviarModeloHumano(emTransacao, enviarModeloMeta, {
+      leadId: dados.data.leadId, pedidoId: dados.data.pedidoId,
+      modelo: { nome: modelo.nome, idioma: modelo.idioma, texto: modelo.texto },
+      parametros: dados.data.parametros.slice(0, modelo.variaveis),
+    });
+    revalidatePath('/whatsapp');
+    return resultado.estado === 'erro' ? { erro: resultado.mensagem, valores } : { ok: resultado.mensagem };
+  } catch (erro) {
+    return { erro: erro instanceof ErroDeDominio || erro instanceof z.ZodError ? mensagemDe(erro) : 'Não foi possível enviar o modelo.', valores };
+  }
+}
+
+export async function criarModeloWhatsApp(_: Resultado, form: FormData): Promise<Resultado> {
+  await exigirSessao();
+  const valores = campos(form);
+  try {
+    const criado = await criarModeloMeta({
+      nome: valores.nome, categoria: valores.categoria, texto: valores.texto,
+      exemplos: form.getAll('exemplo').map(String),
+    });
+    revalidatePath('/whatsapp/modelos');
+    return { ok: criado.status === 'APPROVED' ? 'Modelo criado e já aprovado.' : 'Modelo enviado para a Meta. A aprovação costuma sair em minutos, às vezes em horas.' };
+  } catch (erro) {
+    return { erro: mensagemDe(erro), valores };
   }
 }
 

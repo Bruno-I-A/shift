@@ -443,6 +443,25 @@ export async function prepararRespostaHumanaWhatsApp(tx: Consulta, leadId: strin
   return rows[0].whatsapp;
 }
 
+/**
+ * Registra um modelo enviado por uma pessoa da Shift. Igual à resposta humana,
+ * menos a trava das 24 horas — o modelo existe justamente para falar fora dela.
+ * Só vale para quem já é contato do atendimento (escreveu para a Shift e
+ * autorizou): a Meta exige consentimento para a empresa iniciar a conversa.
+ */
+export async function prepararModeloWhatsApp(tx: Consulta, leadId: string, pedidoId: string, textoEnviado: string): Promise<string | null> {
+  const dados = z.object({ leadId: z.uuid(), pedidoId: z.uuid(), texto: z.string().trim().min(1).max(4000) })
+    .parse({ leadId, pedidoId, texto: textoEnviado });
+  const { rows } = await tx.query<{ whatsapp: string }>(
+    'select whatsapp from crm.atendimento_whatsapp where lead_id = $1 for update', [dados.leadId]);
+  if (!rows[0]) throw new ErroDeDominio('Este contato ainda não tem atendimento no WhatsApp.');
+  const inserida = await tx.query(`insert into crm.conversa_whatsapp (id, lead_id, autor, texto)
+    values ($1, $2, 'humano', $3) on conflict (id) do nothing returning id`, [`h:${dados.pedidoId}`, dados.leadId, dados.texto]);
+  if (!inserida.rows[0]) return null;
+  await mudarModoAtendimentoWhatsApp(tx, dados.leadId, 'humano');
+  return rows[0].whatsapp;
+}
+
 export async function confirmarMensagemWhatsApp(tx: Consulta, id: string, metaId: string | null): Promise<void> {
   await tx.query('update crm.conversa_whatsapp set meta_id = $2, estado = $3 where id = $1',
     [id, metaId, metaId ? 'enviado' : 'erro']);
