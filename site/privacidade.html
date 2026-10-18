@@ -112,6 +112,13 @@
     width: 6px; height: 6px; border-radius: 9999px;
     background: var(--shift-accent); box-shadow: 0 0 10px rgba(234,229,220,0.7);
   }
+  .prose ol { margin: 0 0 1.1rem 0; padding: 0; counter-reset: passo; }
+  .prose ol li { counter-increment: passo; padding-left: 1.8rem; }
+  .prose ol li::before {
+    content: counter(passo, decimal-leading-zero); top: 0.18em; width: auto; height: auto;
+    border-radius: 0; background: none; box-shadow: none;
+    font-family: 'Geist Mono', monospace; font-size: 0.72rem; color: rgba(234,229,220,0.9);
+  }
   .prose strong { color: var(--shift-paper); font-weight: 600; }
   .prose a { color: var(--shift-gold); text-decoration: none; }
   .prose a:hover { text-decoration: underline; }
@@ -202,7 +209,7 @@
       Lei nº 13.709/2018 (Lei Geral de Proteção de Dados — LGPD).
     </p>
     <div class="mt-6 inline-flex items-center gap-2 text-xs font-mono tracking-wider text-white/55 glass rounded-full px-4 py-2">
-      última atualização · 25 de setembro de 2026
+      última atualização · 18 de outubro de 2026
     </div>
   </div>
 
@@ -217,6 +224,25 @@
       estrutura de software necessária para essa operação. Para os fins desta política, a Shift Systems atua como
       <strong>controladora</strong> dos dados pessoais coletados por meio deste site e dos canais de contato
       por ela disponibilizados.
+    </p>
+    <h3>Quando atendemos em nome de empresas clientes</h3>
+    <p>
+      Empresas clientes podem conectar o próprio número de WhatsApp à plataforma da Shift, para que um assistente
+      virtual e a equipe delas atendam quem as procura. Nesse caso, a empresa cliente é a <strong>controladora</strong>
+      dos dados das pessoas que ela atende, e a Shift Systems atua como <strong>operadora</strong>: tratamos as mensagens,
+      os contatos e os registros de atendimento apenas para prestar o serviço contratado e conforme as instruções da
+      empresa cliente. Não usamos esses dados para finalidades próprias, não os vendemos e não os compartilhamos com outras
+      empresas clientes.
+    </p>
+    <p>
+      Se o número conectado já usa o aplicativo WhatsApp Business, a empresa cliente pode autorizar a sincronização dos
+      contatos e do histórico recente de conversas com a plataforma. Esses dados recebem o mesmo tratamento. Para prestar
+      o serviço, usamos os prestadores descritos na seção 05, como a Meta e o prestador de IA.
+    </p>
+    <p>
+      Quem é atendido por uma empresa cliente exerce seus direitos diretamente com ela. Se o pedido chegar à Shift,
+      nós o encaminhamos à empresa responsável. Quando o contrato termina ou a empresa cliente pede, excluímos os dados
+      tratados em nome dela, exceto os que a lei obrigue a guardar.
     </p>
 
     <h2><span class="n">02</span> dados que coletamos</h2>
@@ -250,10 +276,14 @@
     </p>
     <h3>Atendimento pelo WhatsApp</h3>
     <p>
+      O atendimento pelo WhatsApp usa a <strong>WhatsApp Business Platform</strong> (API de nuvem), operada pela Meta.
+      As mensagens trafegam pela infraestrutura da Meta e também estão sujeitas aos termos e à política de privacidade do WhatsApp.
+    </p>
+    <p>
       No WhatsApp, um assistente virtual pode responder dúvidas sobre a Shift usando informações publicadas no nosso site.
       Antes de registrar um novo contato no CRM ou usar IA nesse atendimento, ele pede sua autorização na própria conversa.
       Após a autorização, as mensagens atuais, um trecho recente da conversa e informações públicas relevantes podem ser enviados a um prestador
-      de IA para gerar a resposta. O número de WhatsApp não é incluído nessa consulta.
+      de IA (atualmente a Anthropic) para gerar a resposta. O número de WhatsApp não é incluído nessa consulta.
     </p>
     <p>
       O CRM guarda os dados de contato e de qualificação que você informou, um resumo da necessidade e o registro da
@@ -289,7 +319,9 @@
       necessário com:
     </p>
     <ul>
-      <li><strong>prestadores de serviço e parceiros de tecnologia</strong> (por exemplo, hospedagem, e-mail, mensageria e ferramentas de automação) que nos apoiam na operação, sob obrigações de confidencialidade;</li>
+      <li><strong>Meta Platforms</strong>, pela WhatsApp Business Platform, para enviar e receber as mensagens do WhatsApp;</li>
+      <li><strong>Anthropic</strong>, prestador de IA que gera as respostas do assistente virtual, somente depois da sua autorização na conversa;</li>
+      <li><strong>outros prestadores de serviço e parceiros de tecnologia</strong> (por exemplo, hospedagem, e-mail e ferramentas de automação) que nos apoiam na operação, sob obrigações de confidencialidade;</li>
       <li><strong>autoridades públicas</strong>, quando exigido por lei ou ordem judicial.</li>
     </ul>
     <p>
@@ -338,6 +370,16 @@
       pelo diagnóstico, utilize os canais indicados na seção 11 e informe que o pedido se refere ao
       <strong>diagnóstico do site</strong>. Podemos pedir apenas os dados necessários para localizar o registro
       e confirmar a identidade do titular.
+    </p>
+    <h3 id="exclusao">Como pedir a exclusão dos seus dados</h3>
+    <ol>
+      <li>Envie o pedido pelo WhatsApp ou pelo Instagram indicados na seção 11, dizendo como falou com a gente: pelo diagnóstico do site, pelo WhatsApp da Shift ou pelo atendimento de uma empresa cliente.</li>
+      <li>Para localizar o registro, pedimos só o necessário, como o número de WhatsApp usado na conversa.</li>
+      <li>Excluímos os dados de contato, as respostas do diagnóstico, as mensagens guardadas no CRM e o registro da autorização, e confirmamos pelo mesmo canal em até 15 dias. Dados que a lei obriga a guardar ficam apenas pelo prazo legal.</li>
+    </ol>
+    <p>
+      Se o atendimento foi feito em nome de uma empresa cliente, encaminhamos o pedido a ela, que é a responsável pelos
+      dados. As cópias das conversas que ficam no seu aparelho e os dados tratados pela própria Meta seguem as regras do WhatsApp.
     </p>
 
     <h2><span class="n">10</span> alterações nesta política</h2>
