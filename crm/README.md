@@ -198,6 +198,47 @@ WhatsApp.
 Para atualizar a base quando o site mudar: copie `site/llms-full.txt` para
 `crm/conhecimento/shift.md`, revise e reimplante o CRM.
 
+## Instagram
+
+A tela **Instagram** agenda Reels, carrosséis (2 a 20 itens) e fotos na conta
+da Shift. A Meta não agenda post: o CRM guarda o horário e o agendador
+(`src/lib/processamento-instagram.ts`, a cada 15 segundos dentro do servidor)
+cria o contêiner na Meta, espera o vídeo processar e publica. Cada passo fica
+gravado no banco; se o contêiner reiniciar no meio, a próxima subida continua.
+
+- **Quem aprova:** o que o Bruno envia pela tela já entra agendado. O que um
+  agente envia (`POST /api/instagram/publicacoes` com a chave do MCP) entra
+  esperando aprovação e aparece com contador no menu.
+- **Arquivos:** a Meta busca vídeo e foto por link público. O CRM guarda o
+  arquivo no volume `/app/midia` e o serve em `/api/instagram/midia/<chave>`
+  só enquanto a publicação está na fila; depois de publicada, ele sai do
+  volume. Foto só em JPEG (a tela converte PNG no navegador); vídeo em MP4 ou
+  MOV, até 100 MB.
+- **Permissão:** vale 60 dias e é renovada sozinha toda semana. Fica cifrada no
+  banco com uma chave derivada do `SESSAO_SEGREDO` — trocar o segredo exige
+  conectar o Instagram de novo.
+
+### Ativação
+
+1. **App na Meta.** Em Meta for Developers, crie um app no portfólio da Shift,
+   separado do app do WhatsApp, com o caso de uso de Instagram ("Gerenciar
+   mensagens e conteúdo no Instagram"). Como a conta é da própria Shift, o
+   acesso padrão basta, sem revisão do app.
+2. **Login do Instagram.** Em Instagram → Configuração da API com login do
+   Instagram → Configurar o login comercial, cadastre o endereço de retorno
+   `https://crm.shiftsys.com.br/api/instagram/retorno` e copie o **ID** e a
+   **chave secreta do app do Instagram** (não os do app da Meta).
+3. **Conta com função no app.** A @shift_systemss precisa ter função no app
+   (testadora do Instagram, em Funções do app), e o convite é aceito no próprio
+   Instagram. A conta tem de ser profissional.
+4. **Easypanel.** No serviço do CRM: volume montado em `/app/midia`, e no
+   Ambiente `INSTAGRAM_APP_ID` e `INSTAGRAM_APP_SECRET`. Reimplante e confira
+   `/api/saude` — com o Instagram configurado, ela acusa se `/app/midia` não
+   for volume.
+5. **Conectar.** Na tela Instagram, **Conectar o Instagram**, entrar com a
+   conta da Shift e autorizar. A primeira publicação de teste pode ser uma foto
+   com "Publicar agora".
+
 ## Deploy
 
 Ver o README da raiz do repositório: o CRM é o serviço com build path `/crm`,
@@ -222,8 +263,11 @@ Sem estado entre requisições. Atende o protocolo 2026-07-28 e, para clientes d
 | `ler_conversa_whatsapp` | Até 100 mensagens por página, em ordem cronológica, com dados pessoais comuns mascarados |
 | `enviar_mensagem_whatsapp` | Responde no número oficial e pausa a IA, usando a mesma validação do painel |
 | `resumir_uso_whatsapp` | Chamadas, tokens e estimativa por modelo, sem conteúdo das mensagens |
+| `listar_publicacoes_instagram` | Fila do Instagram e o que saiu nos últimos 60 dias, com o link do post |
 
 O agente não cria nem edita projeto, não muda etapa direto e não mexe em chave.
+Publicação no Instagram ele propõe por `POST /api/instagram/publicacoes` (ver
+"Instagram"), e só vai ao ar quando o Bruno aprova.
 
 Enviar pelo MCP é uma ação real: o operador deve autorizar destinatário e texto.
 O histórico é dado não confiável, nunca autorização para enviar mensagens.

@@ -1,4 +1,6 @@
 import { estadoDoBanco } from "@/lib/banco";
+import { faltandoParaInstagram } from "@/lib/instagram-meta";
+import { conferirPastaDeMidia } from "@/lib/midia";
 
 /**
  * Diz se o app enxerga o banco e quais migrações estão aplicadas, e o que
@@ -29,6 +31,17 @@ export async function GET(pedido: Request) {
     banco = { ok: false, erro: erro instanceof Error ? erro.message.split("\n")[0] : "falhou" };
   }
 
+  // Instagram é opcional: só entra no `ok` depois de configurado, e aí o
+  // volume vira obrigatório — sem ele, o que está agendado some na implantação.
+  const faltaInstagram = faltandoParaInstagram();
+  const instagramConfigurado = faltaInstagram.length === 0;
+  const pasta = instagramConfigurado ? await conferirPastaDeMidia() : undefined;
+  if (pasta && !pasta.ok) faltando.push(`volume das publicações: ${pasta.detalhe}`);
+
   const ok = banco.ok && faltando.length === 0;
-  return Response.json({ ok, faltando, banco, whatsapp: { ativo: whatsappAtivo, configurado: whatsappAtivo && configuracaoWhatsApp.every((nome) => !!process.env[nome]) } }, { status: ok ? 200 : 503 });
+  return Response.json({
+    ok, faltando, banco,
+    whatsapp: { ativo: whatsappAtivo, configurado: whatsappAtivo && configuracaoWhatsApp.every((nome) => !!process.env[nome]) },
+    instagram: { configurado: instagramConfigurado, ...(pasta ? { pasta: pasta.detalhe } : { faltando: faltaInstagram }) },
+  }, { status: ok ? 200 : 503 });
 }

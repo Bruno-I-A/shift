@@ -9,9 +9,10 @@ import { exigirSessao } from "@/lib/sessao";
 export default async function LayoutPainel({ children }: LayoutProps<"/">) {
   await exigirSessao();
   const { rows } = await emTransacao((tx) =>
-    tx.query<{ propostas: number; leads: number }>(
+    tx.query<{ propostas: number; leads: number; publicacoes: number }>(
       `select (select count(*)::int from crm.proposta_etapa where decisao is null) as propostas,
-              (select count(*)::int from crm.lead where etapa = 'novo') as leads`,
+              (select count(*)::int from crm.lead where etapa = 'novo') as leads,
+              (select count(*)::int from crm.publicacao where estado = 'aguardando_aprovacao') as publicacoes`,
     ),
   );
 
@@ -23,7 +24,11 @@ export default async function LayoutPainel({ children }: LayoutProps<"/">) {
           <Link href="/" aria-label="Shift CRM, início" className="hidden sm:block">
             <Marca />
           </Link>
-          <Navegacao pendentes={rows[0]?.propostas ?? 0} leadsNovos={rows[0]?.leads ?? 0} />
+          <Navegacao
+            pendentes={rows[0]?.propostas ?? 0}
+            leadsNovos={rows[0]?.leads ?? 0}
+            publicacoes={rows[0]?.publicacoes ?? 0}
+          />
           <form action={sair} className="ml-auto">
             <button type="submit" className="text-sm text-apagado transition-colors hover:text-texto">
               Sair

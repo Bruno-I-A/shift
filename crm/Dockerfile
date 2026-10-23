@@ -38,6 +38,12 @@ COPY --from=compilacao --chown=nextjs:nextjs /app/conhecimento ./conhecimento
 COPY --chown=nextjs:nextjs banco/sql ./banco/sql
 COPY --chown=nextjs:nextjs scripts/migrar.mjs scripts/configurar-banco.mjs scripts/perguntar.mjs ./scripts/
 
+# Os arquivos das publicações do Instagram, até a Meta buscá-los. Monte um
+# volume neste caminho no Easypanel: a pasta da imagem some a cada implantação.
+# Criada aqui com o dono certo, porque o volume novo herda o dono da pasta.
+ENV PASTA_MIDIA=/app/midia
+RUN mkdir -p /app/midia && chown nextjs:nextjs /app/midia
+
 COPY docker-entrypoint.sh /usr/local/bin/entrada.sh
 RUN chmod +x /usr/local/bin/entrada.sh
 

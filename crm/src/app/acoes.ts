@@ -6,11 +6,13 @@ import * as z from "zod";
 
 import { emTransacao } from "@/lib/banco";
 import * as crm from "@/lib/crm";
+import * as instagram from "@/lib/instagram";
 import { ErroDeDominio, IDS_ETAPA, IDS_ETAPA_LEAD, IDS_TIPO } from "@/lib/dominio";
 import { mudarEtapaDoLead, mudarModoAtendimentoWhatsApp } from "@/lib/leads";
 import { enviarTextoMeta } from "@/lib/whatsapp";
 import { enviarModeloHumano, enviarRespostaHumana } from '@/lib/whatsapp-manual';
 import { criarModeloMeta, enviarModeloMeta, listarModelosMeta } from '@/lib/modelos-whatsapp';
+import { apagarArquivos } from "@/lib/midia";
 import { conferirSenha, iguais } from "@/lib/segredos";
 import {
   credenciaisDoAdmin,
@@ -308,4 +310,47 @@ export async function revogarChave(id: string): Promise<Resultado> {
     return { erro: mensagemDe(erro) };
   }
   revalidatePath("/agentes");
+}
+
+// -----------------------------------------------------------------------------
+// Instagram
+// -----------------------------------------------------------------------------
+
+/** O mesmo esqueleto das outras ações: sessão, entrada conferida, erro em português. */
+async function acaoDePublicacao(id: string, executar: (id: string) => Promise<string[] | void>): Promise<Resultado> {
+  await exigirSessao();
+  try {
+    const arquivos = await executar(z.uuid().parse(id));
+    // Depois do commit: se apagar falhar, sobra arquivo no volume, não buraco no banco.
+    if (arquivos?.length) await apagarArquivos(arquivos).catch(() => console.error("[instagram] arquivos ficaram no volume."));
+  } catch (erro) {
+    return { erro: mensagemDe(erro) };
+  }
+  revalidatePath("/", "layout");
+}
+
+export async function aprovarPublicacao(id: string): Promise<Resultado> {
+  return acaoDePublicacao(id, (valido) => emTransacao((tx) => instagram.aprovarPublicacao(tx, valido, "bruno")));
+}
+
+export async function cancelarPublicacao(id: string): Promise<Resultado> {
+  return acaoDePublicacao(id, (valido) => emTransacao((tx) => instagram.cancelarPublicacao(tx, valido)));
+}
+
+export async function tentarPublicacaoDeNovo(id: string): Promise<Resultado> {
+  return acaoDePublicacao(id, (valido) => emTransacao((tx) => instagram.tentarDeNovo(tx, valido)));
+}
+
+export async function publicarAgora(id: string): Promise<Resultado> {
+  return acaoDePublicacao(id, (valido) => emTransacao((tx) => instagram.publicarAgora(tx, valido)));
+}
+
+export async function desconectarInstagram(): Promise<Resultado> {
+  await exigirSessao();
+  try {
+    await emTransacao(instagram.desconectarConta);
+  } catch (erro) {
+    return { erro: mensagemDe(erro) };
+  }
+  revalidatePath("/instagram");
 }

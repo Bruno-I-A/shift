@@ -78,6 +78,7 @@ describe("MCP", () => {
       "ler_conversa_whatsapp",
       "listar_conversas_whatsapp",
       "listar_projetos",
+      "listar_publicacoes_instagram",
       "projeto_atual",
       "propor_etapa",
       "registrar_sessao",

@@ -44,3 +44,6 @@ next-env.d.ts
 # banco de desenvolvimento (PGlite) e relatórios de teste
 /.banco-local/
 /.vitest/
+
+# arquivos das publicações do Instagram em desenvolvimento
+/.midia-local/

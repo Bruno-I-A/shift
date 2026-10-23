@@ -8,6 +8,7 @@ const ITENS = [
   { href: "/projetos", rotulo: "Projetos" },
   { href: "/leads", rotulo: "Leads" },
   { href: "/whatsapp", rotulo: "WhatsApp" },
+  { href: "/instagram", rotulo: "Instagram" },
   { href: "/agentes", rotulo: "Agentes" },
 ];
 
@@ -21,7 +22,15 @@ function Contador({ n, rotulo }: { n: number; rotulo: string }) {
   );
 }
 
-export function Navegacao({ pendentes, leadsNovos }: { pendentes: number; leadsNovos: number }) {
+export function Navegacao({
+  pendentes,
+  leadsNovos,
+  publicacoes,
+}: {
+  pendentes: number;
+  leadsNovos: number;
+  publicacoes: number;
+}) {
   const caminho = usePathname();
   const ativo = (href: string) => (href === "/" ? caminho === "/" : caminho.startsWith(href));
 
@@ -39,6 +48,7 @@ export function Navegacao({ pendentes, leadsNovos }: { pendentes: number; leadsN
           {item.rotulo}
           {item.href === "/" && <Contador n={pendentes} rotulo="esperando você" />}
           {item.href === "/leads" && <Contador n={leadsNovos} rotulo="novos" />}
+          {item.href === "/instagram" && <Contador n={publicacoes} rotulo="esperando aprovação" />}
         </Link>
       ))}
     </nav>
