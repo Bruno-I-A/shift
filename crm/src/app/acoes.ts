@@ -8,7 +8,7 @@ import { emTransacao } from "@/lib/banco";
 import * as crm from "@/lib/crm";
 import * as instagram from "@/lib/instagram";
 import { ErroDeDominio, IDS_ETAPA, IDS_ETAPA_LEAD, IDS_TIPO } from "@/lib/dominio";
-import { mudarEtapaDoLead, mudarModoAtendimentoWhatsApp } from "@/lib/leads";
+import { excluirLeadComHistorico, mudarEtapaDoLead, mudarModoAtendimentoWhatsApp } from "@/lib/leads";
 import { enviarTextoMeta } from "@/lib/whatsapp";
 import { enviarModeloHumano, enviarRespostaHumana } from '@/lib/whatsapp-manual';
 import { criarModeloMeta, enviarModeloMeta, listarModelosMeta } from '@/lib/modelos-whatsapp';
@@ -213,6 +213,18 @@ export async function mudarEtapaLead(id: string, etapa: string): Promise<Resulta
     return { erro: mensagemDe(erro) };
   }
   revalidatePath("/", "layout");
+}
+
+export async function excluirLead(id: string): Promise<Resultado> {
+  await exigirSessao();
+  try {
+    const leadId = z.uuid().parse(id);
+    await emTransacao((tx) => excluirLeadComHistorico(tx, leadId, "bruno"));
+  } catch (erro) {
+    return { erro: mensagemDe(erro) };
+  }
+  revalidatePath("/", "layout");
+  return { ok: "Lead excluído com todo o histórico." };
 }
 
 export async function mudarModoWhatsApp(id: string, modo: string): Promise<Resultado> {

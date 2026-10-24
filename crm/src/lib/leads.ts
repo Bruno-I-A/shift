@@ -211,6 +211,19 @@ export async function mudarEtapaDoLead(tx: Consulta, id: string, para: EtapaLead
   if (rows[0]) await registrarEventoDoLead(tx, id, ator, "lead_etapa_mudou", { de: rows[0].de, para });
 }
 
+/**
+ * Apaga o lead e tudo o que o atendimento guardou dele (conversa, resumo, fila
+ * e eventos). Serve ao pedido de exclusão do titular e a recomeçar um teste: a
+ * próxima mensagem do número volta a pedir autorização. O evento que fica não
+ * leva nada que identifique a pessoa.
+ */
+export async function excluirLeadComHistorico(tx: Consulta, id: string, ator: Ator): Promise<void> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) throw new ErroDeDominio("Lead inválido.");
+  const { rows } = await tx.query<{ excluido: boolean }>("select crm.excluir_lead($1) as excluido", [id]);
+  if (!rows[0]?.excluido) throw new ErroDeDominio("Lead não encontrado. Ele pode já ter sido excluído.");
+  await tx.query("insert into crm.evento (ator, tipo) values ($1, 'lead_excluido')", [ator]);
+}
+
 export interface AtendimentoWhatsApp extends ContextoAtendimento {
   revisao: number;
   leadId: string;

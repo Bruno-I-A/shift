@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
-import { mudarModoWhatsApp, responderWhatsApp } from '@/app/acoes';
+import { excluirLead, mudarModoWhatsApp, responderWhatsApp } from '@/app/acoes';
 import type { ConversaWhatsApp, MensagemConversa } from '@/lib/leads';
+import { avisoDeExclusao } from '@/lib/rotulos-leads';
 import { ReabrirComModelo, type ModeloAprovado } from './reabrir-com-modelo';
 
 const hora = (valor: Date) => new Date(valor).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
@@ -26,6 +27,7 @@ export function CaixaWhatsApp({ iniciais, agenteAtivo, modelos = [], erroModelos
   const [aviso, setAviso] = useState('');
   const [mostrarContexto, setMostrarContexto] = useState(false);
   const [erro, setErro] = useState('');
+  const [exclusao, setExclusao] = useState<{ texto: string; erro: boolean } | null>(null);
   const [conexao, setConexao] = useState('Atualizando…');
   const [carregando, setCarregando] = useState(false);
   const [temAnteriores, setTemAnteriores] = useState(false);
@@ -83,7 +85,7 @@ export function CaixaWhatsApp({ iniciais, agenteAtivo, modelos = [], erroModelos
 
   function abrir(id: string | null) {
     contatoAtual.current = id; historicoCarregado.current = false;
-    setSelecionada(id); setMensagens([]); setErro(''); setAviso(''); setCarregando(!!id);
+    setSelecionada(id); setMensagens([]); setErro(''); setAviso(''); setExclusao(null); setCarregando(!!id);
     setMostrarContexto(false);
     setTemAnteriores(false); noFim.current = true;
   }
@@ -120,6 +122,18 @@ export function CaixaWhatsApp({ iniciais, agenteAtivo, modelos = [], erroModelos
     });
   }
 
+  function excluir() {
+    if (!contato || !window.confirm(avisoDeExclusao(contato.nome))) return;
+    const id = contato.leadId;
+    iniciar(async () => {
+      const resultado = await excluirLead(id);
+      if (resultado?.erro) { setExclusao({ texto: resultado.erro, erro: true }); return; }
+      abrir(null);
+      setConversas(atual => atual.filter(c => c.leadId !== id));
+      setExclusao({ texto: resultado?.ok ?? 'Lead excluído.', erro: false });
+    });
+  }
+
   function enviar() {
     if (!contato) return;
     const id = contato.leadId;
@@ -143,6 +157,7 @@ export function CaixaWhatsApp({ iniciais, agenteAtivo, modelos = [], erroModelos
       <span className="flex items-center gap-3"><Link href="/whatsapp/modelos" className="text-[11px] text-suave hover:text-texto">Modelos</Link><span className="text-[11px] text-apagado" role="status">{conexao}</span></span>
     </div>
     {!agenteAtivo && <p className="mb-2 shrink-0 text-xs text-destaque">Agente desligado · atendimento manual disponível</p>}
+    {exclusao && <p role={exclusao.erro ? 'alert' : 'status'} className={`mb-2 shrink-0 text-xs ${exclusao.erro ? 'text-perigo' : 'text-sucesso'}`}>{exclusao.texto}</p>}
     <div className="grid min-h-0 grid-cols-1 flex-1 overflow-hidden rounded-xl border border-linha bg-superficie lg:grid-cols-[260px_minmax(0,1fr)]">
       <aside className={`${selecionada ? 'hidden lg:flex' : 'flex'} min-h-0 min-w-0 flex-col border-r border-linha`}>
         <div className="space-y-2 border-b border-linha p-3">
@@ -169,6 +184,7 @@ export function CaixaWhatsApp({ iniciais, agenteAtivo, modelos = [], erroModelos
             <div className="flex min-w-0 items-center gap-2"><button onClick={() => abrir(null)} className={`${botao} lg:hidden`} aria-label="Voltar às conversas">←</button>
               <div className="min-w-0"><h2 className="truncate text-sm font-semibold">{contato.nome}</h2><p className="truncate text-[11px] text-suave">{contato.empresa ? `${contato.empresa} · ` : ''}+{contato.whatsapp}</p></div></div>
             <div className="flex shrink-0 items-center gap-2"><Link href="/leads" className="hidden text-xs text-suave hover:text-texto sm:inline">Ver leads</Link>
+              <button disabled={pendente} onClick={excluir} className={`${botao} text-perigo`}>Excluir</button>
               <button disabled={pendente} onClick={alternarModo} className={botao}>{contato.modo === 'agente' ? 'Assumir' : 'Devolver à IA'}</button></div>
           </header>
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-linha px-3 py-1.5 text-[11px] text-suave">

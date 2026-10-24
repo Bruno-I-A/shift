@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Vazio } from "@/componentes/secao";
 import { SeletorEtapaLead } from "@/componentes/seletor-etapa-lead";
 import { BotaoAcao } from "@/componentes/botao-acao";
-import { mudarModoWhatsApp } from "@/app/acoes";
+import { excluirLead, mudarModoWhatsApp } from "@/app/acoes";
+import { avisoDeExclusao } from "@/lib/rotulos-leads";
 import { emTransacao } from "@/lib/banco";
 import { ETAPAS_LEAD, IDS_ETAPA_LEAD, nomeDaEtapaLead } from "@/lib/dominio";
 import type { EtapaLead } from "@/lib/dominio";
@@ -141,6 +142,13 @@ export default async function Leads({ searchParams }: PageProps<"/leads">) {
                       {lead.modoWhatsApp === "agente" ? "Assumir atendimento" : "Reativar agente"}
                     </BotaoAcao>
                   )}
+                  <BotaoAcao
+                    acao={excluirLead.bind(null, lead.id)}
+                    confirmar={avisoDeExclusao(lead.nome)}
+                    className="text-xs text-perigo hover:underline"
+                  >
+                    Excluir lead
+                  </BotaoAcao>
                 </div>
               </div>
 
