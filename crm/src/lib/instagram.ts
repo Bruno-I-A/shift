@@ -80,6 +80,7 @@ export async function salvarConta(
         set usuario_id = excluded.usuario_id, nome_usuario = excluded.nome_usuario,
             token_cifrado = excluded.token_cifrado, token_expira_em = excluded.token_expira_em,
             direct_assinado = case when conta_instagram.usuario_id = excluded.usuario_id then conta_instagram.direct_assinado else false end,
+            comentarios_assinados = case when conta_instagram.usuario_id = excluded.usuario_id then conta_instagram.comentarios_assinados else false end,
             token_renovado_em = now(), conectada_em = now()`,
     [conta.usuarioId, conta.nomeUsuario, cifrar(conta.token, segredo()), conta.expiraEm],
   );

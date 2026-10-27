@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 interface Conversa {
   id:string; contato_id:string; modo:'agente'|'humano'; iniciada_em:string|null;
-  memoria:{nome?:string;empresa?:string;resumo?:string;qualificacao?:Record<string,string>}; erro:string|null;
+  memoria:{nome?:string;empresa?:string;resumo?:string;qualificacao?:Record<string,string>;campanha?:{nome:string;contexto:string;link:string}}; erro:string|null;
   ultima_recebida:string;
 }
 interface Mensagem {id:string;autor:string;texto:string;estado:string;criada_em:string}
@@ -104,7 +104,7 @@ export function CaixaInstagram() {
             <div className="flex gap-2"><button className={botao} onClick={()=>setContexto(!contexto)}>Contexto</button><button className={botao} disabled={ocupado} onClick={()=>void agir({acao:'modo',id,modo:conversa.modo==='humano'?'agente':'humano'})}>{conversa.modo==='humano'?'Devolver à IA':'Assumir conversa'}</button></div>
           </header>
           {conversa.erro&&<p role="status" className="border-b border-linha p-2 text-xs text-perigo">{conversa.erro}</p>}
-          {contexto&&<div className="max-h-32 overflow-y-auto border-b border-linha p-3 text-xs text-suave"><p>{conversa.memoria.resumo||'Ainda não há resumo.'}</p>{Object.entries(conversa.memoria.qualificacao||{}).map(([k,v])=><p key={k}>{k}: {v}</p>)}</div>}
+          {contexto&&<div className="max-h-32 overflow-y-auto border-b border-linha p-3 text-xs text-suave">{conversa.memoria.campanha&&<p className="mb-2">Origem: <a href={conversa.memoria.campanha.link} target="_blank" rel="noopener noreferrer" className="underline">{conversa.memoria.campanha.nome}</a>. {conversa.memoria.campanha.contexto}</p>}<p>{conversa.memoria.resumo||'Ainda não há resumo.'}</p>{Object.entries(conversa.memoria.qualificacao||{}).map(([k,v])=><p key={k}>{k}: {v}</p>)}</div>}
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3" onScroll={e=>{const a=e.currentTarget;acompanhar.current=a.scrollHeight-a.scrollTop-a.clientHeight<80;}}>
             {mais&&mensagens.length>=60&&<button className={botao} onClick={()=>void anteriores()}>Mensagens anteriores</button>}
             {mensagens.map(m=><div key={m.id} className={`flex ${m.autor==='cliente'?'justify-start':'justify-end'}`}><div className={`max-w-[90%] rounded-lg px-3 py-2 md:max-w-[75%] ${m.autor==='cliente'?'border border-linha':'bg-superficie-2'}`}><p className="text-sm whitespace-pre-wrap break-words">{m.texto}</p><p className="mt-1 text-right text-[10px] text-apagado">{m.autor==='agente'?'IA':m.autor==='humano'?'Equipe':'Cliente'} · {new Date(m.criada_em).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})} · {m.estado}</p></div></div>)}

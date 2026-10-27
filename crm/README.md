@@ -49,6 +49,9 @@ O atendimento do Instagram tem caixa própria em `/instagram/direct`. Configura�
 e roteiro de teste: [Instagram Direct](docs/instagram-direct.md). Usa a mesma IA
 e conhecimento, com histórico e identidade separados do WhatsApp.
 
+Campanhas “comente QUERO e receba uma DM” ficam em `/instagram/campanhas`.
+Configuração, limites e teste: [Comentários para DM](docs/instagram-campanhas.md).
+
 O CRM usa a **Cloud API oficial da Meta** em `POST /api/whatsapp/webhook`. A
 Meta valida o endereço por `GET` com o token de verificação e assina cada
 evento por `X-Hub-Signature-256` com o App Secret. A rota confere a assinatura,

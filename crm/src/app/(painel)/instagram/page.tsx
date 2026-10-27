@@ -177,6 +177,7 @@ export default async function Instagram({ searchParams }: PageProps<"/instagram"
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Instagram</h1>
           <Link href="/instagram/direct" className="mt-2 inline-block text-sm underline">Abrir conversas do Direct →</Link>
+          <Link href="/instagram/campanhas" className="mt-2 ml-4 inline-block text-sm underline">Comentários para DM →</Link>
           <p className="mt-1 text-sm text-suave">
             Reels, carrosséis e fotos da Shift, publicados na hora marcada. O que um agente propõe só vai ao ar depois
             que você aprova.

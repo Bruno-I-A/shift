@@ -7,5 +7,7 @@ export async function register() {
     iniciarAgendaInstagram();
     const { iniciarDirect } = await import('./lib/processamento-direct');
     iniciarDirect();
+    const { iniciarComentariosInstagram } = await import('./lib/processamento-comentarios-instagram');
+    iniciarComentariosInstagram();
   }
 }

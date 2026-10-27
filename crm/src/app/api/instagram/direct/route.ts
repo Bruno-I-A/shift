@@ -2,6 +2,7 @@ import * as z from 'zod';
 import { emTransacao } from '@/lib/banco';
 import { acessoDaConta, lerConta } from '@/lib/instagram';
 import { assinarDirect } from '@/lib/instagram-direct-meta';
+import { assinarComentariosInstagram } from '@/lib/comentarios-instagram-meta';
 import { historicoDirect, listarDirect, mudarModoDirect, prepararManualDirect } from '@/lib/leads';
 import { temSessao } from '@/lib/sessao';
 import { ErroDeDominio } from '@/lib/dominio';
@@ -44,7 +45,9 @@ export async function POST(pedido:Request):Promise<Response> {
     if (dados.acao==='conectar') {
       const acesso=await emTransacao(acessoDaConta);
       if (!acesso || acesso.expiraEm.getTime()<=Date.now()) throw new ErroDeDominio('Reconecte o Instagram primeiro.');
-      await assinarDirect(acesso);
+      const {rows:estado}=await emTransacao(tx=>tx.query<{comentarios_assinados:boolean}>('select comentarios_assinados from crm.conta_instagram where usuario_id=$1',[acesso.usuarioId]));
+      if(estado[0]?.comentarios_assinados)await assinarComentariosInstagram(acesso);
+      else await assinarDirect(acesso);
       await emTransacao(tx=>tx.query('update crm.conta_instagram set direct_assinado=true where usuario_id=$1',[acesso.usuarioId]));
     } else await emTransacao(async tx=>{
       const conta=await lerConta(tx);
