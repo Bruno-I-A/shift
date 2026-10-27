@@ -28,19 +28,6 @@ const esquemaWebhookMeta = z.object({
 
 export interface MensagemRecebida { id: string; whatsapp: string; texto: string; tipo?: string; recebidoEm?: Date }
 
-export function decidirConsentimentoWhatsApp(
-  aviso: { mensagemId: string; enviadoEm: Date } | null,
-  mensagem: Pick<MensagemRecebida, "id" | "texto">,
-  agora = Date.now(),
-): "autorizar" | "avisar" | "ignorar" {
-  const idade = aviso ? agora - new Date(aviso.enviadoEm).getTime() : Infinity;
-  const autorizou = /^(sim|aceito|autorizo)([.! ]*)$/i.test(mensagem.texto);
-  if (aviso?.mensagemId === mensagem.id) return "ignorar";
-  if (autorizou && aviso && idade >= -60_000 && idade <= 86_400_000) return "autorizar";
-  if (aviso && idade >= 0 && idade < 600_000) return "ignorar";
-  return "avisar";
-}
-
 function recente(valor: number | string): boolean {
   const numero = Number(valor);
   if (!Number.isFinite(numero)) return false;

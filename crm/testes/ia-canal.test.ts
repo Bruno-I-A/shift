@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { analisarAtendimento, type ContextoAtendimento } from '@/lib/ia-atendimento';
 afterEach(()=>{vi.unstubAllEnvs();vi.unstubAllGlobals();});
-it('reutiliza IA e RAG no Instagram sem mudar o prompt padrão do WhatsApp',async()=>{
+it('compartilha IA e RAG sem exigir confirmação e identifica corretamente cada canal',async()=>{
   vi.stubEnv('ANTHROPIC_API_KEY','teste');
   const fetch=vi.fn().mockImplementation(async()=>Response.json({stop_reason:'tool_use',content:[{
     type:'tool_use',name:'registrar_atendimento',input:{resposta:'A Shift desenvolve sites. Qual é o seu negócio?'},
@@ -16,5 +16,6 @@ it('reutiliza IA e RAG no Instagram sem mudar o prompt padrão do WhatsApp',asyn
   expect(direct.messages[0].content).toContain('Clínica do Dente');
   await analisarAtendimento('Vocês fazem sites?',{...contexto,canal:undefined});
   expect(JSON.parse(fetch.mock.calls[1][1].body).system[0].text).toContain('Você atende pela Shift Systems no WhatsApp.');
-  expect(JSON.parse(fetch.mock.calls[1][1].body).system[0].text).toContain('A pessoa já autorizou o atendimento com IA.');
+  expect(JSON.parse(fetch.mock.calls[1][1].body).system[0].text).not.toContain('A pessoa já autorizou');
+  expect(JSON.parse(fetch.mock.calls[1][1].body).system[0].text).toContain('Não peça confirmação de privacidade nem exija SIM');
 });

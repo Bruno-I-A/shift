@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { estimarCustoAtendimento, registrarUsoAtendimento, resumirUsoAtendimento } from '@/lib/uso-atendimento';
-import { autorizarAtendimentoWhatsApp } from '@/lib/leads';
+import { iniciarAtendimentoWhatsApp } from '@/lib/leads';
 import { bancoDeTeste } from './banco-de-teste';
 
 describe('uso da IA sem conteúdo pessoal', () => {
@@ -18,7 +18,7 @@ describe('uso da IA sem conteúdo pessoal', () => {
   });
   it('registra chamadas e soma tokens com o papel restrito, sem poder alterar o histórico', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await iniciarAtendimentoWhatsApp(tx, '5554999991234');
     const uso = { modelo: 'claude-haiku-4-5-20251001', inputTokens: 1000, outputTokens: 100, cacheReadTokens: 0, cacheCreationTokens: 0 };
     await registrarUsoAtendimento(tx, a.leadId, uso);
     await registrarUsoAtendimento(tx, a.leadId, uso);

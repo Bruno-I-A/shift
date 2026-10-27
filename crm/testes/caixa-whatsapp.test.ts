@@ -8,8 +8,8 @@ const analise = { resposta: 'Como posso ajudar?', nome: '', empresa: '', segment
 describe('caixa de entrada WhatsApp', () => {
   it('guarda recebidas em modo humano, não duplica e separa os contatos', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
-    const b = await leads.autorizarAtendimentoWhatsApp(tx, '5554988884321');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
+    const b = await leads.iniciarAtendimentoWhatsApp(tx, '5554988884321');
     await leads.mudarModoAtendimentoWhatsApp(tx, a.leadId, 'humano');
     const mensagem = { id: 'ENTRADA1', texto: 'Tenho uma clínica.' };
     await leads.registrarMensagemRecebidaWhatsApp(tx, a.leadId, mensagem);
@@ -21,7 +21,7 @@ describe('caixa de entrada WhatsApp', () => {
 
   it('pausa a IA ao preparar resposta humana, preserva o corpo e impede reenvio da mesma tentativa', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.registrarMensagemRecebidaWhatsApp(tx, a.leadId, { id: 'ENTRADA', texto: 'Oi!' });
     const pedidoId = '78b8e61d-289e-45e9-90b7-b4c82077c8f7';
     expect(await leads.prepararRespostaHumanaWhatsApp(tx, a.leadId, pedidoId, 'Vou te ajudar.')).toBe(a.whatsapp);
@@ -37,7 +37,7 @@ describe('caixa de entrada WhatsApp', () => {
 
   it('recusa resposta fora da janela no servidor e permite após nova mensagem', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.registrarMensagemRecebidaWhatsApp(tx, a.leadId, { id: 'ANTIGA', texto: 'Oi', recebidoEm: new Date(Date.now() - 25 * 3600_000) });
     const pedido = '78b8e61d-289e-45e9-90b7-b4c82077c8f7';
     await expect(leads.prepararRespostaHumanaWhatsApp(tx, a.leadId, pedido, 'Oi')).rejects.toThrow(/24 horas/);
@@ -48,7 +48,7 @@ describe('caixa de entrada WhatsApp', () => {
 
   it('a tomada humana cancela a resposta de IA que estava sendo preparada, mesmo após devolver ao agente', async () => {
     const { tx } = await bancoDeTeste();
-    const contexto = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const contexto = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     const enviar = vi.fn(async () => 'META');
     await leads.mudarModoAtendimentoWhatsApp(tx, contexto.leadId, 'humano');
     await leads.mudarModoAtendimentoWhatsApp(tx, contexto.leadId, 'agente');
@@ -63,7 +63,7 @@ describe('caixa de entrada WhatsApp', () => {
 
   it('status antecipado e fora de ordem não faz a mensagem lida voltar para enviada', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.registrarRespostaWhatsApp(tx, a, 'IA1', analise);
     for (const estado of ['read', 'delivered', 'sent', 'read']) {
       await leads.registrarStatusWhatsApp(tx, { id: 'META1', estado, ocorridoEm: new Date() });
@@ -79,7 +79,7 @@ describe('caixa de entrada WhatsApp', () => {
 
   it('limpa só os registros com mais de 90 dias e pagina mensagens com a mesma data', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.registrarMensagemRecebidaWhatsApp(tx, a.leadId, { id: 'VELHA', texto: 'Antiga', recebidoEm: new Date(Date.now() - 91 * 86400_000) });
     const agora = new Date();
     for (let i = 0; i < 105; i++) {

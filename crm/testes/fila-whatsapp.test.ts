@@ -12,7 +12,7 @@ const analise = {
 describe('fila durável do atendimento WhatsApp', () => {
   it('confirma a primeira caixa e permite tomada humana antes da segunda', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'CAIXAS', texto: 'Quero um site' });
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     const lote = (await leads.reservarLoteWhatsApp(tx))!;
@@ -30,7 +30,7 @@ describe('fila durável do atendimento WhatsApp', () => {
     const { tx } = await bancoDeTeste();
     // Fixa now() na transação para simular a pausa sem sleep ou flutuação do relógio.
     await tx.query('begin');
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.registrarRespostaWhatsApp(tx, a, 'ABERTURA', { ...analise, resposta: 'Como posso ajudar?' });
     await leads.marcarEnvioWhatsApp(tx, 'ABERTURA', true);
     const instante = new Date();
@@ -62,7 +62,7 @@ describe('fila durável do atendimento WhatsApp', () => {
 
   it('descarta análise obsoleta e reagrupa quando chega texto durante a IA', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'A', texto: 'Quero um site' });
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     const antigo = (await leads.reservarLoteWhatsApp(tx))!;
@@ -83,7 +83,7 @@ describe('fila durável do atendimento WhatsApp', () => {
 
   it('recupera reserva vencida após reinício e invalida o processo antigo', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'RECUPERAR', texto: 'Continuamos?' });
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     const antigo = (await leads.reservarLoteWhatsApp(tx))!;
@@ -102,7 +102,7 @@ describe('fila durável do atendimento WhatsApp', () => {
 
   it('assumir atendimento cancela pendentes e resposta da IA em andamento', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'ASSUMIR', texto: 'Preciso de ajuda' });
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     const lote = (await leads.reservarLoteWhatsApp(tx))!;
@@ -119,7 +119,7 @@ describe('fila durável do atendimento WhatsApp', () => {
 
   it('divide um lote excepcionalmente longo sem perder texto e limita recuperação operacional', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     for (let i = 0; i < 4; i++) await leads.enfileirarMensagemWhatsApp(tx, a, { id: `LONGA${i}`, texto: 'a'.repeat(4000) });
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     const lote = (await leads.reservarLoteWhatsApp(tx))!;
@@ -138,14 +138,14 @@ describe('fila durável do atendimento WhatsApp', () => {
 
   it('fecha pendências e reabre o número mesmo quando sobrou uma fila de atendimento encerrado', async () => {
     const { tx } = await bancoDeTeste();
-    const anterior = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const anterior = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.enfileirarMensagemWhatsApp(tx, anterior, { id: 'ANTERIOR', texto: 'Um site' });
     await leads.mudarEtapaDoLead(tx, anterior.leadId, 'ganho', 'bruno');
     expect((await tx.query('select * from crm.fila_whatsapp')).rows).toHaveLength(0);
     expect(await leads.enfileirarMensagemWhatsApp(tx, anterior, { id: 'ATRASADA', texto: 'Outra mensagem' })).toBe(false);
     // Simula resíduo operacional anterior à correção: a FK não pode bloquear a reabertura.
     await tx.query('insert into crm.fila_whatsapp (lead_id, mensagens) values ($1, $2)', [anterior.leadId, ['e:ANTERIOR']]);
-    const atual = await leads.autorizarAtendimentoWhatsApp(tx, anterior.whatsapp);
+    const atual = await leads.iniciarAtendimentoWhatsApp(tx, anterior.whatsapp);
     expect(atual.leadId).not.toBe(anterior.leadId);
     expect(atual.etapa).toBe('novo');
     expect((await tx.query('select * from crm.fila_whatsapp')).rows).toHaveLength(0);
@@ -153,7 +153,7 @@ describe('fila durável do atendimento WhatsApp', () => {
 
   it('não reserva trabalho fora das 24 horas nem envia análise que atravessou o limite', async () => {
     const { db, tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'EXPIRADA', texto: 'Olá', recebidoEm: new Date(Date.now() - 86_401_000) });
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     expect(await leads.reservarLoteWhatsApp(tx)).toBeNull();
@@ -168,7 +168,7 @@ describe('fila durável do atendimento WhatsApp', () => {
 
   it('intenção durável não volta à fila após reinício; tomada humana ainda cancela o envio preparado', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'INTENCAO', texto: 'Meu projeto' });
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     const lote = (await leads.reservarLoteWhatsApp(tx))!;
@@ -185,7 +185,7 @@ describe('fila durável do atendimento WhatsApp', () => {
 
   it('resposta humana invalida também a contingência que já preparou passagem para humano', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'FALLBACK', texto: 'Está funcionando?' });
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     const lote = (await leads.reservarLoteWhatsApp(tx))!;
@@ -199,7 +199,7 @@ describe('fila durável do atendimento WhatsApp', () => {
 
   it('limita reservas vencidas sucessivas mesmo sem passagem por liberar após um crash', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'REINICIO', texto: 'Oi' });
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     for (let i = 0; i < 3; i++) {

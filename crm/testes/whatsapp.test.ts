@@ -4,7 +4,7 @@ import type { Consulta } from "@/lib/consulta";
 import { buscarConhecimento } from "@/lib/conhecimento-shift";
 import { analisarAtendimento } from "@/lib/ia-atendimento";
 import * as leads from "@/lib/leads";
-import { decidirConsentimentoWhatsApp, enviarTextoMeta, lerMensagensMeta } from "@/lib/whatsapp";
+import { enviarTextoMeta, lerMensagensMeta } from "@/lib/whatsapp";
 
 import { bancoDeTeste } from "./banco-de-teste";
 
@@ -44,17 +44,6 @@ describe("ponte oficial da Meta e base de conhecimento", () => {
     expect(buscarConhecimento("Qual é o preço exato de R$ 123?", 1)).toEqual([]);
   });
 
-  it("um SIM solto não autoriza; exige aviso anterior e ignora webhooks repetidos", () => {
-    const agora = Date.now();
-    const mensagem = { id: "SIM1", texto: "SIM" };
-    expect(decidirConsentimentoWhatsApp(null, mensagem, agora)).toBe("avisar");
-    const aviso = { mensagemId: "AVISO1", enviadoEm: new Date(agora - 1000) };
-    expect(decidirConsentimentoWhatsApp(aviso, mensagem, agora)).toBe("autorizar");
-    expect(decidirConsentimentoWhatsApp(aviso, { id: "AVISO1", texto: "Oi" }, agora)).toBe("ignorar");
-    expect(decidirConsentimentoWhatsApp({ ...aviso, mensagemId: "SIM1" }, mensagem, agora)).toBe("ignorar");
-    expect(decidirConsentimentoWhatsApp({ ...aviso, enviadoEm: new Date(agora - 2 * 86_400_000) }, mensagem, agora)).toBe("avisar");
-  });
-
   it("envia texto pela Cloud API com o número configurado", async () => {
     vi.stubEnv("WHATSAPP_META_ACCESS_TOKEN", "teste");
     vi.stubEnv("WHATSAPP_META_PHONE_NUMBER_ID", "123456");
@@ -75,20 +64,20 @@ describe("qualificação pelo WhatsApp", () => {
   let tx: Consulta;
   beforeEach(async () => { ({ tx } = await bancoDeTeste()); });
 
-  it("registra somente uma chave pseudonimizada do aviso antes da autorização", async () => {
-    const chave = "a".repeat(64);
-    expect(await leads.buscarAvisoWhatsApp(tx, chave)).toBeNull();
-    await leads.registrarAvisoWhatsApp(tx, chave, "ABC0");
-    expect(await leads.buscarAvisoWhatsApp(tx, chave)).toMatchObject({ mensagemId: "ABC0" });
-    expect(await leads.listarLeads(tx)).toHaveLength(0);
-    await leads.apagarAvisoWhatsApp(tx, chave);
-    expect(await leads.buscarAvisoWhatsApp(tx, chave)).toBeNull();
+  it("inicia sem inventar aceite e mantém os aceites reais registrados anteriormente", async () => {
+    const a=await leads.iniciarAtendimentoWhatsApp(tx,'5554999991234');
+    expect((await leads.listarLeads(tx))[0].consentimentoEm).toBeNull();
+    const data='2026-10-01T12:00:00.000Z';
+    await tx.query('update crm.lead set consentimento_em=$2 where id=$1',[a.leadId,data]);
+    await leads.iniciarAtendimentoWhatsApp(tx,a.whatsapp);
+    expect(new Date((await leads.listarLeads(tx))[0].consentimentoEm!).toISOString()).toBe(data);
+    await expect(tx.query(`insert into crm.lead(nome,whatsapp,origem) values('Site','5554988880000','site')`)).rejects.toThrow(/lead_consentimento_por_origem/);
   });
 
-  it("cria lead só após autorização, qualifica e não processa o mesmo evento duas vezes", async () => {
+  it("cria lead no início do atendimento, qualifica e não processa o mesmo evento duas vezes", async () => {
     expect(await leads.buscarAtendimentoWhatsApp(tx, "5554999991234")).toBeNull();
-    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
-    expect(await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({ leadId: atendimento.leadId });
+    const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
+    expect(await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({ leadId: atendimento.leadId });
     expect(await leads.registrarRespostaWhatsApp(tx, atendimento, "ABC1", analise)).toBe(true);
     expect(await leads.registrarRespostaWhatsApp(tx, atendimento, "ABC1", analise)).toBe(false);
     await leads.marcarEnvioWhatsApp(tx, "ABC1", true);
@@ -99,7 +88,7 @@ describe("qualificação pelo WhatsApp", () => {
   });
 
   it("permite a tomada humana e mostra falha de envio para acompanhamento", async () => {
-    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     await leads.registrarRespostaWhatsApp(tx, atendimento, "ABC2", { ...analise, passarParaHumano: true });
     await leads.marcarEnvioWhatsApp(tx, "ABC2", false);
     expect(await leads.buscarAtendimentoWhatsApp(tx, atendimento.whatsapp)).toMatchObject({ modo: "humano" });
@@ -109,7 +98,7 @@ describe("qualificação pelo WhatsApp", () => {
   });
 
   it("lembra os dados salvos e a última resposta entregue, sem misturar contatos", async () => {
-    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     expect(atendimento.nome).toBe("");
     await leads.registrarRespostaWhatsApp(tx, atendimento, "MEM1", {
       ...analise, nome: "Ana Maria", resposta: "Ana, em que sistema vocês conferem os pedidos?",
@@ -143,12 +132,12 @@ describe("qualificação pelo WhatsApp", () => {
     expect(await leads.buscarAtendimentoWhatsApp(tx, memoria.whatsapp)).toMatchObject({
       nome: "Ana Maria", empresa: "Indústria Ana", resumo: proxima.resumo,
     });
-    const outro = await leads.autorizarAtendimentoWhatsApp(tx, "5554988885678");
+    const outro = await leads.iniciarAtendimentoWhatsApp(tx, "5554988885678");
     expect(outro).toMatchObject({ nome: "", empresa: null, resumo: "", ultimaResposta: "" });
   });
 
   it("aceita correções explícitas e preserva campos não atualizados", async () => {
-    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     await leads.registrarRespostaWhatsApp(tx, atendimento, "COR1", analise);
     await leads.registrarRespostaWhatsApp(tx, atendimento, "COR2", {
       ...analise, nome: "Ana Maria", empresa: "Indústria Nova", dor: "Conferência de notas",
@@ -170,7 +159,7 @@ describe("qualificação pelo WhatsApp", () => {
       nome: "Ana Maria", empresa: "Indústria Ana", whatsapp: "5554999991234", respostas: { segmento: "Indústria", prazo: "Este mês" },
       nivel: null, oferta: null, processo: null, origem: "site",
     });
-    expect(await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({
+    expect(await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({
       leadId: id, nome: "Ana Maria", empresa: "Indústria Ana", segmento: "Indústria", prazo: "Este mês",
     });
   });
@@ -180,7 +169,7 @@ describe("qualificação pelo WhatsApp", () => {
       nome: "Bruno", empresa: "Clínica B", whatsapp: "5554999991234", respostas: { segmento: "Odontologia", controle: "Planilhas" },
       nivel: null, oferta: null, processo: null, origem: "site",
     });
-    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     await leads.registrarRespostaWhatsApp(tx, atendimento, "SITE1", {
       ...analise, nome: "", empresa: "", segmento: "", dor: "", prazo: "Ainda não definido", resumo: "Quer o primeiro site para atrair pacientes.",
       qualificacao: { interesse: "site", objetivo: "Atrair pacientes", cidade: "Passo Fundo", siteAtual: "Primeiro site", materiais: "Tem logo", investimento: "Prefere não informar", preferenciaContato: "À tarde; ana@example.com" },
@@ -200,20 +189,21 @@ describe("qualificação pelo WhatsApp", () => {
   });
 
   it("pausa ao detectar resposta manual, mas ignora o eco de uma resposta do agente", async () => {
-    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     await leads.registrarRespostaWhatsApp(tx, atendimento, "ABC3", analise);
     expect(await leads.pausarSeRespostaHumana(tx, atendimento.whatsapp, analise.resposta)).toBe(false);
     expect(await leads.pausarSeRespostaHumana(tx, atendimento.whatsapp, "Vou verificar isso para você.")).toBe(true);
     expect(await leads.buscarAtendimentoWhatsApp(tx, atendimento.whatsapp)).toMatchObject({ modo: "humano" });
   });
 
-  it("um contato que volta após Ganho inicia novo lead com novo consentimento", async () => {
-    const primeiro = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+  it("um contato que volta após Ganho inicia novo lead sem inventar novo consentimento", async () => {
+    const primeiro = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     await leads.mudarEtapaDoLead(tx, primeiro.leadId, "ganho", "bruno");
     const anterior = await leads.buscarAtendimentoWhatsApp(tx, primeiro.whatsapp);
     expect(anterior?.etapa).toBe("ganho");
-    const segundo = await leads.autorizarAtendimentoWhatsApp(tx, primeiro.whatsapp);
+    const segundo = await leads.iniciarAtendimentoWhatsApp(tx, primeiro.whatsapp);
     expect(segundo.leadId).not.toBe(primeiro.leadId);
     expect((await leads.listarLeads(tx)).map((lead) => lead.etapa).sort()).toEqual(["ganho", "novo"]);
+    expect((await leads.listarLeads(tx)).every(lead=>lead.consentimentoEm===null)).toBe(true);
   });
 });

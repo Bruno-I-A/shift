@@ -107,7 +107,7 @@ describe("envio de modelo pelo painel", () => {
   it("fora da janela registra o texto que o cliente recebe, assume a conversa e não envia duas vezes", async () => {
     const { tx } = await bancoDeTeste();
     const executar = <T,>(trabalho: (t: typeof tx) => Promise<T>) => trabalho(tx);
-    const contato = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    const contato = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     await leads.registrarMensagemRecebidaWhatsApp(tx, contato.leadId, {
       id: "ANTIGA", texto: "Oi", recebidoEm: new Date(Date.now() - 30 * 3600_000),
     });

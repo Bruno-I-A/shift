@@ -91,8 +91,8 @@ describe("MCP", () => {
   });
 
   it("lista e lê uma conversa com dados mascarados, sem vazar mensagens ou cursor de outro contato", async () => {
-    const ana = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
-    const beto = await leads.autorizarAtendimentoWhatsApp(tx, "5554988884321");
+    const ana = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
+    const beto = await leads.iniciarAtendimentoWhatsApp(tx, "5554988884321");
     await tx.query("update crm.lead set nome = $2, empresa = $3 where id = $1", [ana.leadId, "Ana", "ana@exemplo.com"]);
     await tx.query("update crm.atendimento_whatsapp set resumo = $2 where lead_id = $1", [ana.leadId, "CPF 123.456.789-09"]);
     await leads.registrarMensagemRecebidaWhatsApp(tx, ana.leadId, {
@@ -123,7 +123,7 @@ describe("MCP", () => {
   });
 
   it("envia pelo MCP com a janela aberta, pausa a IA antes da Meta e não repete o mesmo id", async () => {
-    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     await leads.registrarMensagemRecebidaWhatsApp(tx, atendimento.leadId, { id: "OI", texto: "Oi!" });
     const enviar = vi.fn(async (_url: string | URL, opcoes: RequestInit) => {
       expect(await leads.buscarAtendimentoWhatsApp(tx, atendimento.whatsapp)).toMatchObject({ modo: "humano" });
@@ -148,7 +148,7 @@ describe("MCP", () => {
   });
 
   it("uma falha da Meta fica no histórico e mantém a IA pausada, sem tentar reenviar", async () => {
-    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     await leads.registrarMensagemRecebidaWhatsApp(tx, atendimento.leadId, { id: "OI", texto: "Oi!" });
     const enviar = vi.fn(async () => Response.json({ error: "falha fictícia" }, { status: 503 }));
     vi.stubGlobal("fetch", enviar);
@@ -165,7 +165,7 @@ describe("MCP", () => {
   });
 
   it("fora das 24 horas não chama a Meta, não cria mensagem e não muda o controle da IA", async () => {
-    const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, "5554999991234");
+    const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, "5554999991234");
     await leads.registrarMensagemRecebidaWhatsApp(tx, atendimento.leadId, {
       id: "ANTIGA", texto: "Oi!", recebidoEm: new Date(Date.now() - 25 * 3600_000),
     });

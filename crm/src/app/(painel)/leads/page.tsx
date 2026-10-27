@@ -57,7 +57,7 @@ export default async function Leads({ searchParams }: PageProps<"/leads">) {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Leads</h1>
         <p className="mt-1 text-sm text-apagado">
-          Contatos do diagnóstico no site e do atendimento no WhatsApp, com autorização para guardar os dados.
+          Contatos do diagnóstico no site e das conversas iniciadas pelo cliente no WhatsApp.
         </p>
       </header>
 
@@ -91,7 +91,7 @@ export default async function Leads({ searchParams }: PageProps<"/leads">) {
         <Vazio>
           {etapa
             ? `Nenhum lead em ${nomeDaEtapaLead(etapa)}.`
-            : "Nenhum lead ainda. O diagnóstico do site e os contatos autorizados no WhatsApp aparecem aqui."}
+            : "Nenhum lead ainda. O diagnóstico do site e as conversas iniciadas no WhatsApp aparecem aqui."}
         </Vazio>
       ) : (
         <ul className="divide-y divide-linha rounded-lg border border-linha">
@@ -183,7 +183,7 @@ export default async function Leads({ searchParams }: PageProps<"/leads">) {
                   )}
                   <div className="sm:col-span-2">
                     <dt className="text-xs text-apagado">Consentimento</dt>
-                    <dd>Autorizado em {dataCompleta(lead.consentimentoEm)}</dd>
+                    <dd>{lead.consentimentoEm ? `Autorizado em ${dataCompleta(lead.consentimentoEm)}` : `Contato iniciado em ${dataCompleta(lead.criadoEm)}`}</dd>
                   </div>
                 </dl>
               </details>

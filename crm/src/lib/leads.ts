@@ -33,7 +33,7 @@ export interface Lead {
   origem: string;
   etapa: EtapaLead;
   etapaDesde: Date;
-  consentimentoEm: Date;
+  consentimentoEm: Date | null;
   criadoEm: Date;
   atualizadoEm: Date;
   modoWhatsApp: "agente" | "humano" | null;
@@ -217,7 +217,7 @@ export async function mudarEtapaDoLead(tx: Consulta, id: string, para: EtapaLead
 /**
  * Apaga o lead e tudo o que o atendimento guardou dele (conversa, resumo, fila
  * e eventos). Serve ao pedido de exclusão do titular e a recomeçar um teste: a
- * próxima mensagem do número volta a pedir autorização. O evento que fica não
+ * próxima mensagem do número inicia um atendimento novo. O evento que fica não
  * leva nada que identifique a pessoa.
  */
 export async function excluirLeadComHistorico(tx: Consulta, id: string, ator: Ator): Promise<void> {
@@ -233,27 +233,6 @@ export interface AtendimentoWhatsApp extends ContextoAtendimento {
   whatsapp: string;
   modo: "agente" | "humano";
   etapa: EtapaLead;
-}
-
-export async function buscarAvisoWhatsApp(tx: Consulta, chave: string): Promise<{ mensagemId: string; enviadoEm: Date } | null> {
-  const { rows } = await tx.query<{ mensagemId: string; enviadoEm: Date }>(
-    `select mensagem_id as "mensagemId", enviado_em as "enviadoEm"
-      from crm.aviso_whatsapp where chave = $1`, [chave],
-  );
-  return rows[0] ?? null;
-}
-
-export async function registrarAvisoWhatsApp(tx: Consulta, chave: string, mensagemId: string): Promise<void> {
-  await tx.query(
-    `insert into crm.aviso_whatsapp (chave, mensagem_id) values ($1, $2)
-      on conflict (chave) do update set mensagem_id = excluded.mensagem_id, enviado_em = now()`,
-    [chave, mensagemId],
-  );
-  await tx.query("delete from crm.aviso_whatsapp where enviado_em < now() - interval '1 day'");
-}
-
-export async function apagarAvisoWhatsApp(tx: Consulta, chave: string): Promise<void> {
-  await tx.query("delete from crm.aviso_whatsapp where chave = $1", [chave]);
 }
 
 export async function buscarAtendimentoWhatsApp(tx: Consulta, whatsapp: string): Promise<AtendimentoWhatsApp | null> {
@@ -272,8 +251,8 @@ export async function buscarAtendimentoWhatsApp(tx: Consulta, whatsapp: string):
   return rows[0] ?? null;
 }
 
-/** O primeiro registro acontece só depois da resposta afirmativa ao aviso de privacidade. */
-export async function autorizarAtendimentoWhatsApp(tx: Consulta, whatsapp: string): Promise<AtendimentoWhatsApp> {
+/** O próprio contato inicia o atendimento, sem criar consentimento artificial. */
+export async function iniciarAtendimentoWhatsApp(tx: Consulta, whatsapp: string): Promise<AtendimentoWhatsApp> {
   if (!/^\d{10,15}$/.test(whatsapp)) throw new ErroDeDominio("WhatsApp inválido.");
   await tx.query("select pg_advisory_xact_lock(hashtext($1))", [whatsapp]);
   // Mesma ordem do ingresso e da conclusão: atendimento, depois fila.
@@ -287,8 +266,8 @@ export async function autorizarAtendimentoWhatsApp(tx: Consulta, whatsapp: strin
   let leadId = existentes[0]?.id;
   if (!leadId) {
     const { rows } = await tx.query<{ id: string }>(
-      `insert into crm.lead (nome, whatsapp, origem, consentimento_em)
-       values ('Contato WhatsApp', $1, 'whatsapp', now()) returning id`, [whatsapp],
+      `insert into crm.lead (nome, whatsapp, origem)
+       values ('Contato WhatsApp', $1, 'whatsapp') returning id`, [whatsapp],
     );
     leadId = rows[0].id;
     await registrarEventoDoLead(tx, leadId, "sistema", "lead_recebido", { origem: "whatsapp" });
@@ -299,7 +278,7 @@ export async function autorizarAtendimentoWhatsApp(tx: Consulta, whatsapp: strin
       on conflict (whatsapp) do update set lead_id = excluded.lead_id,
         modo = 'agente', resumo = '', atualizado_em = now()`, [leadId, whatsapp],
   );
-  await registrarEventoDoLead(tx, leadId, "sistema", "whatsapp_autorizado");
+  await registrarEventoDoLead(tx, leadId, "sistema", "whatsapp_iniciado");
   return (await buscarAtendimentoWhatsApp(tx, whatsapp))!;
 }
 

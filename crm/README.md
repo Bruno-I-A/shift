@@ -55,10 +55,11 @@ evento por `X-Hub-Signature-256` com o App Secret. A rota confere a assinatura,
 aceita mensagens recentes destinadas ao ID do número público e os eventos de
 entrega/leitura. Anexos aparecem como indicação do tipo, sem download do arquivo.
 O serviço inicia **desligado**: `WHATSAPP_ATIVO=sim` é necessário para a IA atender;
-o recebimento de conversas autorizadas e o envio manual continuam funcionando.
+o recebimento de conversas já iniciadas e o envio manual continuam funcionando.
 
-O primeiro contato recebe um aviso de privacidade. Só depois de responder
-`SIM`, `ACEITO` ou `AUTORIZO` o CRM cria ou associa um lead. A cada pergunta,
+O primeiro contato já cria ou associa o lead e entra na fila de atendimento,
+sem aviso de privacidade nem exigência de responder SIM. A IA se identifica
+brevemente como assistente virtual na primeira interação. A cada pergunta,
 busca trechos de `conhecimento/shift.md` (cópia versionada de
 `../site/llms-full.txt`) e envia esses trechos, o histórico recente e as mensagens mascaradas
 para a Messages API da Anthropic. O Claude responde e extrai nome, empresa, setor,
@@ -68,7 +69,9 @@ atendimento passa para uma pessoa. O botão **Assumir atendimento** no lead
 pausa o agente; **Reativar agente** devolve o atendimento automático.
 
 O CRM guarda o resumo, os dados de qualificação e o histórico de mensagens
-das conversas autorizadas por até 90 dias. Cada chamada ao Claude recebe nome,
+das conversas iniciadas pelo contato por até 90 dias. O início não é gravado
+como consentimento explícito; aceites reais anteriores e do site são preservados.
+Cada chamada ao Claude recebe nome,
 empresa, segmento, necessidade, prazo, resumo acumulado e a última resposta
 enviada pela Shift (agente ou humano), mais até 12 mensagens recentes limitadas a 8 mil caracteres. Isso permite
 entender respostas curtas e continuar a conversa usando o que o contato já contou,
@@ -118,7 +121,7 @@ evitar insistência. Um lead de site também pode ser qualificado pelo objetivo.
 
 ### Mensagens em sequência e custo
 
-As mensagens autorizadas entram numa fila PostgreSQL, e o webhook confirma o
+As mensagens recebidas entram numa fila PostgreSQL, e o webhook confirma o
 recebimento sem esperar a IA. O worker do servidor Next persistente do Easypanel
 aguarda dez segundos de silêncio para juntar as mensagens do contato. IDs
 repetidos não viram novas chamadas. O estado é recuperado depois de reiniciar;

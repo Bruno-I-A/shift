@@ -39,7 +39,7 @@ async function preparar() {
   vi.stubEnv('WHATSAPP_META_PHONE_NUMBER_ID', '123');
   vi.stubEnv('WHATSAPP_META_ACCESS_TOKEN', 'meta-teste');
   vi.stubEnv('WHATSAPP_META_GRAPH_VERSION', 'v24.0');
-  const atendimento = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+  const atendimento = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
   await leads.enfileirarMensagemWhatsApp(tx, atendimento, { id: 'A', texto: 'Quero organizar' });
   await leads.enfileirarMensagemWhatsApp(tx, atendimento, { id: 'B', texto: 'A agenda da clínica' });
   await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
