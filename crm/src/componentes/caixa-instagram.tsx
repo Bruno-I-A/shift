@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
 interface Conversa {
-  id:string; contato_id:string; modo:'agente'|'humano'; consentimento_em:string|null;
+  id:string; contato_id:string; modo:'agente'|'humano'; iniciada_em:string|null;
   memoria:{nome?:string;empresa?:string;resumo?:string;qualificacao?:Record<string,string>}; erro:string|null;
   ultima_recebida:string;
 }
@@ -100,7 +100,7 @@ export function CaixaInstagram() {
       <section className={`${id?'flex':'hidden md:flex'} min-h-0 min-w-0 flex-col`}>
         {conversa?<>
           <header className="flex flex-wrap items-center justify-between gap-2 border-b border-linha p-3">
-            <div><button className="mr-2 text-xs md:hidden" onClick={()=>escolher('')}>← Contatos</button><strong className="text-sm">{conversa.memoria.nome||'Contato Instagram'}</strong><p className="text-xs text-apagado">{conversa.modo==='humano'?'Atendimento humano · IA pausada':'Atendimento com IA'}{!conversa.consentimento_em?' · aguardando autorização':''}</p></div>
+            <div><button className="mr-2 text-xs md:hidden" onClick={()=>escolher('')}>← Contatos</button><strong className="text-sm">{conversa.memoria.nome||'Contato Instagram'}</strong><p className="text-xs text-apagado">{conversa.modo==='humano'?'Atendimento humano · IA pausada':'Atendimento com IA'}{!conversa.iniciada_em?' · aguardando mensagem do contato':''}</p></div>
             <div className="flex gap-2"><button className={botao} onClick={()=>setContexto(!contexto)}>Contexto</button><button className={botao} disabled={ocupado} onClick={()=>void agir({acao:'modo',id,modo:conversa.modo==='humano'?'agente':'humano'})}>{conversa.modo==='humano'?'Devolver à IA':'Assumir conversa'}</button></div>
           </header>
           {conversa.erro&&<p role="status" className="border-b border-linha p-2 text-xs text-perigo">{conversa.erro}</p>}
@@ -111,8 +111,8 @@ export function CaixaInstagram() {
             <div ref={fim}/>
           </div>
           <form className="flex gap-2 border-t border-linha p-3" onSubmit={e=>{e.preventDefault();if(!texto.trim()||ocupado)return;idEnvio.current??=crypto.randomUUID();void agir({acao:'enviar',id,texto,idEnvio:idEnvio.current});}}>
-            <textarea aria-label="Sua resposta" rows={2} maxLength={1000} value={texto} readOnly={envioIncerto} onChange={e=>{setTexto(e.target.value);}} disabled={ocupado||!aberta||!conversa.consentimento_em} placeholder={aberta?'Escreva sua resposta…':'Aguarde uma nova mensagem do contato para responder.'} className="min-w-0 flex-1 resize-none rounded-md border border-linha bg-fundo px-3 py-2 text-sm"/>
-            <button className={botao} disabled={ocupado||!texto.trim()||!aberta||!conversa.consentimento_em}>Enviar</button>
+            <textarea aria-label="Sua resposta" rows={2} maxLength={1000} value={texto} readOnly={envioIncerto} onChange={e=>{setTexto(e.target.value);}} disabled={ocupado||!aberta||!conversa.iniciada_em} placeholder={aberta?'Escreva sua resposta…':'Aguarde uma nova mensagem do contato para responder.'} className="min-w-0 flex-1 resize-none rounded-md border border-linha bg-fundo px-3 py-2 text-sm"/>
+            <button className={botao} disabled={ocupado||!texto.trim()||!aberta||!conversa.iniciada_em}>Enviar</button>
           </form>
         </>:<p className="m-auto p-4 text-sm text-apagado">Selecione uma conversa do Instagram.</p>}
       </section>

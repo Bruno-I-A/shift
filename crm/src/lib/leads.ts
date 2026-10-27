@@ -699,7 +699,7 @@ export async function liberarLoteWhatsApp(tx: Consulta, lote: LoteWhatsApp): Pro
 // Instagram Direct — identidade própria, sem criar telefones fictícios em leads.
 // -----------------------------------------------------------------------------
 export interface ConversaDirect {
-  id: string; conta_id: string; contato_id: string; consentimento_em: Date | null;
+  id: string; conta_id: string; contato_id: string; consentimento_em: Date | null; iniciada_em: Date | null;
   modo: 'agente' | 'humano'; memoria: Partial<AnaliseAtendimento>;
   revisao: string; processada: string; ultima_recebida: Date;
   reserva: string | null; reserva_ate: Date | null; erro: string | null; aviso_em: Date | null;
@@ -708,7 +708,6 @@ export interface MensagemDirect {
   id: string; meta_id: string | null; chave?:string; autor: 'cliente' | 'agente' | 'humano';
   texto: string; estado: string; revisao: string; criada_em: Date;
 }
-const AVISO_DIRECT = 'Oi! Sou o assistente virtual da Shift. Você autoriza o uso de IA e o registro desta conversa por até 90 dias para nossa equipe atender você? Responda SIM. Privacidade: https://shiftsys.com.br/privacidade.html';
 
 async function travarDirect(tx: Consulta, id: string): Promise<ConversaDirect> {
   const { rows } = await tx.query<ConversaDirect>('select * from crm.conversa_instagram where id = $1 for update', [z.uuid().parse(id)]);
@@ -725,7 +724,7 @@ async function prepararTextoDirect(tx: Consulta, c: ConversaDirect, texto: strin
   }
 }
 
-/** O recibo deduplica inclusive mensagens anteriores ao consentimento, sem seu texto. */
+/** Guarda a mensagem e agenda o turno desde o primeiro contato, sem pedir SIM. */
 export async function receberDirect(tx: Consulta, e: EventoDirect, ativo: boolean): Promise<void> {
   // Conta desconectada ou substituída nunca aceita eventos nem recupera uma fila antiga.
   const { rows: contas } = await tx.query('select 1 from crm.conta_instagram where usuario_id=$1 and direct_assinado', [e.conta]);
@@ -746,27 +745,14 @@ export async function receberDirect(tx: Consulta, e: EventoDirect, ativo: boolea
     if (nossas.length) return;
     // Eco não identificado como nosso: resposta pelo aplicativo assume a conversa.
     await mudarModoDirect(tx, c.id, 'humano');
-    if (c.consentimento_em) await tx.query(`insert into crm.mensagem_instagram(conversa_id,meta_id,autor,texto,estado,revisao)
+    if (c.iniciada_em) await tx.query(`insert into crm.mensagem_instagram(conversa_id,meta_id,autor,texto,estado,revisao)
       values($1,$2,'humano',$3,'enviada',$4) on conflict(meta_id) do nothing`, [c.id,e.id,e.texto,c.revisao]);
     return;
   }
   await tx.query(`update crm.conversa_instagram set revisao=revisao+1, ultima_recebida=greatest(ultima_recebida,$2),
-    atualizada_em=now(), proxima_execucao=now()+interval '10 seconds' where id=$1`, [c.id,e.quando]);
+    iniciada_em=coalesce(iniciada_em,now()), atualizada_em=now(),
+    proxima_execucao=case when $3 then now()+interval '10 seconds' else null end where id=$1`, [c.id,e.quando,ativo]);
   c.revisao = String(BigInt(c.revisao) + BigInt(1));
-  if (!c.consentimento_em) {
-    if (!ativo || c.modo === 'humano') return;
-    if (c.aviso_em && Date.now() - new Date(c.aviso_em).getTime() < 24*3600_000 && /^(sim|aceito|autorizo)[.! ]*$/i.test(e.texto)) {
-      await tx.query('update crm.conversa_instagram set consentimento_em=now() where id=$1', [c.id]);
-      await prepararTextoDirect(tx,c,'Combinado. Como você se chama?', 'agente', `consentimento:${e.id}`);
-      await tx.query('update crm.conversa_instagram set processada=revisao where id=$1', [c.id]);
-    } else {
-      if (!c.aviso_em || Date.now()-new Date(c.aviso_em).getTime() >= 600_000) {
-        await prepararTextoDirect(tx,c,AVISO_DIRECT,'agente',`aviso:${e.id}`);
-        await tx.query('update crm.conversa_instagram set aviso_em=now(),processada=revisao where id=$1',[c.id]);
-      }
-      return;
-    }
-  }
   await tx.query(`insert into crm.mensagem_instagram(conversa_id,meta_id,autor,texto,estado,revisao,criada_em)
     values($1,$2,'cliente',$3,'recebida',$4,$5) on conflict(meta_id) do nothing`, [c.id,e.id,e.texto,c.revisao,e.quando]);
   if (e.anexo) await mudarModoDirect(tx,c.id,'humano');
@@ -809,7 +795,7 @@ export async function reservarDirect(tx: Consulta, ativo = true): Promise<Conver
     select c.id from crm.conversa_instagram c join crm.conta_instagram a on a.usuario_id=c.conta_id
     where a.direct_assinado and a.token_expira_em>now() and (c.reserva_ate is null or c.reserva_ate<now()) and
     (exists(select 1 from crm.mensagem_instagram m where m.conversa_id=c.id and m.estado='pendente' and ($1 or m.autor='humano'))
-      or ($1 and c.modo='agente' and c.consentimento_em is not null and c.revisao>c.processada
+      or ($1 and c.modo='agente' and c.iniciada_em is not null and c.revisao>c.processada
         and c.proxima_execucao<=now() and c.ultima_recebida>now()-interval '24 hours'))
     order by c.atualizada_em for update of c skip locked limit 1)
     update crm.conversa_instagram c set reserva=gen_random_uuid(),reserva_ate=now()+interval '120 seconds'
@@ -874,7 +860,7 @@ export async function liberarDirect(tx: Consulta, c: ConversaDirect, erro?: stri
 
 export async function prepararManualDirect(tx: Consulta, id: string, texto: string, idEnvio: string): Promise<void> {
   const c = await travarDirect(tx,id);
-  if (!c.consentimento_em) throw new ErroDeDominio('O contato ainda não autorizou o registro da conversa. Responda pelo Instagram.');
+  if (!c.iniciada_em) throw new ErroDeDominio('Aguarde uma mensagem do contato para responder pelo CRM.');
   if (Date.now()-new Date(c.ultima_recebida).getTime()>=24*3600_000) throw new ErroDeDominio('Janela de 24 horas encerrada. Aguarde uma nova mensagem do contato.');
   const chave=`manual:${z.uuid().parse(idEnvio)}`;
   const { rows }=await tx.query('select 1 from crm.mensagem_instagram where chave=$1',[`${chave}:0`]);
@@ -892,9 +878,9 @@ export async function enviarPendentesDirect(tx: Consulta, lote: ConversaDirect, 
   const { rows } = await tx.query<MensagemDirect>(`select * from crm.mensagem_instagram where conversa_id=$1 and estado='pendente'
     order by criada_em,id limit 6`,[c.id]);
   for (const m of rows) {
-    const avisoPendente=!c.consentimento_em && m.chave?.startsWith('aviso:');
-    if (!conta.length || (m.autor==='agente' && process.env.INSTAGRAM_DIRECT_ATIVO!=='sim') ||
-        (m.autor==='agente' && !avisoPendente && m.revisao!==c.revisao) ||
+    const confirmacaoAntiga=m.chave?.startsWith('aviso:') || m.chave?.startsWith('consentimento:');
+    if (confirmacaoAntiga || !conta.length || (m.autor==='agente' && process.env.INSTAGRAM_DIRECT_ATIVO!=='sim') ||
+        (m.autor==='agente' && m.revisao!==c.revisao) ||
         Date.now()-new Date(c.ultima_recebida).getTime()>=24*3600_000) {
       await tx.query("update crm.mensagem_instagram set estado='cancelada' where id=$1",[m.id]);
       continue;

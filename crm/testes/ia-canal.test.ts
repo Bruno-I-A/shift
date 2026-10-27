@@ -11,7 +11,10 @@ it('reutiliza IA e RAG no Instagram sem mudar o prompt padrão do WhatsApp',asyn
   await analisarAtendimento('Vocês fazem sites?',contexto);
   const direct=JSON.parse(fetch.mock.calls[0][1].body);
   expect(direct.system[0].text).toContain('Você atende pela Shift Systems no Instagram Direct.');
+  expect(direct.system[0].text).not.toContain('A pessoa já autorizou');
+  expect(direct.system[0].text).toContain('Não peça confirmação de privacidade nem exija SIM');
   expect(direct.messages[0].content).toContain('Clínica do Dente');
   await analisarAtendimento('Vocês fazem sites?',{...contexto,canal:undefined});
   expect(JSON.parse(fetch.mock.calls[1][1].body).system[0].text).toContain('Você atende pela Shift Systems no WhatsApp.');
+  expect(JSON.parse(fetch.mock.calls[1][1].body).system[0].text).toContain('A pessoa já autorizou o atendimento com IA.');
 });

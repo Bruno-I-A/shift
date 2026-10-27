@@ -25,8 +25,9 @@ Não associa pessoas a leads do WhatsApp pelo nome e não inventa telefones.
    pelas ferramentas conectadas, caso a opção apareça. Em desenvolvimento,
    teste com as contas/funções autorizadas pela Meta; acesso ao público depende
    do modo do app e das aprovações exigidas pela Meta.
-6. De outro perfil, envie uma DM. O primeiro contato recebe o aviso de IA e
-   privacidade; responda SIM. Mande duas mensagens seguidas sobre um projeto.
+6. De outro perfil, envie uma DM. O agente atende a primeira mensagem,
+   identificando-se como assistente virtual, sem exigir SIM nem confirmação
+   de privacidade. Mande duas mensagens seguidas sobre um projeto.
    Confira a resposta única ao turno e o contexto na caixa `/instagram/direct`.
 7. Assuma a conversa no painel e envie uma resposta; depois teste uma resposta
    pelo aplicativo do Instagram. O eco externo deve pausar a IA. Só devolva
@@ -38,9 +39,10 @@ Não associa pessoas a leads do WhatsApp pelo nome e não inventa telefones.
 - Aguarda 10 segundos de silêncio para agrupar o turno; não paga outra chamada
   para encurtar respostas. Memória, histórico limitado e RAG são os mesmos da IA
   do WhatsApp, com identificação do canal Instagram no prompt.
-- Registra texto do cliente e usa a IA só após consentimento. Antes dele guarda
-  recibos de entrega, identificação do contato, horário e o aviso da Shift;
-  o texto da mensagem inicial não é armazenado. Retenção de 90 dias.
+- O cliente inicia a conversa e já pode ser atendido pela IA ou equipe no CRM.
+  Guarda mensagem inicial, contexto e histórico por até 90 dias. O início da
+  conversa não é gravado como consentimento explícito: aceites do fluxo antigo
+  são preservados, sem criar novos aceites artificiais. A política continua no site.
 - Anexos não são baixados nem abertos: indicados no painel e passam para humano.
 - Janela conservadora de 24 horas desde a mensagem do cliente, inclusive para
   envio manual pelo CRM. Não faz prospecção por DM nem usa HUMAN_AGENT para IA.
