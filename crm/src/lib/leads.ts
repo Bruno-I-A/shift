@@ -15,6 +15,9 @@ import type { EtapaLead } from "./dominio";
 import type { AnaliseAtendimento, ContextoAtendimento } from "./ia-atendimento";
 import { mascararDados } from "./dados-sensiveis";
 import { separarRespostaAtendimento } from './mensagens-atendimento';
+import type { EventoDirect } from './instagram-direct-meta';
+import { estimarCustoAtendimento } from './uso-atendimento';
+import type { UsoAtendimento } from './ia-atendimento';
 
 export interface Lead {
   id: string;
@@ -690,4 +693,220 @@ export async function liberarLoteWhatsApp(tx: Consulta, lote: LoteWhatsApp): Pro
   await tx.query(`update crm.fila_whatsapp set reserva = null, reserva_ate = null,
     disponivel_em = greatest(disponivel_em, now() + interval '30 seconds')
     where lead_id = $1 and reserva = $2`, [lote.leadId, lote.reserva]);
+}
+
+// -----------------------------------------------------------------------------
+// Instagram Direct — identidade própria, sem criar telefones fictícios em leads.
+// -----------------------------------------------------------------------------
+export interface ConversaDirect {
+  id: string; conta_id: string; contato_id: string; consentimento_em: Date | null;
+  modo: 'agente' | 'humano'; memoria: Partial<AnaliseAtendimento>;
+  revisao: string; processada: string; ultima_recebida: Date;
+  reserva: string | null; reserva_ate: Date | null; erro: string | null; aviso_em: Date | null;
+}
+export interface MensagemDirect {
+  id: string; meta_id: string | null; chave?:string; autor: 'cliente' | 'agente' | 'humano';
+  texto: string; estado: string; revisao: string; criada_em: Date;
+}
+const AVISO_DIRECT = 'Oi! Sou o assistente virtual da Shift. Você autoriza o uso de IA e o registro desta conversa por até 90 dias para nossa equipe atender você? Responda SIM. Privacidade: https://shiftsys.com.br/privacidade.html';
+
+async function travarDirect(tx: Consulta, id: string): Promise<ConversaDirect> {
+  const { rows } = await tx.query<ConversaDirect>('select * from crm.conversa_instagram where id = $1 for update', [z.uuid().parse(id)]);
+  if (!rows[0]) throw new ErroDeDominio('Conversa não encontrada.');
+  return rows[0];
+}
+
+async function prepararTextoDirect(tx: Consulta, c: ConversaDirect, texto: string, autor: 'agente' | 'humano', chave: string) {
+  const partes = separarRespostaAtendimento(texto);
+  for (const [i, parte] of partes.entries()) {
+    await tx.query(`insert into crm.mensagem_instagram(conversa_id,chave,autor,texto,estado,revisao,criada_em)
+      values($1,$2,$3,$4,'pendente',$5,clock_timestamp() + $6 * interval '1 millisecond') on conflict(chave) do nothing`,
+    [c.id, `${chave}:${i}`, autor, parte, c.revisao, i]);
+  }
+}
+
+/** O recibo deduplica inclusive mensagens anteriores ao consentimento, sem seu texto. */
+export async function receberDirect(tx: Consulta, e: EventoDirect, ativo: boolean): Promise<void> {
+  // Conta desconectada ou substituída nunca aceita eventos nem recupera uma fila antiga.
+  const { rows: contas } = await tx.query('select 1 from crm.conta_instagram where usuario_id=$1 and direct_assinado', [e.conta]);
+  if (!contas.length) return;
+  const { rows: recibos } = await tx.query('insert into crm.recibo_instagram(meta_id) values($1) on conflict do nothing returning meta_id', [e.id]);
+  if (!recibos.length) return;
+  if (e.eco) {
+    const { rows: nossas } = await tx.query('select 1 from crm.mensagem_instagram where meta_id=$1', [e.id]);
+    if (nossas.length) return;
+  }
+  const { rows } = await tx.query<{ id: string }>(`insert into crm.conversa_instagram(conta_id,contato_id,ultima_recebida,modo)
+    values($1,$2,$3,$4) on conflict(conta_id,contato_id) do update set atualizada_em=now() returning id`,
+  [e.conta,e.contato,e.quando,e.eco ? 'humano' : 'agente']);
+  const c = await travarDirect(tx, rows[0].id);
+  if (e.eco) {
+    // O eco pode chegar antes de a transação do envio confirmar. Releia depois da trava.
+    const { rows: nossas } = await tx.query('select 1 from crm.mensagem_instagram where meta_id=$1', [e.id]);
+    if (nossas.length) return;
+    // Eco não identificado como nosso: resposta pelo aplicativo assume a conversa.
+    await mudarModoDirect(tx, c.id, 'humano');
+    if (c.consentimento_em) await tx.query(`insert into crm.mensagem_instagram(conversa_id,meta_id,autor,texto,estado,revisao)
+      values($1,$2,'humano',$3,'enviada',$4) on conflict(meta_id) do nothing`, [c.id,e.id,e.texto,c.revisao]);
+    return;
+  }
+  await tx.query(`update crm.conversa_instagram set revisao=revisao+1, ultima_recebida=greatest(ultima_recebida,$2),
+    atualizada_em=now(), proxima_execucao=now()+interval '10 seconds' where id=$1`, [c.id,e.quando]);
+  c.revisao = String(BigInt(c.revisao) + BigInt(1));
+  if (!c.consentimento_em) {
+    if (!ativo || c.modo === 'humano') return;
+    if (c.aviso_em && Date.now() - new Date(c.aviso_em).getTime() < 24*3600_000 && /^(sim|aceito|autorizo)[.! ]*$/i.test(e.texto)) {
+      await tx.query('update crm.conversa_instagram set consentimento_em=now() where id=$1', [c.id]);
+      await prepararTextoDirect(tx,c,'Combinado. Como você se chama?', 'agente', `consentimento:${e.id}`);
+      await tx.query('update crm.conversa_instagram set processada=revisao where id=$1', [c.id]);
+    } else {
+      if (!c.aviso_em || Date.now()-new Date(c.aviso_em).getTime() >= 600_000) {
+        await prepararTextoDirect(tx,c,AVISO_DIRECT,'agente',`aviso:${e.id}`);
+        await tx.query('update crm.conversa_instagram set aviso_em=now(),processada=revisao where id=$1',[c.id]);
+      }
+      return;
+    }
+  }
+  await tx.query(`insert into crm.mensagem_instagram(conversa_id,meta_id,autor,texto,estado,revisao,criada_em)
+    values($1,$2,'cliente',$3,'recebida',$4,$5) on conflict(meta_id) do nothing`, [c.id,e.id,e.texto,c.revisao,e.quando]);
+  if (e.anexo) await mudarModoDirect(tx,c.id,'humano');
+}
+
+export async function mudarModoDirect(tx: Consulta, id: string, modo: 'agente' | 'humano'): Promise<void> {
+  await travarDirect(tx,id);
+  await tx.query(`update crm.conversa_instagram set modo=$2,revisao=revisao+1,processada=revisao+1,
+    reserva=null,reserva_ate=null,proxima_execucao=null,erro=null,atualizada_em=now() where id=$1`, [id,z.enum(['agente','humano']).parse(modo)]);
+  await tx.query("update crm.mensagem_instagram set estado='cancelada' where conversa_id=$1 and estado='pendente'", [id]);
+}
+
+export async function listarDirect(tx: Consulta, conta: string): Promise<ConversaDirect[]> {
+  const { rows } = await tx.query<ConversaDirect>(`select * from crm.conversa_instagram where conta_id=$1
+    order by atualizada_em desc limit 100`,[conta]);
+  return rows;
+}
+
+export async function historicoDirect(tx: Consulta, id: string, antes?: string): Promise<MensagemDirect[]> {
+  const limite = antes ? z.iso.datetime({ offset:true }).parse(antes) : new Date(Date.now()+60_000).toISOString();
+  const { rows } = await tx.query<MensagemDirect>(`select * from (select id,meta_id,autor,texto,estado,revisao,criada_em
+    from crm.mensagem_instagram where conversa_id=$1 and criada_em<$2 order by criada_em desc,id desc limit 60) m
+    order by criada_em,id`,[z.uuid().parse(id),limite]);
+  return rows;
+}
+
+export async function reservarDirect(tx: Consulta, ativo = true): Promise<ConversaDirect | null> {
+  // Intenção de envio sobrevive ao processo. Após queda, nunca reenviar às cegas.
+  const { rows: expiradas } = await tx.query<{id:string}>(`select id from crm.conversa_instagram
+    where reserva_ate<now() for update skip locked limit 10`);
+  for (const expirada of expiradas) {
+    const { rows: pendentes } = await tx.query(`update crm.mensagem_instagram set estado='incerto'
+      where conversa_id=$1 and estado='pendente' returning id`, [expirada.id]);
+    await tx.query(`update crm.conversa_instagram set reserva=null,reserva_ate=null,
+      modo=case when $2 then 'humano' else modo end,
+      erro=case when $2 then 'Envio sem confirmação; confira no Instagram.' else erro end
+      where id=$1`,[expirada.id,pendentes.length>0]);
+  }
+  const { rows } = await tx.query<ConversaDirect>(`with candidata as (
+    select c.id from crm.conversa_instagram c join crm.conta_instagram a on a.usuario_id=c.conta_id
+    where a.direct_assinado and a.token_expira_em>now() and (c.reserva_ate is null or c.reserva_ate<now()) and
+    (exists(select 1 from crm.mensagem_instagram m where m.conversa_id=c.id and m.estado='pendente' and ($1 or m.autor='humano'))
+      or ($1 and c.modo='agente' and c.consentimento_em is not null and c.revisao>c.processada
+        and c.proxima_execucao<=now() and c.ultima_recebida>now()-interval '24 hours'))
+    order by c.atualizada_em for update of c skip locked limit 1)
+    update crm.conversa_instagram c set reserva=gen_random_uuid(),reserva_ate=now()+interval '120 seconds'
+    from candidata x where c.id=x.id returning c.*`,[ativo]);
+  return rows[0] ?? null;
+}
+
+export async function contextoDirect(tx: Consulta, c: ConversaDirect): Promise<{ pergunta:string; contexto:ContextoAtendimento } | null> {
+  const atual=await travarDirect(tx,c.id);
+  if(atual.reserva!==c.reserva || atual.revisao!==c.revisao || atual.modo!=='agente') return null;
+  const { rows: uso } = await tx.query<{ n:number }>(`select count(*)::int as n from crm.uso_ia_instagram
+    where conversa_id=$1 and criada_em>now()-interval '1 hour'`,[c.id]);
+  if (uso[0].n>=30) throw new ErroDeDominio('Limite de atendimento automático atingido.');
+  const {rows:quantidade}=await tx.query<{n:number}>(`select count(*)::int as n from crm.mensagem_instagram
+    where conversa_id=$1 and autor='cliente' and revisao>$2`,[c.id,c.processada]);
+  if(quantidade[0].n>30) throw new ErroDeDominio('Mensagens demais para um turno.');
+  const { rows } = await tx.query<MensagemDirect>(`select * from (select * from crm.mensagem_instagram where conversa_id=$1
+    and (autor='cliente' or estado='enviada') order by criada_em desc,id desc limit 30) m order by criada_em,id`, [c.id]);
+  const {rows:atuais}=await tx.query<MensagemDirect>(`select * from crm.mensagem_instagram
+    where conversa_id=$1 and autor='cliente' and revisao>$2 order by criada_em,id limit 30`,[c.id,c.processada]);
+  const pergunta = atuais.map(m=>m.texto).join('\n');
+  if (!pergunta) return null;
+  if (pergunta.length>12000) throw new ErroDeDominio('Mensagens demais para um turno.');
+  const anterior = rows.filter(m=>!atuais.some(a=>a.id===m.id)).slice(-12);
+  return { pergunta, contexto: { canal:'instagram', nome:c.memoria.nome||'', empresa:c.memoria.empresa||null,
+    segmento:c.memoria.segmento||null,dor:c.memoria.dor||null,prazo:c.memoria.prazo||null,resumo:c.memoria.resumo||'',
+    qualificacao:c.memoria.qualificacao, ultimaResposta:rows.filter(m=>m.autor!=='cliente').at(-1)?.texto||'',
+    historico:anterior.map(m=>({autor:m.autor,texto:m.texto})) } };
+}
+
+export async function registrarUsoDirect(tx: Consulta, id: string, u: UsoAtendimento): Promise<void> {
+  await tx.query(`insert into crm.uso_ia_instagram(conversa_id,modelo,entrada,saida,cache_leitura,cache_criacao,custo_estimado_usd)
+    values($1,$2,$3,$4,$5,$6,$7)`,[id,u.modelo,u.inputTokens,u.outputTokens,u.cacheReadTokens,u.cacheCreationTokens,estimarCustoAtendimento(u)]);
+}
+
+export async function concluirAnaliseDirect(tx: Consulta, lote: ConversaDirect, analise: AnaliseAtendimento): Promise<boolean> {
+  const c = await travarDirect(tx,lote.id);
+  if (c.reserva!==lote.reserva || c.revisao!==lote.revisao || c.modo!=='agente' ||
+      Date.now()-new Date(c.ultima_recebida).getTime()>=24*3600_000) return false;
+  const memoria = { ...c.memoria };
+  for (const campo of ['nome','empresa','segmento','dor','prazo','resumo'] as const) {
+    if (analise[campo]) memoria[campo]=analise[campo];
+  }
+  memoria.qualificacao={...memoria.qualificacao,...analise.qualificacao};
+  await tx.query(`update crm.conversa_instagram set memoria=$2,processada=revisao,modo=$3,erro=null where id=$1`,
+    [c.id,JSON.stringify(memoria),analise.passarParaHumano?'humano':'agente']);
+  await prepararTextoDirect(tx,c,analise.resposta,'agente',`ia:${c.id}:${c.revisao}`);
+  return true;
+}
+
+export async function liberarDirect(tx: Consulta, c: ConversaDirect, erro?: string): Promise<void> {
+  await travarDirect(tx,c.id);
+  if (erro) {
+    const { rows } = await tx.query('select 1 from crm.conversa_instagram where id=$1 and reserva=$2',[c.id,c.reserva]);
+    if (!rows.length) return;
+    // Uma falha no COMMIT pode acontecer depois do HTTP. Preserve a incerteza.
+    await tx.query("update crm.mensagem_instagram set estado='incerto' where conversa_id=$1 and estado='pendente'",[c.id]);
+    await mudarModoDirect(tx,c.id,'humano');
+    await tx.query('update crm.conversa_instagram set erro=$2 where id=$1',[c.id,erro]);
+  } else await tx.query('update crm.conversa_instagram set reserva=null,reserva_ate=null where id=$1 and reserva=$2',[c.id,c.reserva]);
+}
+
+export async function prepararManualDirect(tx: Consulta, id: string, texto: string, idEnvio: string): Promise<void> {
+  const c = await travarDirect(tx,id);
+  if (!c.consentimento_em) throw new ErroDeDominio('O contato ainda não autorizou o registro da conversa. Responda pelo Instagram.');
+  if (Date.now()-new Date(c.ultima_recebida).getTime()>=24*3600_000) throw new ErroDeDominio('Janela de 24 horas encerrada. Aguarde uma nova mensagem do contato.');
+  const chave=`manual:${z.uuid().parse(idEnvio)}`;
+  const { rows }=await tx.query('select 1 from crm.mensagem_instagram where chave=$1',[`${chave}:0`]);
+  if (rows.length) return;
+  await mudarModoDirect(tx,id,'humano');
+  const atual = await travarDirect(tx,id);
+  await prepararTextoDirect(tx,atual,z.string().trim().min(1).max(1000).parse(texto),'humano',chave);
+}
+
+/** Rede sob a trava da conversa: assumir atendimento espera o envio em curso. */
+export async function enviarPendentesDirect(tx: Consulta, lote: ConversaDirect, enviar: (contato:string,texto:string)=>Promise<string>): Promise<void> {
+  const c = await travarDirect(tx,lote.id);
+  if (c.reserva!==lote.reserva) return;
+  const { rows: conta } = await tx.query('select 1 from crm.conta_instagram where usuario_id=$1 and direct_assinado and token_expira_em>now()', [c.conta_id]);
+  const { rows } = await tx.query<MensagemDirect>(`select * from crm.mensagem_instagram where conversa_id=$1 and estado='pendente'
+    order by criada_em,id limit 6`,[c.id]);
+  for (const m of rows) {
+    const avisoPendente=!c.consentimento_em && m.chave?.startsWith('aviso:');
+    if (!conta.length || (m.autor==='agente' && process.env.INSTAGRAM_DIRECT_ATIVO!=='sim') ||
+        (m.autor==='agente' && !avisoPendente && m.revisao!==c.revisao) ||
+        Date.now()-new Date(c.ultima_recebida).getTime()>=24*3600_000) {
+      await tx.query("update crm.mensagem_instagram set estado='cancelada' where id=$1",[m.id]);
+      continue;
+    }
+    try {
+      const mid = await enviar(c.contato_id,m.texto);
+      await tx.query("update crm.mensagem_instagram set estado='enviada',meta_id=$2 where id=$1",[m.id,mid]);
+    } catch {
+      await tx.query("update crm.mensagem_instagram set estado='incerto' where id=$1",[m.id]);
+      await mudarModoDirect(tx,c.id,'humano');
+      await tx.query("update crm.conversa_instagram set erro='Envio sem confirmação; confira no Instagram.' where id=$1",[c.id]);
+      break;
+    }
+  }
 }

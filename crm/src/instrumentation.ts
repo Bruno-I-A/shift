@@ -5,5 +5,7 @@ export async function register() {
     iniciarProcessamentoWhatsApp();
     const { iniciarAgendaInstagram } = await import('./lib/processamento-instagram');
     iniciarAgendaInstagram();
+    const { iniciarDirect } = await import('./lib/processamento-direct');
+    iniciarDirect();
   }
 }

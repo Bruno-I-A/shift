@@ -9,7 +9,8 @@ import { ErroDeDominio } from "./dominio";
  *
  * Esse caminho não pede Página do Facebook, e para a conta da própria Shift o
  * acesso padrão basta — sem revisão do app. Permissões:
- * `instagram_business_basic` e `instagram_business_content_publish`.
+ * `instagram_business_basic`, `instagram_business_content_publish` e
+ * `instagram_business_manage_messages` (Direct).
  *
  * Publicar é sempre em dois passos: criar um contêiner apontando para o
  * arquivo (a Meta vai buscá-lo pelo link) e, quando ele estiver pronto,
@@ -17,7 +18,7 @@ import { ErroDeDominio } from "./dominio";
  */
 
 const VERSAO_PADRAO = "v26.0";
-const ESCOPOS = ["instagram_business_basic", "instagram_business_content_publish"];
+const ESCOPOS = ["instagram_business_basic", "instagram_business_content_publish", "instagram_business_manage_messages"];
 
 /** O `state` do login, guardado entre a ida ao Instagram e o retorno. */
 export const COOKIE_ESTADO = "crm_instagram_estado";
