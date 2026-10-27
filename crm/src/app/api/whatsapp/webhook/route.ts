@@ -2,15 +2,13 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 import { emTransacao } from "@/lib/banco";
 import {
-  apagarAvisoWhatsApp, autorizarAtendimentoWhatsApp, buscarAtendimentoWhatsApp, buscarAvisoWhatsApp,
-  registrarAvisoWhatsApp,
-  enfileirarMensagemWhatsApp, registrarMensagemRecebidaWhatsApp, responderComAgenteWhatsApp, registrarStatusWhatsApp,
+  iniciarAtendimentoWhatsApp, buscarAtendimentoWhatsApp,
+  enfileirarMensagemWhatsApp, registrarStatusWhatsApp,
 } from "@/lib/leads";
-import { decidirConsentimentoWhatsApp, enviarTextoMeta, lerMensagensMeta, lerStatusMeta, type MensagemRecebida } from "@/lib/whatsapp";
+import { lerMensagensMeta, lerStatusMeta, type MensagemRecebida } from "@/lib/whatsapp";
 
 export const runtime = "nodejs";
 
-const AVISO = "Oi! Sou o assistente virtual da Shift. Posso tirar suas dúvidas e lembrar as informações que você me contar. Você autoriza o uso de IA e o registro da conversa no CRM por até 90 dias para nossa equipe continuar o atendimento? Responda SIM. Privacidade: https://shiftsys.com.br/privacidade.html";
 
 function segredoCorreto(recebido: string, esperado: string): boolean {
   const a = createHash("sha256").update(recebido).digest();
@@ -33,33 +31,18 @@ export async function GET(pedido: Request): Promise<Response> {
   return new Response(desafio, { status: 200, headers: { "Content-Type": "text/plain" } });
 }
 
-async function atenderMensagem(mensagem: MensagemRecebida, segredo: string): Promise<void> {
+async function atenderMensagem(mensagem: MensagemRecebida): Promise<void> {
   try {
-    let atendimento = await emTransacao((tx) => buscarAtendimentoWhatsApp(tx, mensagem.whatsapp));
-    if (atendimento && ["ganho", "perdido"].includes(atendimento.etapa)) atendimento = null;
-    if (!atendimento) {
-      if (process.env.WHATSAPP_ATIVO !== 'sim') return;
-      const chaveAviso = createHmac("sha256", segredo).update(`aviso:${mensagem.whatsapp}`).digest("hex");
-      const aviso = await emTransacao((tx) => buscarAvisoWhatsApp(tx, chaveAviso));
-      const decisao = decidirConsentimentoWhatsApp(aviso, mensagem);
-      if (decisao === "ignorar") return;
-      if (decisao === "avisar") {
-        await enviarTextoMeta(mensagem.whatsapp, AVISO);
-        await emTransacao((tx) => registrarAvisoWhatsApp(tx, chaveAviso, mensagem.id));
-        return;
+    const ativo=process.env.WHATSAPP_ATIVO==='sim';
+    await emTransacao(async tx=>{
+      let atendimento=await buscarAtendimentoWhatsApp(tx,mensagem.whatsapp);
+      if (!atendimento || ['ganho','perdido'].includes(atendimento.etapa)) {
+        if (!ativo) return;
+        atendimento=await iniciarAtendimentoWhatsApp(tx,mensagem.whatsapp);
       }
-      atendimento = await emTransacao((tx) => autorizarAtendimentoWhatsApp(tx, mensagem.whatsapp));
-      await emTransacao((tx) => registrarMensagemRecebidaWhatsApp(tx, atendimento!.leadId, mensagem));
-      await emTransacao((tx) => apagarAvisoWhatsApp(tx, chaveAviso));
-      const boasVindas = atendimento.nome
-        ? `Combinado, ${atendimento.nome.split(/\s+/)[0]}. Como posso ajudar?`
-        : "Combinado. Como você se chama?";
-      await emTransacao((tx) => responderComAgenteWhatsApp(tx, atendimento!, mensagem.id, {
-        resposta: boasVindas, nome: "", empresa: "", segmento: "", dor: "", prazo: "", resumo: "", passarParaHumano: false,
-      }, enviarTextoMeta));
-      return;
-    }
-    await emTransacao((tx) => enfileirarMensagemWhatsApp(tx, atendimento!, mensagem, process.env.WHATSAPP_ATIVO === 'sim'));
+      // O primeiro turno entra na mesma fila dos seguintes, com deduplicação e agrupamento.
+      await enfileirarMensagemWhatsApp(tx,atendimento,mensagem,ativo);
+    });
   } catch {
     // Nunca registra o texto recebido nem o número do contato em logs.
     console.error("[whatsapp] atendimento falhou; verifique conexão e envios pendentes no CRM.");
@@ -82,7 +65,7 @@ export async function POST(pedido: Request): Promise<Response> {
   const mensagens = lerMensagensMeta(corpo, phoneNumberId, true);
   try {
     for (const status of lerStatusMeta(corpo, phoneNumberId)) await emTransacao(tx => registrarStatusWhatsApp(tx, status));
-    for (const mensagem of mensagens) await atenderMensagem(mensagem, segredo);
+    for (const mensagem of mensagens) await atenderMensagem(mensagem);
     return Response.json({ recebidas: mensagens.length });
   } catch {
     return new Response(null, { status: 503 });

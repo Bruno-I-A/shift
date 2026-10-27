@@ -41,7 +41,7 @@ describe("proteção do webhook oficial do WhatsApp", () => {
     expect((await POST(pedido)).status).toBe(401);
   });
 
-  it("continua do consentimento ao nome e entende um SIM posterior como resposta da conversa", async () => {
+  it("continua do primeiro contato ao nome e entende um SIM posterior como resposta da conversa", async () => {
     const { tx } = await bancoDeTeste();
     vi.mocked(emTransacao).mockImplementation((executar) => executar(tx));
     vi.stubEnv("WHATSAPP_ATIVO", "sim");
@@ -77,15 +77,16 @@ describe("proteção do webhook oficial do WhatsApp", () => {
     }
     await receber("OI1", "Oi");
     expect(pedidosIa).toHaveLength(0);
-    expect(await buscarAtendimentoWhatsApp(tx, "5554999991234")).toBeNull();
-    await receber("SIM1", "SIM");
-    expect(enviados.at(-1)).toBe("Combinado. Como você se chama?");
+    expect(await buscarAtendimentoWhatsApp(tx, "5554999991234")).toMatchObject({modo:'agente'});
+    expect(enviados).toHaveLength(0);
     await receber("NOME1", "Bruno");
     expect(pedidosIa).toHaveLength(0); // O webhook confirma antes de chamar a IA.
     await receber('NOME1', 'Bruno'); // Duplicata da Meta não produz outra cobrança.
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     await processarFilaWhatsApp();
-    expect(pedidosIa[0]).toContain("Como você se chama?");
+    expect(pedidosIa[0]).toContain('Oi');
+    expect(pedidosIa[0]).toContain('Bruno');
+    expect(enviados.some(texto=>texto.includes('Responda SIM'))).toBe(false);
     await receber("SIM2", "SIM");
     await tx.query("update crm.fila_whatsapp set disponivel_em = now() - interval '1 second'");
     await processarFilaWhatsApp();

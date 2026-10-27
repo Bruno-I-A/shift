@@ -6,8 +6,8 @@ import { bancoDeTeste } from './banco-de-teste';
 describe('exclusão de lead', () => {
   it('apaga o lead com todo o histórico e o mesmo número recomeça do zero', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
-    const outro = await leads.autorizarAtendimentoWhatsApp(tx, '5554988884321');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
+    const outro = await leads.iniciarAtendimentoWhatsApp(tx, '5554988884321');
     await leads.enfileirarMensagemWhatsApp(tx, a, { id: 'ENTRADA', texto: 'Oi, tenho uma clínica.' });
     const pedidoId = '78b8e61d-289e-45e9-90b7-b4c82077c8f7';
     await leads.prepararRespostaHumanaWhatsApp(tx, a.leadId, pedidoId, 'Vou te ajudar.');
@@ -31,7 +31,7 @@ describe('exclusão de lead', () => {
     expect((await tx.query("select ator, lead_id, dados from crm.evento where tipo = 'lead_excluido'")).rows)
       .toEqual([{ ator: 'bruno', lead_id: null, dados: {} }]);
 
-    const novo = await leads.autorizarAtendimentoWhatsApp(tx, a.whatsapp);
+    const novo = await leads.iniciarAtendimentoWhatsApp(tx, a.whatsapp);
     expect(novo.leadId).not.toBe(a.leadId);
     expect(novo).toMatchObject({ modo: 'agente', resumo: '', ultimaResposta: '' });
     expect(await leads.listarMensagensWhatsApp(tx, novo.leadId)).toEqual([]);
@@ -39,7 +39,7 @@ describe('exclusão de lead', () => {
 
   it('avisa quando o lead já não existe e não abre DELETE livre ao app', async () => {
     const { tx } = await bancoDeTeste();
-    const a = await leads.autorizarAtendimentoWhatsApp(tx, '5554999991234');
+    const a = await leads.iniciarAtendimentoWhatsApp(tx, '5554999991234');
     await leads.excluirLeadComHistorico(tx, a.leadId, 'bruno');
     await expect(leads.excluirLeadComHistorico(tx, a.leadId, 'bruno')).rejects.toThrow(/não encontrado/);
     await expect(leads.excluirLeadComHistorico(tx, 'x', 'bruno')).rejects.toThrow(/inválido/);
