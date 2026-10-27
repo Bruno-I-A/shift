@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from 'next/link';
 
 import {
   aprovarPublicacao,
@@ -175,6 +176,7 @@ export default async function Instagram({ searchParams }: PageProps<"/instagram"
       <header className="space-y-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Instagram</h1>
+          <Link href="/instagram/direct" className="mt-2 inline-block text-sm underline">Abrir conversas do Direct →</Link>
           <p className="mt-1 text-sm text-suave">
             Reels, carrosséis e fotos da Shift, publicados na hora marcada. O que um agente propõe só vai ao ar depois
             que você aprova.

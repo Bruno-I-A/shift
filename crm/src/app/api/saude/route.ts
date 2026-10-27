@@ -35,6 +35,9 @@ export async function GET(pedido: Request) {
   // volume vira obrigatório — sem ele, o que está agendado some na implantação.
   const faltaInstagram = faltandoParaInstagram();
   const instagramConfigurado = faltaInstagram.length === 0;
+  const directAtivo=process.env.INSTAGRAM_DIRECT_ATIVO==='sim';
+  const faltaDirect=[...faltaInstagram,...['INSTAGRAM_WEBHOOK_VERIFY_TOKEN','ANTHROPIC_API_KEY'].filter(nome=>!process.env[nome])];
+  if(directAtivo) faltando.push(...faltaDirect.filter(nome=>!faltando.includes(nome)));
   const pasta = instagramConfigurado ? await conferirPastaDeMidia() : undefined;
   if (pasta && !pasta.ok) faltando.push(`volume das publicações: ${pasta.detalhe}`);
 
@@ -42,6 +45,6 @@ export async function GET(pedido: Request) {
   return Response.json({
     ok, faltando, banco,
     whatsapp: { ativo: whatsappAtivo, configurado: whatsappAtivo && configuracaoWhatsApp.every((nome) => !!process.env[nome]) },
-    instagram: { configurado: instagramConfigurado, ...(pasta ? { pasta: pasta.detalhe } : { faltando: faltaInstagram }) },
+    instagram: { configurado: instagramConfigurado, direct:{ativo:directAtivo,configurado:faltaDirect.length===0}, ...(pasta ? { pasta: pasta.detalhe } : { faltando: faltaInstagram }) },
   }, { status: ok ? 200 : 503 });
 }
