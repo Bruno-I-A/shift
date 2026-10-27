@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHmac } from 'node:crypto';
-const mocks=vi.hoisted(()=>({receber:vi.fn(),conta:vi.fn(),tx:vi.fn(),sessao:vi.fn()}));
+const mocks=vi.hoisted(()=>({receber:vi.fn(),comentario:vi.fn(),conta:vi.fn(),tx:vi.fn(),sessao:vi.fn()}));
 vi.mock('@/lib/banco',()=>({emTransacao:async(f:(tx:unknown)=>unknown)=>f(mocks.tx)}));
 vi.mock('@/lib/instagram',()=>({lerConta:mocks.conta,acessoDaConta:vi.fn()}));
-vi.mock('@/lib/leads',()=>({receberDirect:mocks.receber,listarDirect:vi.fn(),historicoDirect:vi.fn(),mudarModoDirect:vi.fn(),prepararManualDirect:vi.fn()}));
+vi.mock('@/lib/leads',()=>({receberDirect:mocks.receber,receberComentarioInstagram:mocks.comentario,listarDirect:vi.fn(),historicoDirect:vi.fn(),mudarModoDirect:vi.fn(),prepararManualDirect:vi.fn()}));
 vi.mock('@/lib/sessao',()=>({temSessao:mocks.sessao}));
 import { GET, POST } from '@/app/api/instagram/webhook/route';
 import { GET as GETCaixa, POST as POSTCaixa } from '@/app/api/instagram/direct/route';
@@ -21,6 +21,17 @@ function pedido(corpo:string,segredo='segredo') {
   },body:corpo});
 }
 describe('webhook do Direct',()=>{
+  it('encaminha comentários autenticados à fila e pede reentrega se não conseguir persistir',async()=>{
+    const corpo=JSON.stringify({object:'instagram',entry:[{id:'17841400000001',changes:[{field:'comments',value:{
+      id:'100',from:{id:'200'},media:{id:'300'},text:'QUERO',
+    }}]}]});
+    mocks.comentario.mockResolvedValueOnce(true);
+    const resposta=await POST(pedido(corpo));
+    expect(resposta.status).toBe(200);expect(await resposta.json()).toMatchObject({comentarios:1});
+    expect(mocks.comentario).toHaveBeenCalledOnce();expect(mocks.receber).not.toHaveBeenCalled();
+    mocks.comentario.mockRejectedValueOnce(new Error('banco indisponível'));
+    expect((await POST(pedido(corpo))).status).toBe(503);
+  });
   it('caixa exige sessão e recusa comandos vindos de outro site',async()=>{
     vi.stubEnv('APP_URL','https://crm.exemplo.com');
     mocks.sessao.mockResolvedValue(false);

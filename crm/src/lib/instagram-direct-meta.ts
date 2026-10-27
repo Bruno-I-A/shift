@@ -6,12 +6,14 @@ import { configuracaoInstagram, type Acesso } from './instagram-meta';
 
 export interface EventoDirect {
   id: string; conta: string; contato: string; texto: string; quando: Date; eco: boolean; anexo: boolean;
+  respondeA?:string;
 }
 const identificador = z.string().regex(/^\d{1,30}$/);
 const evento = z.object({
   sender: z.object({ id: identificador }), recipient: z.object({ id: identificador }),
   timestamp: z.number().int().positive(),
   message: z.object({ mid: z.string().min(1).max(2000), text: z.string().max(12000).optional(),
+    reply_to:z.object({mid:z.string().min(1).max(2000).optional()}).optional(),
     is_echo: z.boolean().optional(), is_deleted: z.boolean().optional(),
     attachments: z.array(z.unknown()).optional() }),
 });
@@ -33,7 +35,7 @@ export function lerEventosDirect(corpo: unknown, conta: string, agora = Date.now
     const texto = m.message.text?.trim() || (anexo ? '[Anexo recebido no Instagram]' : '');
     if (!texto) return [];
     return [{ id: m.message.mid, conta, contato: eco ? m.recipient.id : m.sender.id,
-      texto, quando: new Date(m.timestamp), eco, anexo }];
+      texto, quando: new Date(m.timestamp), eco, anexo,...(m.message.reply_to?.mid?{respondeA:m.message.reply_to.mid}:{}) }];
   }));
 }
 

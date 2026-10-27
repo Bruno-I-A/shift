@@ -100,6 +100,8 @@ function diagnosticoFormato(corpo: RetornoIa, problemas: z.ZodIssue[]): string {
 
 export interface ContextoAtendimento {
   canal?: 'whatsapp' | 'instagram';
+  /** Tema da publicação/oferta de origem; dado contextual, não instrução. */
+  tema?: string;
   nome: string;
   empresa: string | null;
   segmento: string | null;
@@ -234,7 +236,7 @@ export async function analisarAtendimento(pergunta: string, contexto: ContextoAt
   if (!pergunta.trim() || pergunta.length > 12_000) throw new Error("Turno de atendimento fora do limite.");
   const historico = historicoRecente(contexto);
   const temaRecente = historico.filter((m) => m.role === "user").slice(-2).map((m) => m.content).join(" ");
-  const encontrados = buscarConhecimento(`${pergunta} ${temaRecente} ${contexto.qualificacao?.interesse ?? ""} ${contexto.segmento ?? ""} ${contexto.dor ?? ""}`, 2);
+  const encontrados = buscarConhecimento(`${pergunta} ${temaRecente} ${contexto.tema ?? ''} ${contexto.qualificacao?.interesse ?? ""} ${contexto.segmento ?? ""} ${contexto.dor ?? ""}`, 2);
   // Respostas como "Bruno" e "sim" precisam do contexto da conversa, mesmo sem
   // coincidência lexical com a base. A apresentação geral não autoriza inventar detalhes.
   const trechos = encontrados.length ? encontrados : buscarConhecimento("posicionamento", 1);

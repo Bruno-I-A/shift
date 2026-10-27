@@ -18,7 +18,7 @@ import { ErroDeDominio } from "./dominio";
  */
 
 const VERSAO_PADRAO = "v26.0";
-const ESCOPOS = ["instagram_business_basic", "instagram_business_content_publish", "instagram_business_manage_messages"];
+const ESCOPOS = ["instagram_business_basic", "instagram_business_content_publish", "instagram_business_manage_messages", "instagram_business_manage_comments"];
 
 /** O `state` do login, guardado entre a ida ao Instagram e o retorno. */
 export const COOKIE_ESTADO = "crm_instagram_estado";

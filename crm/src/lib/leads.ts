@@ -18,6 +18,7 @@ import { separarRespostaAtendimento } from './mensagens-atendimento';
 import type { EventoDirect } from './instagram-direct-meta';
 import { estimarCustoAtendimento } from './uso-atendimento';
 import type { UsoAtendimento } from './ia-atendimento';
+import { correspondeComentario, palavrasDaCampanha, type ComentarioInstagram } from './comentarios-instagram-regras';
 
 export interface Lead {
   id: string;
@@ -679,7 +680,7 @@ export async function liberarLoteWhatsApp(tx: Consulta, lote: LoteWhatsApp): Pro
 // -----------------------------------------------------------------------------
 export interface ConversaDirect {
   id: string; conta_id: string; contato_id: string; consentimento_em: Date | null; iniciada_em: Date | null;
-  modo: 'agente' | 'humano'; memoria: Partial<AnaliseAtendimento>;
+  modo: 'agente' | 'humano'; memoria: Partial<AnaliseAtendimento> & {campanha?:{nome:string;contexto:string;link:string;comentario?:string}};
   revisao: string; processada: string; ultima_recebida: Date;
   reserva: string | null; reserva_ate: Date | null; erro: string | null; aviso_em: Date | null;
 }
@@ -734,6 +735,13 @@ export async function receberDirect(tx: Consulta, e: EventoDirect, ativo: boolea
   c.revisao = String(BigInt(c.revisao) + BigInt(1));
   await tx.query(`insert into crm.mensagem_instagram(conversa_id,meta_id,autor,texto,estado,revisao,criada_em)
     values($1,$2,'cliente',$3,'recebida',$4,$5) on conflict(meta_id) do nothing`, [c.id,e.id,e.texto,c.revisao,e.quando]);
+  if(e.respondeA){
+    const {rows:origens}=await tx.query<{nome:string;contexto:string;link:string;comentario:string}>(`select j.nome_campanha as nome,j.contexto,
+      j.link_publicacao as link,coalesce(j.texto_verificado,j.texto) as comentario
+      from crm.mensagem_instagram m join crm.resposta_comentario_instagram j on m.chave='comentario:'||j.id::text
+      where m.conversa_id=$1 and m.meta_id=$2 and j.conta_id=$3`,[c.id,e.respondeA,e.conta]);
+    if(origens[0])await tx.query("update crm.conversa_instagram set memoria=jsonb_set(memoria,'{campanha}',$2::jsonb) where id=$1",[c.id,JSON.stringify({...origens[0],comentario:origens[0].comentario.slice(0,500)})]);
+  }
   if (e.anexo) await mudarModoDirect(tx,c.id,'humano');
 }
 
@@ -800,7 +808,9 @@ export async function contextoDirect(tx: Consulta, c: ConversaDirect): Promise<{
   if (pergunta.length>12000) throw new ErroDeDominio('Mensagens demais para um turno.');
   const anterior = rows.filter(m=>!atuais.some(a=>a.id===m.id)).slice(-12);
   return { pergunta, contexto: { canal:'instagram', nome:c.memoria.nome||'', empresa:c.memoria.empresa||null,
-    segmento:c.memoria.segmento||null,dor:c.memoria.dor||null,prazo:c.memoria.prazo||null,resumo:c.memoria.resumo||'',
+    segmento:c.memoria.segmento||null,dor:c.memoria.dor||null,prazo:c.memoria.prazo||null,
+    resumo:[c.memoria.resumo||'',c.memoria.campanha?`Origem do contato: campanha ${c.memoria.campanha.nome}. ${c.memoria.campanha.contexto}. Comentou: ${c.memoria.campanha.comentario||''}. Publicação: ${c.memoria.campanha.link}`:''].filter(Boolean).join('\n').slice(0,2200),
+    tema:c.memoria.campanha?`${c.memoria.campanha.nome} ${c.memoria.campanha.contexto}`.slice(0,1000):undefined,
     qualificacao:c.memoria.qualificacao, ultimaResposta:rows.filter(m=>m.autor!=='cliente').at(-1)?.texto||'',
     historico:anterior.map(m=>({autor:m.autor,texto:m.texto})) } };
 }
@@ -874,4 +884,159 @@ export async function enviarPendentesDirect(tx: Consulta, lote: ConversaDirect, 
       break;
     }
   }
+}
+
+// Campanhas de comentário → resposta privada. O comentário não abre a janela do Direct.
+export interface CampanhaInstagram {
+  id:string;conta_id:string;midia_id:string;link:string;nome:string;palavras:string[];
+  mensagem:string;contexto:string;ativa:boolean;revisao:number;
+}
+export interface RespostaComentarioInstagram {
+  id:string;campanha_id:string;conta_id:string;comentario_id:string;contato_id:string;
+  texto:string;mensagem:string;contexto:string;nome_campanha:string;link_publicacao:string;revisao:number;reserva:string;estado:string;tentativas:number;
+}
+export const esquemaCampanhaInstagram=z.object({
+  id:z.uuid().optional(),midiaId:z.string().regex(/^\d{1,30}$/),nome:z.string().trim().min(1).max(100),
+  palavras:z.string().trim().min(1).max(650).refine(v=>{try{palavrasDaCampanha(v);return true;}catch{return false;}},'Informe de 1 a 10 palavras ou frases.'),mensagem:z.string().trim().min(1).max(1000),
+  contexto:z.string().trim().max(1000).default(''),ativa:z.boolean().default(false),
+});
+async function exigirComentariosConectados(tx:Consulta,conta:string):Promise<void>{
+  const {rows}=await tx.query('select 1 from crm.conta_instagram where usuario_id=$1 and comentarios_assinados and direct_assinado',[conta]);
+  if(!rows.length)throw new ErroDeDominio('Conecte os comentários antes de ativar a campanha.');
+}
+export async function salvarCampanhaInstagram(tx:Consulta,conta:string,entrada:z.infer<typeof esquemaCampanhaInstagram>,link:string):Promise<void>{
+  const d=esquemaCampanhaInstagram.parse(entrada);
+  if(d.ativa)await exigirComentariosConectados(tx,conta);
+  const palavras=palavrasDaCampanha(d.palavras);
+  if(!/^https:\/\/(www\.)?instagram\.com\//.test(link))throw new ErroDeDominio('Publicação inválida.');
+  if(d.id){
+    const {rows}=await tx.query<{midia_id:string}>('select midia_id from crm.campanha_instagram where id=$1 and conta_id=$2 for update',[d.id,conta]);
+    if(!rows.length)throw new ErroDeDominio('Campanha não encontrada.');
+    if(rows[0].midia_id!==d.midiaId)throw new ErroDeDominio('Crie outra campanha para usar uma publicação diferente.');
+    await tx.query(`update crm.campanha_instagram set midia_id=$3,link=$4,nome=$5,palavras=$6,mensagem=$7,contexto=$8,
+      ativa=$9,revisao=revisao+1,atualizada_em=now() where id=$1 and conta_id=$2`,[d.id,conta,d.midiaId,link,d.nome,palavras,d.mensagem,d.contexto,d.ativa]);
+    await tx.query(`update crm.resposta_comentario_instagram set estado='cancelada',erro='Campanha alterada.'
+      where campanha_id=$1 and estado in ('pendente','preparando') and envio_iniciado_em is null`,[d.id]);
+  }else{
+    const {rows}=await tx.query('select id from crm.campanha_instagram where conta_id=$1 and midia_id=$2',[conta,d.midiaId]);
+    if(rows.length)throw new ErroDeDominio('Essa publicação já tem uma campanha. Edite a existente.');
+    await tx.query(`insert into crm.campanha_instagram(conta_id,midia_id,link,nome,palavras,mensagem,contexto,ativa)
+      values($1,$2,$3,$4,$5,$6,$7,$8)`,[conta,d.midiaId,link,d.nome,palavras,d.mensagem,d.contexto,d.ativa]);
+  }
+}
+export async function alternarCampanhaInstagram(tx:Consulta,conta:string,id:string,ativa:boolean):Promise<void>{
+  if(ativa)await exigirComentariosConectados(tx,conta);
+  const {rows}=await tx.query('select id from crm.campanha_instagram where id=$1 and conta_id=$2 for update',[z.uuid().parse(id),conta]);
+  if(!rows.length)throw new ErroDeDominio('Campanha não encontrada.');
+  await tx.query('update crm.campanha_instagram set ativa=$2,revisao=revisao+1,atualizada_em=now() where id=$1',[id,z.boolean().parse(ativa)]);
+  await tx.query(`update crm.resposta_comentario_instagram set estado='cancelada',erro='Campanha pausada ou alterada.'
+    where campanha_id=$1 and estado in ('pendente','preparando') and envio_iniciado_em is null`,[id]);
+}
+export async function listarCampanhasInstagram(tx:Consulta,conta:string){
+  const campanhas=await tx.query<CampanhaInstagram>(`select * from crm.campanha_instagram where conta_id=$1 order by ativa desc,criada_em desc`,[conta]);
+  const respostas=await tx.query<RespostaComentarioInstagram & {erro:string|null;recebida_em:Date}>(`select * from crm.resposta_comentario_instagram
+    where conta_id=$1 order by recebida_em desc limit 50`,[conta]);
+  return {campanhas:campanhas.rows,respostas:respostas.rows};
+}
+export async function receberComentarioInstagram(tx:Consulta,c:ComentarioInstagram):Promise<boolean>{
+  const {rows}=await tx.query<CampanhaInstagram>(`select p.* from crm.campanha_instagram p join crm.conta_instagram a on a.usuario_id=p.conta_id
+    where p.conta_id=$1 and p.midia_id=$2 and p.ativa and a.comentarios_assinados and a.direct_assinado`,[c.conta,c.midia]);
+  const campanha=rows[0];
+  if(!campanha || !correspondeComentario(c.texto,campanha.palavras) || c.contato===c.conta)return false;
+  const {rows:inseridas}=await tx.query(`insert into crm.resposta_comentario_instagram(campanha_id,conta_id,comentario_id,contato_id,texto,mensagem,contexto,revisao,nome_campanha,link_publicacao)
+    values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) on conflict do nothing returning id`,[campanha.id,c.conta,c.id,c.contato,c.texto,campanha.mensagem,campanha.contexto,campanha.revisao,campanha.nome,campanha.link]);
+  return inseridas.length>0;
+}
+export async function reservarComentarioInstagram(tx:Consulta):Promise<RespostaComentarioInstagram|null>{
+  await tx.query(`update crm.resposta_comentario_instagram set estado=case when envio_iniciado_em is not null then 'incerta'
+    when tentativas>=3 then 'falhou' else 'pendente' end,reserva=null,reserva_ate=null,
+    erro=case when envio_iniciado_em is not null then 'Envio sem confirmação. Confira no Instagram; não reenviar.' else 'Processamento interrompido.' end
+    where estado='preparando' and reserva_ate<now()`);
+  const {rows}=await tx.query<RespostaComentarioInstagram>(`with candidata as(
+    select r.id from crm.resposta_comentario_instagram r join crm.conta_instagram a on a.usuario_id=r.conta_id
+    where r.estado='pendente' and r.disponivel_em<=now() and a.comentarios_assinados and a.direct_assinado and a.token_expira_em>now()
+    order by r.recebida_em for update of r skip locked limit 1)
+    update crm.resposta_comentario_instagram r set estado='preparando',reserva=gen_random_uuid(),reserva_ate=now()+interval '90 seconds',tentativas=tentativas+1
+    from candidata c where r.id=c.id returning r.*`);
+  return rows[0]||null;
+}
+async function campanhaDoLote(tx:Consulta,lote:RespostaComentarioInstagram){
+  const {rows}=await tx.query<CampanhaInstagram>('select * from crm.campanha_instagram where id=$1 for update',[lote.campanha_id]);
+  const {rows:jobs}=await tx.query<RespostaComentarioInstagram>('select * from crm.resposta_comentario_instagram where id=$1 and reserva_ate>now() for update',[lote.id]);
+  if(!jobs[0] || jobs[0].reserva!==lote.reserva || jobs[0].estado!=='preparando')return null;
+  const campanha=rows[0];
+  if(!campanha?.ativa || campanha.revisao!==lote.revisao){
+    await tx.query("update crm.resposta_comentario_instagram set estado='cancelada',erro='Campanha pausada ou alterada.' where id=$1",[lote.id]);
+    return null;
+  }
+  return campanha;
+}
+/** Intenção persistida antes do HTTP; após queda, só uma conferência humana pode decidir. */
+export async function prepararRespostaComentario(tx:Consulta,lote:RespostaComentarioInstagram,textoAtual:string,criadoEm:Date):Promise<boolean>{
+  const campanha=await campanhaDoLote(tx,lote);
+  if(!campanha)return false;
+  const idade=Date.now()-criadoEm.getTime();
+  if(!correspondeComentario(textoAtual,campanha.palavras) || !Number.isFinite(idade) || idade< -60_000 || idade>=7*86400_000){
+    await tx.query("update crm.resposta_comentario_instagram set estado='cancelada',erro='Comentário alterado ou fora do prazo de 7 dias.' where id=$1",[lote.id]);
+    return false;
+  }
+  const {rows:uso}=await tx.query<{n:number}>(`select count(*)::int as n from crm.resposta_comentario_instagram
+    where conta_id=$1 and envio_iniciado_em>now()-interval '1 hour'`,[lote.conta_id]);
+  if(uso[0].n>=100){
+    await tx.query("update crm.resposta_comentario_instagram set estado='pendente',disponivel_em=now()+interval '1 hour',reserva=null,reserva_ate=null where id=$1",[lote.id]);
+    return false;
+  }
+  await tx.query('update crm.resposta_comentario_instagram set envio_iniciado_em=now(),texto_verificado=$2 where id=$1',[lote.id,textoAtual]);
+  return true;
+}
+export async function falharConsultaComentario(tx:Consulta,lote:RespostaComentarioInstagram,rejeitado:boolean):Promise<void>{
+  await tx.query(`update crm.resposta_comentario_instagram set estado=case when $3 or tentativas>=3 then 'falhou' else 'pendente' end,
+    disponivel_em=now()+interval '30 seconds',reserva=null,reserva_ate=null,erro='Não foi possível conferir o comentário. Verifique as permissões na Meta.'
+    where id=$1 and reserva=$2 and estado='preparando' and envio_iniciado_em is null`,[lote.id,lote.reserva,rejeitado]);
+}
+export async function repetirRespostaComentario(tx:Consulta,conta:string,id:string):Promise<void>{
+  const {rows}=await tx.query<RespostaComentarioInstagram>('select * from crm.resposta_comentario_instagram where id=$1 and conta_id=$2 for update',[z.uuid().parse(id),conta]);
+  if(!rows[0] || rows[0].estado!=='falhou')throw new ErroDeDominio('Somente uma falha confirmada pode ser tentada novamente.');
+  const {rows:outras}=await tx.query(`select id from crm.resposta_comentario_instagram where campanha_id=$1 and contato_id=$2
+    and id<>$3 and estado in ('pendente','preparando','enviada','incerta')`,[rows[0].campanha_id,rows[0].contato_id,id]);
+  if(outras.length)throw new ErroDeDominio('Esse contato já tem uma resposta enviada, pendente ou sem confirmação nesta campanha.');
+  await tx.query(`update crm.resposta_comentario_instagram set estado='pendente',tentativas=0,reserva=null,reserva_ate=null,
+    envio_iniciado_em=null,disponivel_em=now(),erro=null where id=$1`,[id]);
+}
+export async function enviarRespostaComentario(tx:Consulta,lote:RespostaComentarioInstagram,enviar:()=>Promise<{id:string;contato:string}>):Promise<void>{
+  const campanha=await campanhaDoLote(tx,lote);
+  if(!campanha)return;
+  const {rows:intencoes}=await tx.query('select id from crm.resposta_comentario_instagram where id=$1 and envio_iniciado_em is not null',[lote.id]);
+  if(!intencoes.length)return;
+  if(process.env.INSTAGRAM_DIRECT_ATIVO!=='sim'){
+    await tx.query("update crm.resposta_comentario_instagram set estado='cancelada',erro='Atendimento automático desligado.' where id=$1",[lote.id]);return;
+  }
+  const {rows:contas}=await tx.query('select 1 from crm.conta_instagram where usuario_id=$1 and comentarios_assinados and direct_assinado and token_expira_em>now() for share',[lote.conta_id]);
+  if(!contas.length){await tx.query("update crm.resposta_comentario_instagram set estado='cancelada',erro='Conta desconectada.' where id=$1",[lote.id]);return;}
+  const {rows}=await tx.query<{id:string}>(`insert into crm.conversa_instagram(conta_id,contato_id,ultima_recebida)
+    values($1,$2,to_timestamp(0)) on conflict(conta_id,contato_id) do update set atualizada_em=now() returning id`,[lote.conta_id,lote.contato_id]);
+  const c=await travarDirect(tx,rows[0].id);
+  if(c.modo==='humano'){
+    await tx.query("update crm.resposta_comentario_instagram set estado='cancelada',erro='Conversa em atendimento humano.' where id=$1",[lote.id]);return;
+  }
+  let resultado:{id:string;contato:string};
+  try {resultado=await enviar();} catch(erro){
+    const rejeitado=erro instanceof Error && 'rejeitado' in erro && erro.rejeitado===true;
+    await tx.query(`update crm.resposta_comentario_instagram set estado=$2,erro=$3 where id=$1`,[lote.id,rejeitado?'falhou':'incerta',
+      rejeitado?'A Meta recusou o envio. Verifique as permissões e o comentário.':'Envio sem confirmação. Confira no Instagram; não reenviar.']);
+    return;
+  }
+  if(resultado.contato!==lote.contato_id){
+    await tx.query("update crm.resposta_comentario_instagram set estado='incerta',meta_id=$2,erro='A Meta retornou outro identificador de destinatário. Confira no Instagram.' where id=$1",[lote.id,resultado.id]);return;
+  }
+  await tx.query(`insert into crm.mensagem_instagram(conversa_id,meta_id,chave,autor,texto,estado,revisao)
+    values($1,$2,$3,'agente',$4,'enviada',$5) on conflict(meta_id) do nothing`,[c.id,resultado.id,`comentario:${lote.id}`,lote.mensagem,c.revisao]);
+  const {rows:verificacao}=await tx.query<{texto_verificado:string|null}>('select texto_verificado from crm.resposta_comentario_instagram where id=$1',[lote.id]);
+  const memoria={...c.memoria,campanha:{nome:lote.nome_campanha,contexto:lote.contexto,link:lote.link_publicacao,comentario:(verificacao[0]?.texto_verificado||lote.texto).slice(0,500)}};
+  // Invalida resposta de IA que estava sendo preparada sem o contexto da campanha.
+  await tx.query(`update crm.conversa_instagram c set memoria=$2,revisao=revisao+1,
+    processada=case when exists(select 1 from crm.mensagem_instagram m where m.conversa_id=c.id and m.autor='cliente' and m.revisao>c.processada)
+      then processada else revisao+1 end where id=$1`,[c.id,JSON.stringify(memoria)]);
+  await tx.query("update crm.mensagem_instagram set estado='cancelada' where conversa_id=$1 and autor='agente' and estado='pendente'",[c.id]);
+  await tx.query("update crm.resposta_comentario_instagram set estado='enviada',meta_id=$2,enviada_em=now(),erro=null where id=$1",[lote.id,resultado.id]);
 }

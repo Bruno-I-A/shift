@@ -2,6 +2,8 @@ import { emTransacao } from '@/lib/banco';
 import { lerConta } from '@/lib/instagram';
 import { assinaturaDirectValida, lerEventosDirect } from '@/lib/instagram-direct-meta';
 import { receberDirect } from '@/lib/leads';
+import { receberComentarioInstagram } from '@/lib/leads';
+import { lerComentariosInstagram } from '@/lib/comentarios-instagram-regras';
 import { iguais } from '@/lib/segredos';
 
 export const runtime='nodejs';
@@ -28,7 +30,11 @@ export async function POST(pedido:Request):Promise<Response> {
     if (!conta) return Response.json({recebidas:0});
     const eventos=lerEventosDirect(objeto,conta.usuarioId);
     for (const e of eventos) await emTransacao(tx=>receberDirect(tx,e,process.env.INSTAGRAM_DIRECT_ATIVO==='sim'));
-    return Response.json({recebidas:eventos.length});
+    const comentarios=lerComentariosInstagram(objeto,conta.usuarioId);
+    let enfileirados=0;
+    for(const c of comentarios)if(await emTransacao(tx=>receberComentarioInstagram(tx,c)))enfileirados++;
+    if(comentarios.length)console.info(`[instagram-comentarios] recebidos=${comentarios.length}; enfileirados=${enfileirados}`);
+    return Response.json({recebidas:eventos.length,comentarios:comentarios.length});
   } catch {
     console.error('[instagram-direct] webhook não persistido; aguardando nova entrega da Meta.');
     return new Response(null,{status:503});
