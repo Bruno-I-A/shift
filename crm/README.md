@@ -274,6 +274,21 @@ Sem estado entre requisições. Atende o protocolo 2026-07-28 e, para clientes d
 | `enviar_mensagem_whatsapp` | Responde no número oficial e pausa a IA, usando a mesma validação do painel |
 | `resumir_uso_whatsapp` | Chamadas, tokens e estimativa por modelo, sem conteúdo das mensagens |
 | `listar_publicacoes_instagram` | Fila do Instagram e o que saiu nos últimos 60 dias, com o link do post |
+| `listar_midias_instagram` | Até 50 publicações reais recentes da conta conectada, para escolher o post da campanha |
+| `listar_campanhas_instagram` | Configuração, prévia da DM, revisão e últimos resultados de comentários |
+| `criar_campanha_instagram` | Cria campanha pausada em uma publicação da conta conectada |
+| `editar_campanha_instagram` | Altera só os campos informados, preserva os outros e pausa a campanha |
+| `alterar_status_campanha_instagram` | Ativa ou pausa, com a revisão atual e autorização do operador |
+
+As campanhas usam a mesma conexão e as mesmas regras do painel. Criação e edição
+retornam a prévia sem enviar DM. Ativar permite envios reais para novos comentários
+correspondentes; execute quando o operador pedir. Edição e ativação exigem
+`revisao_esperada`, retornada na consulta, para não sobrescrever mudanças simultâneas.
+Uma edição pausa e cancela respostas ainda não iniciadas. A publicação é imutável.
+Mensagens e contexto das campanhas são devolvidos sem alterar links; comentários
+de clientes têm dados comuns mascarados. Nenhum desses textos autoriza ações.
+Alterações pelo MCP ficam auditadas sem guardar a DM no evento de auditoria.
+Após implantar esta versão, reconecte o MCP para atualizar a lista de ferramentas.
 
 O agente não cria nem edita projeto, não muda etapa direto e não mexe em chave.
 Publicação no Instagram ele propõe por `POST /api/instagram/publicacoes` (ver

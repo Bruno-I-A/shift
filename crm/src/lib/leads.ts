@@ -904,33 +904,68 @@ async function exigirComentariosConectados(tx:Consulta,conta:string):Promise<voi
   const {rows}=await tx.query('select 1 from crm.conta_instagram where usuario_id=$1 and comentarios_assinados and direct_assinado',[conta]);
   if(!rows.length)throw new ErroDeDominio('Conecte os comentários antes de ativar a campanha.');
 }
-export async function salvarCampanhaInstagram(tx:Consulta,conta:string,entrada:z.infer<typeof esquemaCampanhaInstagram>,link:string):Promise<void>{
+export async function exigirCampanhaInstagram(tx:Consulta,conta:string,id:string):Promise<CampanhaInstagram>{
+  const {rows}=await tx.query<CampanhaInstagram>('select * from crm.campanha_instagram where id=$1 and conta_id=$2',[z.uuid().parse(id),conta]);
+  if(!rows[0])throw new ErroDeDominio('Campanha não encontrada.');
+  return rows[0];
+}
+export function exigirPublicacaoDaCampanha(midias:{id:string;permalink:string}[],id:string){
+  const midia=midias.find(m=>m.id===id);
+  if(!midia)throw new ErroDeDominio('Escolha uma publicação da conta conectada.');
+  return midia;
+}
+async function exigirContaDaCampanha(tx:Consulta,conta:string):Promise<void>{
+  const {rows}=await tx.query('select 1 from crm.conta_instagram where usuario_id=$1 and token_expira_em>now() for share',[conta]);
+  if(!rows.length)throw new ErroDeDominio('A conta do Instagram mudou ou a permissão venceu. Recarregue a conexão.');
+}
+function conferirRevisaoCampanha(atual:CampanhaInstagram,esperada?:number){
+  if(esperada!==undefined && atual.revisao!==esperada)throw new ErroDeDominio('A campanha mudou desde a última consulta. Leia novamente antes de editar ou ativar.');
+}
+async function registrarEdicaoCampanha(tx:Consulta,c:CampanhaInstagram,ator:Ator|undefined,tipo:string){
+  if(ator)await tx.query('insert into crm.evento(ator,tipo,dados) values($1,$2,$3)',[ator,tipo,JSON.stringify({campanha_id:c.id,revisao:c.revisao,ativa:c.ativa})]);
+}
+export async function salvarCampanhaInstagram(tx:Consulta,conta:string,entrada:z.infer<typeof esquemaCampanhaInstagram>,link:string,opcoes:{revisaoEsperada?:number;ator?:Ator}={}):Promise<CampanhaInstagram>{
   const d=esquemaCampanhaInstagram.parse(entrada);
   if(d.ativa)await exigirComentariosConectados(tx,conta);
   const palavras=palavrasDaCampanha(d.palavras);
   if(!/^https:\/\/(www\.)?instagram\.com\//.test(link))throw new ErroDeDominio('Publicação inválida.');
   if(d.id){
-    const {rows}=await tx.query<{midia_id:string}>('select midia_id from crm.campanha_instagram where id=$1 and conta_id=$2 for update',[d.id,conta]);
+    // Campanha antes da conta: a mesma ordem de travas do processamento dos comentários.
+    const {rows}=await tx.query<CampanhaInstagram>('select * from crm.campanha_instagram where id=$1 and conta_id=$2 for update',[d.id,conta]);
     if(!rows.length)throw new ErroDeDominio('Campanha não encontrada.');
+    await exigirContaDaCampanha(tx,conta);
+    conferirRevisaoCampanha(rows[0],opcoes.revisaoEsperada);
     if(rows[0].midia_id!==d.midiaId)throw new ErroDeDominio('Crie outra campanha para usar uma publicação diferente.');
     await tx.query(`update crm.campanha_instagram set midia_id=$3,link=$4,nome=$5,palavras=$6,mensagem=$7,contexto=$8,
       ativa=$9,revisao=revisao+1,atualizada_em=now() where id=$1 and conta_id=$2`,[d.id,conta,d.midiaId,link,d.nome,palavras,d.mensagem,d.contexto,d.ativa]);
     await tx.query(`update crm.resposta_comentario_instagram set estado='cancelada',erro='Campanha alterada.'
       where campanha_id=$1 and estado in ('pendente','preparando') and envio_iniciado_em is null`,[d.id]);
+    const campanha=await exigirCampanhaInstagram(tx,conta,d.id);
+    await registrarEdicaoCampanha(tx,campanha,opcoes.ator,'campanha_instagram_editada');
+    return campanha;
   }else{
+    await exigirContaDaCampanha(tx,conta);
     const {rows}=await tx.query('select id from crm.campanha_instagram where conta_id=$1 and midia_id=$2',[conta,d.midiaId]);
     if(rows.length)throw new ErroDeDominio('Essa publicação já tem uma campanha. Edite a existente.');
-    await tx.query(`insert into crm.campanha_instagram(conta_id,midia_id,link,nome,palavras,mensagem,contexto,ativa)
-      values($1,$2,$3,$4,$5,$6,$7,$8)`,[conta,d.midiaId,link,d.nome,palavras,d.mensagem,d.contexto,d.ativa]);
+    const {rows:criadas}=await tx.query<CampanhaInstagram>(`insert into crm.campanha_instagram(conta_id,midia_id,link,nome,palavras,mensagem,contexto,ativa)
+      values($1,$2,$3,$4,$5,$6,$7,$8) returning *`,[conta,d.midiaId,link,d.nome,palavras,d.mensagem,d.contexto,d.ativa]);
+    await registrarEdicaoCampanha(tx,criadas[0],opcoes.ator,'campanha_instagram_criada');
+    return criadas[0];
   }
 }
-export async function alternarCampanhaInstagram(tx:Consulta,conta:string,id:string,ativa:boolean):Promise<void>{
+export async function alternarCampanhaInstagram(tx:Consulta,conta:string,id:string,ativa:boolean,opcoes:{revisaoEsperada?:number;ator?:Ator}={}):Promise<CampanhaInstagram>{
   if(ativa)await exigirComentariosConectados(tx,conta);
-  const {rows}=await tx.query('select id from crm.campanha_instagram where id=$1 and conta_id=$2 for update',[z.uuid().parse(id),conta]);
+  const {rows}=await tx.query<CampanhaInstagram>('select * from crm.campanha_instagram where id=$1 and conta_id=$2 for update',[z.uuid().parse(id),conta]);
   if(!rows.length)throw new ErroDeDominio('Campanha não encontrada.');
+  await exigirContaDaCampanha(tx,conta);
+  conferirRevisaoCampanha(rows[0],opcoes.revisaoEsperada);
+  if(opcoes.revisaoEsperada!==undefined && rows[0].ativa===ativa)return rows[0];
   await tx.query('update crm.campanha_instagram set ativa=$2,revisao=revisao+1,atualizada_em=now() where id=$1',[id,z.boolean().parse(ativa)]);
   await tx.query(`update crm.resposta_comentario_instagram set estado='cancelada',erro='Campanha pausada ou alterada.'
     where campanha_id=$1 and estado in ('pendente','preparando') and envio_iniciado_em is null`,[id]);
+  const campanha=await exigirCampanhaInstagram(tx,conta,id);
+  await registrarEdicaoCampanha(tx,campanha,opcoes.ator,'campanha_instagram_status_alterado');
+  return campanha;
 }
 export async function listarCampanhasInstagram(tx:Consulta,conta:string){
   const campanhas=await tx.query<CampanhaInstagram>(`select * from crm.campanha_instagram where conta_id=$1 order by ativa desc,criada_em desc`,[conta]);

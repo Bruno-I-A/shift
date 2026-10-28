@@ -2,7 +2,8 @@ import * as z from 'zod';
 import {emTransacao} from '@/lib/banco';
 import {lerConta,acessoDaConta} from '@/lib/instagram';
 import {assinarComentariosInstagram,listarMidiasCampanha} from '@/lib/comentarios-instagram-meta';
-import {esquemaCampanhaInstagram,salvarCampanhaInstagram,alternarCampanhaInstagram,listarCampanhasInstagram,repetirRespostaComentario} from '@/lib/leads';
+import {esquemaCampanhaInstagram,alternarCampanhaInstagram,listarCampanhasInstagram,repetirRespostaComentario} from '@/lib/leads';
+import {salvarCampanhaComPublicacao} from '@/lib/gestao-campanhas-instagram';
 import {temSessao} from '@/lib/sessao';
 import {ErroDeDominio} from '@/lib/dominio';
 export const runtime='nodejs';
@@ -42,12 +43,7 @@ export async function POST(pedido:Request):Promise<Response>{
       await assinarComentariosInstagram(acesso);
       await emTransacao(tx=>tx.query('update crm.conta_instagram set comentarios_assinados=true,direct_assinado=true where usuario_id=$1',[acesso.usuarioId]));
     }else if(d.acao==='salvar'){
-      // Uma mídia já cadastrada pode ser editada mesmo depois de sair das 50 mais recentes.
-      const atuais=await emTransacao(tx=>listarCampanhasInstagram(tx,acesso.usuarioId));
-      const atual=atuais.campanhas.find(c=>c.id===d.campanha.id&&c.midia_id===d.campanha.midiaId);
-      const midia=atual?{id:atual.midia_id,permalink:atual.link}:(await listarMidiasCampanha(acesso)).find(m=>m.id===d.campanha.midiaId);
-      if(!midia)throw new ErroDeDominio('Escolha uma publicação da conta conectada.');
-      await emTransacao(tx=>salvarCampanhaInstagram(tx,acesso.usuarioId,d.campanha,midia.permalink));
+      await salvarCampanhaComPublicacao(emTransacao,d.campanha);
     }else if(d.acao==='ativar'){
       await emTransacao(async tx=>{
         const {rows}=await tx.query<{comentarios_assinados:boolean}>('select comentarios_assinados from crm.conta_instagram where usuario_id=$1',[acesso.usuarioId]);
