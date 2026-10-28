@@ -10,6 +10,7 @@ import type { Consulta } from "@/lib/consulta";
 import * as crm from "@/lib/crm";
 import * as leads from "@/lib/leads";
 import { criarServidorMcp } from "@/mcp/servidor";
+import { salvarConta } from '@/lib/instagram';
 
 import { bancoDeTeste } from "./banco-de-teste";
 
@@ -59,7 +60,7 @@ async function chamar(nome: string, args: Record<string, unknown>) {
 }
 
 describe("MCP", () => {
-  it("se apresenta com as instruções e as onze ferramentas", async () => {
+  it("se apresenta com as instruções e as dezessete ferramentas", async () => {
     const init = await rpc("initialize", {
       protocolVersion: "2025-06-18",
       capabilities: {},
@@ -71,12 +72,17 @@ describe("MCP", () => {
 
     const { tools } = await rpc("tools/list");
     expect(tools.map((t: { name: string }) => t.name).sort()).toEqual([
+      "alterar_status_campanha_instagram",
       "concluir_tarefa",
       "contexto_do_projeto",
+      "criar_campanha_instagram",
       "criar_tarefa",
+      "editar_campanha_instagram",
       "enviar_mensagem_whatsapp",
       "ler_conversa_whatsapp",
+      "listar_campanhas_instagram",
       "listar_conversas_whatsapp",
+      "listar_midias_instagram",
       "listar_projetos",
       "listar_publicacoes_instagram",
       "projeto_atual",
@@ -88,6 +94,60 @@ describe("MCP", () => {
     expect(tools.find((t: { name: string }) => t.name === "enviar_mensagem_whatsapp").annotations).toMatchObject({
       readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true,
     });
+  });
+
+  /** O mínimo que o Instagram exige; sem isso a chamada falha antes de chegar à Meta simulada. */
+  function configurarInstagram() {
+    vi.stubEnv('SESSAO_SEGREDO','segredo-de-teste-com-mais-de-32-caracteres');
+    vi.stubEnv('INSTAGRAM_APP_ID','123');vi.stubEnv('INSTAGRAM_APP_SECRET','teste');
+    vi.stubEnv('APP_URL','https://crm.exemplo.com');
+  }
+
+  it('gerencia campanhas pelo protocolo, preserva campos, pausa edições e rejeita revisão antiga', async () => {
+    configurarInstagram();
+    vi.stubEnv('INSTAGRAM_DIRECT_ATIVO','sim');
+    await salvarConta(tx,{usuarioId:'17841400000001',nomeUsuario:'shift',token:'TOKEN-NAO-EXIBIR',expiraEm:new Date(Date.now()+86400_000)});
+    await tx.query('update crm.conta_instagram set comentarios_assinados=true,direct_assinado=true');
+    const buscar = vi.fn(async () => Response.json({data:[{id:'300',caption:'Post Shift',permalink:'https://www.instagram.com/p/teste/'}]}));
+    vi.stubGlobal('fetch',buscar);
+    const midias = await chamar('listar_midias_instagram',{});
+    expect(midias.json()).toMatchObject([{id:'300'}]);
+    const criada = await chamar('criar_campanha_instagram',{midia_id:'300',nome:'Diagnóstico',palavras_chave:['eu quero'],mensagem:'Veja https://shiftsys.com.br/contato',contexto:'Diagnóstico da empresa'});
+    expect(criada.erro).toBe(false);
+    const c = criada.json();
+    expect(c).toMatchObject({ativa:false,revisao:0});
+    expect(criada.texto).not.toContain('TOKEN-NAO-EXIBIR');
+    expect((await chamar('criar_campanha_instagram',{midia_id:'999',nome:'Inválida',palavras_chave:['quero'],mensagem:'Oi'})).erro).toBe(true);
+    const ativa = await chamar('alterar_status_campanha_instagram',{id:c.id,revisao_esperada:0,ativa:true});
+    expect(ativa.json()).toMatchObject({ativa:true,revisao:1});
+    const antes = buscar.mock.calls.length;
+    const editada = await chamar('editar_campanha_instagram',{id:c.id,revisao_esperada:1,nome:'Novo nome'});
+    expect(editada.json()).toMatchObject({nome:'Novo nome',ativa:false,revisao:2,mensagem:c.mensagem,contexto:c.contexto,palavras_chave:c.palavras_chave,midia_id:'300'});
+    expect(buscar.mock.calls.length).toBe(antes); // Não depende da lista recente para editar uma publicação antiga.
+    expect((await chamar('editar_campanha_instagram',{id:c.id,revisao_esperada:1,mensagem:'Perderia a edição'})).erro).toBe(true);
+    expect((await chamar('alterar_status_campanha_instagram',{id:c.id,revisao_esperada:1,ativa:true})).erro).toBe(true);
+    const lista = await chamar('listar_campanhas_instagram',{});
+    expect(lista.json().campanhas).toMatchObject([{nome:'Novo nome',mensagem:c.mensagem,ativa:false,revisao:2}]);
+    expect(lista.texto).not.toContain('TOKEN-NAO-EXIBIR');
+    const eventos = await tx.query<{ator:string;dados:Record<string,unknown>}>("select ator,dados from crm.evento where tipo like 'campanha_instagram_%'");
+    expect(eventos.rows).toHaveLength(3);
+    expect(eventos.rows.every(e => e.ator==='agente:claude' && !('mensagem' in e.dados))).toBe(true);
+    const semMudanca = await chamar('alterar_status_campanha_instagram',{id:c.id,revisao_esperada:2,ativa:false});
+    expect(semMudanca.json().revisao).toBe(2);
+    await salvarConta(tx,{usuarioId:'17841400000002',nomeUsuario:'outra',token:'OUTRO-TOKEN',expiraEm:new Date(Date.now()+86400_000)});
+    expect((await chamar('editar_campanha_instagram',{id:c.id,revisao_esperada:2,nome:'Outra conta'})).erro).toBe(true);
+  });
+
+  it('não expõe credenciais nem grava campanha quando a Meta falha', async () => {
+    configurarInstagram();
+    await salvarConta(tx,{usuarioId:'17841400000001',nomeUsuario:'shift',token:'TOKEN-SIGILOSO',expiraEm:new Date(Date.now()+86400_000)});
+    const falhar = vi.fn(async () => {throw new Error('TOKEN-SIGILOSO');});
+    vi.stubGlobal('fetch',falhar);
+    const resposta = await chamar('criar_campanha_instagram',{midia_id:'300',nome:'Teste',palavras_chave:['quero'],mensagem:'Olá'});
+    expect(resposta.erro).toBe(true);
+    expect(falhar).toHaveBeenCalled(); // A falha veio da Meta, não de configuração faltando.
+    expect(resposta.texto).not.toContain('TOKEN-SIGILOSO');
+    expect((await tx.query('select id from crm.campanha_instagram')).rows).toHaveLength(0);
   });
 
   it("lista e lê uma conversa com dados mascarados, sem vazar mensagens ou cursor de outro contato", async () => {
