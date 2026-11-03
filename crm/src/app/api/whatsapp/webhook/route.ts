@@ -1,6 +1,6 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
-
+import { assinaturaMetaCorreta, responderDesafioMeta } from "@/lib/assinatura-meta";
 import { emTransacao } from "@/lib/banco";
+import { registrarAvisos } from "@/lib/conexoes-whatsapp";
 import {
   iniciarAtendimentoWhatsApp, buscarAtendimentoWhatsApp,
   enfileirarMensagemWhatsApp, registrarStatusWhatsApp,
@@ -9,26 +9,8 @@ import { lerMensagensMeta, lerStatusMeta, type MensagemRecebida } from "@/lib/wh
 
 export const runtime = "nodejs";
 
-
-function segredoCorreto(recebido: string, esperado: string): boolean {
-  const a = createHash("sha256").update(recebido).digest();
-  const b = createHash("sha256").update(esperado).digest();
-  return timingSafeEqual(a, b);
-}
-
-function assinaturaMetaCorreta(recebida: string, corpo: string, segredo: string): boolean {
-  const esperada = `sha256=${createHmac("sha256", segredo).update(corpo).digest("hex")}`;
-  return segredoCorreto(recebida, esperada);
-}
-
 export async function GET(pedido: Request): Promise<Response> {
-  const url = new URL(pedido.url);
-  const modo = url.searchParams.get("hub.mode");
-  const token = url.searchParams.get("hub.verify_token") ?? "";
-  const desafio = url.searchParams.get("hub.challenge");
-  const esperado = process.env.WHATSAPP_META_VERIFY_TOKEN;
-  if (modo !== "subscribe" || !desafio || !esperado || !segredoCorreto(token, esperado)) return new Response(null, { status: 403 });
-  return new Response(desafio, { status: 200, headers: { "Content-Type": "text/plain" } });
+  return responderDesafioMeta(pedido, process.env.WHATSAPP_META_VERIFY_TOKEN);
 }
 
 async function atenderMensagem(mensagem: MensagemRecebida): Promise<void> {
@@ -66,8 +48,13 @@ export async function POST(pedido: Request): Promise<Response> {
   try {
     for (const status of lerStatusMeta(corpo, phoneNumberId)) await emTransacao(tx => registrarStatusWhatsApp(tx, status));
     for (const mensagem of mensagens) await atenderMensagem(mensagem);
-    return Response.json({ recebidas: mensagens.length });
   } catch {
     return new Response(null, { status: 503 });
   }
+  // Avisos de conta dos números conectados (account_update…) sempre vêm para cá,
+  // mesmo com o webhook separado. Contar é secundário: falha aqui não faz a Meta
+  // reenviar as mensagens da Shift.
+  try { await emTransacao(tx => registrarAvisos(tx, corpo)); }
+  catch { console.warn("[whatsapp] não foi possível contar avisos de números conectados."); }
+  return Response.json({ recebidas: mensagens.length });
 }
