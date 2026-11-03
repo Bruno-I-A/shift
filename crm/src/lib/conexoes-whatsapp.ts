@@ -98,6 +98,7 @@ const esquemaConectar = z.object({
   phoneNumberId: z.string().regex(ID).optional(),
   businessId: z.string().regex(ID).optional(),
   evento: z.string().max(80),
+  numeroDaShift: z.boolean().default(false),
 });
 
 /**
@@ -123,24 +124,31 @@ export async function conectarNumero(executar: Executor, entrada: unknown): Prom
     phoneNumberId = lista.data[0].id;
   }
 
-  await graph(`${d.wabaId}/subscribed_apps`, {
-    token, metodo: "POST", corpo: { override_callback_uri: c.webhook, verify_token: c.verifyToken },
-  });
+  // Número de cliente: os avisos vão para o webhook separado, que só conta.
+  // Número da Shift: sem desvio (POST sem corpo também desfaz um desvio
+  // anterior), para o agente continuar atendendo pelo webhook principal.
+  await graph(`${d.wabaId}/subscribed_apps`, d.numeroDaShift
+    ? { token, metodo: "POST" }
+    : { token, metodo: "POST", corpo: { override_callback_uri: c.webhook, verify_token: c.verifyToken } });
   const numero = await lerNumero(phoneNumberId, token);
 
   const id = await executar(async (tx) => {
+    if (d.numeroDaShift) {
+      await tx.query("update crm.conexao_whatsapp set numero_da_shift = false where numero_da_shift and phone_number_id <> $1", [phoneNumberId]);
+    }
     const { rows } = await tx.query<{ id: string }>(
       `insert into crm.conexao_whatsapp
-         (waba_id, phone_number_id, business_id, numero_exibicao, nome_verificado, coexistencia, token_cifrado)
-       values ($1, $2, $3, $4, $5, true, $6)
+         (waba_id, phone_number_id, business_id, numero_exibicao, nome_verificado, coexistencia, token_cifrado, numero_da_shift)
+       values ($1, $2, $3, $4, $5, true, $6, $7)
        on conflict (phone_number_id) do update set
          waba_id = excluded.waba_id, business_id = excluded.business_id,
          numero_exibicao = excluded.numero_exibicao, nome_verificado = excluded.nome_verificado,
          coexistencia = excluded.coexistencia, token_cifrado = excluded.token_cifrado, conectada_em = now(),
+         numero_da_shift = excluded.numero_da_shift,
          sinc_contatos_id = null, sinc_contatos_em = null, sinc_historico_id = null, sinc_historico_em = null
        returning id`,
       [d.wabaId, phoneNumberId, d.businessId ?? null, numero.display_phone_number ?? null,
-        numero.verified_name ?? null, cifrar(token, c.segredo, USO_DA_CIFRA)],
+        numero.verified_name ?? null, cifrar(token, c.segredo, USO_DA_CIFRA), d.numeroDaShift],
     );
     await tx.query("insert into crm.evento (ator, tipo, dados) values ('bruno', 'whatsapp_numero_conectado', $1::jsonb)",
       [JSON.stringify({ conexao_id: rows[0].id })]);
@@ -163,6 +171,7 @@ export interface ConexaoWhatsApp {
   ultimoEventoEm: Date | null;
   /** Passaram as 24 horas em que a Meta aceita sincronizar contatos e histórico. */
   prazoSincronizarVencido: boolean;
+  numeroDaShift: boolean;
 }
 
 /** Sem a permissão: ela nunca sai do servidor. */
@@ -172,8 +181,9 @@ export async function listarConexoes(tx: Consulta): Promise<ConexaoWhatsApp[]> {
             nome_verificado as "nomeVerificado", coexistencia, conectada_em as "conectadaEm",
             sinc_contatos_em as "sincContatosEm", sinc_historico_em as "sincHistoricoEm",
             eventos, ultimo_evento_em as "ultimoEventoEm",
-            conectada_em <= now() - interval '24 hours' as "prazoSincronizarVencido"
-       from crm.conexao_whatsapp order by conectada_em desc`,
+            conectada_em <= now() - interval '24 hours' as "prazoSincronizarVencido",
+            numero_da_shift as "numeroDaShift"
+       from crm.conexao_whatsapp order by numero_da_shift desc, conectada_em desc`,
   );
   return rows;
 }
@@ -212,6 +222,9 @@ export async function sincronizar(executar: Executor, id: string, qual: keyof ty
   const { coluna, tipo } = SINCRONIZACOES[z.enum(["contatos", "historico"]).parse(qual)];
   const conexaoId = z.uuid().parse(id);
   const marcada = await executar(async (tx) => {
+    const { rows: shift } = await tx.query("select 1 from crm.conexao_whatsapp where id = $1 and numero_da_shift", [conexaoId]);
+    // Os avisos da sincronização são grandes e iriam para o webhook principal.
+    if (shift.length) throw new ErroDeDominio("No número da Shift a sincronização fica desligada.");
     const { rows } = await tx.query<{ id: string }>(
       `update crm.conexao_whatsapp set ${coluna}_em = now()
         where id = $1 and ${coluna}_em is null and conectada_em > now() - interval '24 hours' returning id`, [conexaoId],

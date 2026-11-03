@@ -24,7 +24,11 @@ create table crm.conexao_whatsapp (
   sinc_historico_id text check (sinc_historico_id is null or length(sinc_historico_id) <= 200),
   sinc_historico_em timestamptz,
   eventos jsonb not null default '{}',
-  ultimo_evento_em timestamptz
+  ultimo_evento_em timestamptz,
+  -- O próprio número da Shift em coexistência: os avisos continuam no webhook
+  -- principal, onde o agente atende e as respostas pelo app pausam o agente.
+  numero_da_shift boolean not null default false
 );
+create unique index conexao_whatsapp_numero_da_shift on crm.conexao_whatsapp (numero_da_shift) where numero_da_shift;
 
 grant select, insert, update on crm.conexao_whatsapp to shift_crm_app;

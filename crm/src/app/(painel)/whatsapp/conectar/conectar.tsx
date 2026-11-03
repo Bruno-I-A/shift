@@ -7,6 +7,8 @@ import { estilos } from "@/componentes/estilos";
 
 interface Conexao {
   id: string;
+  wabaId: string;
+  numeroDaShift: boolean;
   phoneNumberId: string;
   numeroExibicao: string | null;
   nomeVerificado: string | null;
@@ -71,6 +73,8 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
   const [conectando, setConectando] = useState(false);
   const [pendente, iniciar] = useTransition();
   const [estados, setEstados] = useState<Record<string, string>>({});
+  const [daShift, setDaShift] = useState(false);
+  const numeroDaShift = useRef(false);
   const codigo = useRef<string | null>(null);
   const sessao = useRef<SessaoMeta | null>(null);
   const enviado = useRef(false);
@@ -82,6 +86,7 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
       const r = await chamar({
         acao: "conectar", codigo: codigo.current, waba_id: sessao.current.waba_id,
         phone_number_id: sessao.current.phone_number_id, business_id: sessao.current.business_id, evento: sessao.current.event,
+        numero_da_shift: numeroDaShift.current,
       });
       const numero = r.numero as { display_phone_number?: string } | undefined;
       setAviso({ texto: `Número ${numero?.display_phone_number ?? ""} conectado. Mande uma mensagem pelo app para ver o aviso chegar.`, erro: false });
@@ -130,6 +135,7 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
   function abrirFluxo() {
     if (!configuracao || !window.FB) return;
     codigo.current = null; sessao.current = null; enviado.current = false;
+    numeroDaShift.current = daShift;
     setAviso(null); setConectando(true);
     window.FB.login((resposta) => {
       const recebido = resposta.authResponse?.code;
@@ -172,6 +178,13 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
           <li>Clique no botão e entre com o Facebook de quem administra a empresa.</li>
           <li>Escolha <strong className="text-texto">conectar um número que já usa o app WhatsApp Business</strong> e siga o QR code no celular.</li>
         </ol>
+        <label className="flex items-start gap-2 text-sm">
+          <input type="checkbox" checked={daShift} onChange={(e) => setDaShift(e.target.checked)} className="mt-1" />
+          <span>
+            É o número da própria Shift <span className="text-apagado">(o agente continua atendendo; suas respostas pelo
+            app entram na conversa e pausam o agente)</span>
+          </span>
+        </label>
         {erroConfiguracao ? (
           <p role="alert" className="text-sm text-perigo">{erroConfiguracao}</p>
         ) : (
@@ -190,7 +203,10 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
           return (
             <article key={c.id} className="space-y-3 rounded-lg border border-linha p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="font-medium">{c.nomeVerificado ?? "Sem nome"} <span className="text-sm text-suave">{c.numeroExibicao ?? ""}</span></p>
+                <p className="font-medium">
+                  {c.nomeVerificado ?? "Sem nome"} <span className="text-sm text-suave">{c.numeroExibicao ?? ""}</span>
+                  {c.numeroDaShift && <span className="ml-2 rounded bg-destaque-fundo px-1.5 py-0.5 text-xs text-destaque">Número da Shift</span>}
+                </p>
                 <p className="text-xs text-apagado">Conectado em {quando(c.conectadaEm)} · último aviso {quando(c.ultimoEventoEm)}</p>
               </div>
 
@@ -204,6 +220,17 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
               </dl>
 
               {estados[c.id] && <p className="text-sm text-suave">{estados[c.id]}</p>}
+
+              {c.numeroDaShift && (
+                <div className="space-y-1 rounded-md bg-superficie-2 px-3 py-2 text-sm">
+                  <p>Para o agente usar este número, o Easypanel (<code>crm-shift</code> → Ambiente) precisa ter:</p>
+                  <pre className="overflow-x-auto font-mono text-xs">{`WHATSAPP_META_PHONE_NUMBER_ID=${c.phoneNumberId}\nWHATSAPP_META_WABA_ID=${c.wabaId}`}</pre>
+                  <p className="text-xs text-apagado">
+                    E o usuário do sistema da chave WHATSAPP_META_ACCESS_TOKEN precisa ter acesso a esta conta do WhatsApp
+                    (Configurações da empresa → Usuários do sistema → Atribuir ativos).
+                  </p>
+                </div>
+              )}
 
               <div className="flex flex-wrap gap-2">
                 <button type="button" disabled={pendente} className={estilos.secundario}
@@ -220,18 +247,20 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
                   })}>
                   Conferir estado
                 </button>
-                <button type="button" disabled={pendente || !!c.sincContatosEm || vencida} className={estilos.secundario}
-                  onClick={() => window.confirm("Trazer os contatos do app? Só dá para pedir uma vez.") &&
-                    acao({ acao: "sincronizar", id: c.id, tipo: "contatos" }, () => "Contatos pedidos. Os avisos chegam aos poucos.")}>
-                  {c.sincContatosEm ? "Contatos pedidos" : "Sincronizar contatos"}
-                </button>
-                <button type="button" disabled={pendente || !!c.sincHistoricoEm || vencida} className={estilos.secundario}
-                  onClick={() => window.confirm("Trazer até 180 dias de conversas do app? Só dá para pedir uma vez.") &&
-                    acao({ acao: "sincronizar", id: c.id, tipo: "historico" }, () => "Histórico pedido. Os avisos chegam aos poucos.")}>
-                  {c.sincHistoricoEm ? "Histórico pedido" : "Sincronizar histórico"}
-                </button>
+                {!c.numeroDaShift && <>
+                  <button type="button" disabled={pendente || !!c.sincContatosEm || vencida} className={estilos.secundario}
+                    onClick={() => window.confirm("Trazer os contatos do app? Só dá para pedir uma vez.") &&
+                      acao({ acao: "sincronizar", id: c.id, tipo: "contatos" }, () => "Contatos pedidos. Os avisos chegam aos poucos.")}>
+                    {c.sincContatosEm ? "Contatos pedidos" : "Sincronizar contatos"}
+                  </button>
+                  <button type="button" disabled={pendente || !!c.sincHistoricoEm || vencida} className={estilos.secundario}
+                    onClick={() => window.confirm("Trazer até 180 dias de conversas do app? Só dá para pedir uma vez.") &&
+                      acao({ acao: "sincronizar", id: c.id, tipo: "historico" }, () => "Histórico pedido. Os avisos chegam aos poucos.")}>
+                    {c.sincHistoricoEm ? "Histórico pedido" : "Sincronizar histórico"}
+                  </button>
+                </>}
               </div>
-              {vencida && (!c.sincContatosEm || !c.sincHistoricoEm) && (
+              {!c.numeroDaShift && vencida && (!c.sincContatosEm || !c.sincHistoricoEm) && (
                 <p className="text-xs text-apagado">Passaram as 24 horas para sincronizar. Para isso, conecte o número de novo.</p>
               )}
 

@@ -3,9 +3,9 @@ import { emTransacao } from "@/lib/banco";
 import { registrarAvisos } from "@/lib/conexoes-whatsapp";
 import {
   iniciarAtendimentoWhatsApp, buscarAtendimentoWhatsApp,
-  enfileirarMensagemWhatsApp, registrarStatusWhatsApp,
+  enfileirarMensagemWhatsApp, registrarRespostaPeloAppWhatsApp, registrarStatusWhatsApp,
 } from "@/lib/leads";
-import { lerMensagensMeta, lerStatusMeta, type MensagemRecebida } from "@/lib/whatsapp";
+import { lerEcosMeta, lerMensagensMeta, lerStatusMeta, type MensagemRecebida } from "@/lib/whatsapp";
 
 export const runtime = "nodejs";
 
@@ -47,6 +47,9 @@ export async function POST(pedido: Request): Promise<Response> {
   const mensagens = lerMensagensMeta(corpo, phoneNumberId, true);
   try {
     for (const status of lerStatusMeta(corpo, phoneNumberId)) await emTransacao(tx => registrarStatusWhatsApp(tx, status));
+    // Respostas pelo app (coexistência) antes das mensagens novas: se vierem
+    // juntas, o agente já está pausado quando a mensagem do cliente entra.
+    for (const eco of lerEcosMeta(corpo, phoneNumberId)) await emTransacao(tx => registrarRespostaPeloAppWhatsApp(tx, eco));
     for (const mensagem of mensagens) await atenderMensagem(mensagem);
   } catch {
     return new Response(null, { status: 503 });

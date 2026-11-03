@@ -75,6 +75,46 @@ export function lerStatusMeta(corpo: unknown, phoneNumberId: string): { id: stri
   }));
 }
 
+const esquemaValorEcos = z.object({
+  metadata: z.object({ phone_number_id: z.string().min(1).max(100) }),
+  message_echoes: z.array(z.object({
+    to: z.string().regex(/^\d{10,15}$/),
+    id: z.string().min(1).max(200),
+    timestamp: z.union([z.number(), z.string()]),
+    type: z.string(),
+    text: z.object({ body: z.string() }).optional(),
+    image: z.object({ caption: z.string().optional() }).optional(),
+    video: z.object({ caption: z.string().optional() }).optional(),
+    document: z.object({ filename: z.string().optional(), caption: z.string().optional() }).optional(),
+  })).optional(),
+});
+
+export interface MensagemPeloApp { id: string; whatsapp: string; texto: string; tipo: string; enviadoEm: Date }
+
+/**
+ * Mensagens que alguém mandou pelo app WhatsApp Business do número oficial
+ * (coexistência). São respostas humanas: entram na conversa e pausam o agente.
+ * Apagar e editar pelo app não mudam o histórico do CRM.
+ */
+export function lerEcosMeta(corpo: unknown, phoneNumberId: string): MensagemPeloApp[] {
+  const lido = esquemaWebhookMeta.safeParse(corpo);
+  if (!lido.success) return [];
+  const tipos: Record<string, string> = { image: "Imagem", video: "Vídeo", document: "Documento", audio: "Áudio", sticker: "Figurinha" };
+  return lido.data.entry.flatMap((entrada) => entrada.changes).flatMap((mudanca) => {
+    if (mudanca.field !== "smb_message_echoes") return [];
+    const valor = esquemaValorEcos.safeParse(mudanca.value);
+    if (!valor.success || valor.data.metadata.phone_number_id !== phoneNumberId) return [];
+    return (valor.data.message_echoes ?? []).flatMap((eco) => {
+      if (eco.type === "revoke" || eco.type === "edit" || !recente(eco.timestamp)) return [];
+      const legenda = eco.image?.caption || eco.video?.caption || eco.document?.caption || eco.document?.filename || "";
+      const texto = eco.type === "text" ? eco.text?.body.trim() : `[${tipos[eco.type] ?? "Mensagem não textual"} enviada pelo app]${legenda ? ` ${legenda}` : ""}`;
+      if (!texto || texto.length > 4000) return [];
+      const n = Number(eco.timestamp);
+      return [{ id: eco.id, whatsapp: eco.to, texto, tipo: eco.type, enviadoEm: new Date(n > 1_000_000_000_000 ? n : n * 1000) }];
+    });
+  });
+}
+
 export async function enviarTextoMeta(whatsapp: string, texto: string): Promise<string> {
   const token = process.env.WHATSAPP_META_ACCESS_TOKEN;
   const phoneNumberId = process.env.WHATSAPP_META_PHONE_NUMBER_ID;

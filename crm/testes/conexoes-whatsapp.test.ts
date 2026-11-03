@@ -3,9 +3,11 @@ import { createHmac } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GET, POST } from "@/app/api/whatsapp/conexoes/webhook/route";
+import { POST as POST_PRINCIPAL } from "@/app/api/whatsapp/webhook/route";
 import { emTransacao } from "@/lib/banco";
 import type { Consulta } from "@/lib/consulta";
 import { conectarNumero, enviarTeste, listarConexoes, registrarAvisos, sincronizar } from "@/lib/conexoes-whatsapp";
+import * as leads from "@/lib/leads";
 
 import { bancoDeTeste } from "./banco-de-teste";
 
@@ -118,6 +120,42 @@ describe("conexão de número em coexistência", () => {
       caminho: "222/messages", autorizacao: `Bearer ${TOKEN}`,
       corpo: { messaging_product: "whatsapp", to: "5554988887777", type: "text", text: { body: "Olá", preview_url: false } },
     });
+  });
+});
+
+describe("o número da própria Shift em coexistência", () => {
+  it("assina a conta sem desviar os avisos, fica marcado e não sincroniza", async () => {
+    const chamadas = metaFalsa();
+    const { id } = await conectarNumero(executar, { ...fimDoFluxo, numeroDaShift: true });
+    expect(chamadas[1]).toMatchObject({ caminho: "111/subscribed_apps", metodo: "POST", corpo: undefined });
+    expect((await listarConexoes(tx))[0]).toMatchObject({ numeroDaShift: true, phoneNumberId: "222" });
+    await expect(sincronizar(executar, id, "historico")).rejects.toThrow(/número da Shift/);
+
+    metaFalsa({ "333": { display_phone_number: "+55 54 90000-0000" }, "111/subscribed_apps": { success: true } });
+    await conectarNumero(executar, { ...fimDoFluxo, phoneNumberId: "333", numeroDaShift: true });
+    expect((await listarConexoes(tx)).filter((c) => c.numeroDaShift).map((c) => c.phoneNumberId)).toEqual(["333"]);
+  });
+
+  it("resposta pelo app entra na conversa como humana, uma vez, e pausa o agente", async () => {
+    vi.stubEnv("WHATSAPP_META_PHONE_NUMBER_ID", "222");
+    const contato = await leads.iniciarAtendimentoWhatsApp(tx, "5554988887777");
+    const eco = (id: string, para: string) => JSON.stringify({ object: "whatsapp_business_account", entry: [{ id: "111", changes: [{
+      field: "smb_message_echoes", value: { messaging_product: "whatsapp", metadata: { phone_number_id: "222" }, message_echoes: [{
+        from: "5554900000000", to: para, id, timestamp: String(Math.floor(Date.now() / 1000)), type: "text", text: { body: "Oi, aqui é o Bruno!" },
+      }] },
+    }] }] });
+    const enviar = (corpo: string) => POST_PRINCIPAL(new Request("https://crm.exemplo.com/api/whatsapp/webhook", {
+      method: "POST", body: corpo,
+      headers: { "x-hub-signature-256": `sha256=${createHmac("sha256", "segredo-do-app").update(corpo).digest("hex")}` },
+    }));
+
+    expect((await enviar(eco("wamid.APP1", "5554988887777"))).status).toBe(200);
+    expect((await enviar(eco("wamid.APP1", "5554988887777"))).status).toBe(200);
+    expect((await enviar(eco("wamid.APP2", "5554911112222"))).status).toBe(200);
+
+    expect(await leads.listarMensagensWhatsApp(tx, contato.leadId)).toMatchObject([{ autor: "humano", texto: "Oi, aqui é o Bruno!", estado: "enviado" }]);
+    expect(await leads.buscarAtendimentoWhatsApp(tx, "5554988887777")).toMatchObject({ modo: "humano" });
+    expect(await leads.buscarAtendimentoWhatsApp(tx, "5554911112222")).toBeNull();
   });
 });
 

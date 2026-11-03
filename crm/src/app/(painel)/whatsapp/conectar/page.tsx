@@ -32,8 +32,9 @@ export default async function Conectar() {
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">Conectar números</h1>
         <p className="mt-1 text-sm text-suave">
           Teste de coexistência: o número continua no app WhatsApp Business do celular e também passa a responder pela
-          API oficial, pelo app aprovado da Shift. As mensagens desses números não entram na caixa da Shift; aqui
-          aparece só a contagem dos avisos que a Meta manda.
+          API oficial, pelo app aprovado da Shift. As mensagens dos números de outras empresas não entram na caixa da
+          Shift; aqui aparece só a contagem dos avisos que a Meta manda. O número da própria Shift continua na caixa,
+          com o agente.
         </p>
       </header>
       <ConectarNumeros configuracao={configuracao} erroConfiguracao={erro} iniciais={JSON.parse(JSON.stringify(conexoes))} />
