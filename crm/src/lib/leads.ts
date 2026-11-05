@@ -370,6 +370,26 @@ export async function pausarSeRespostaHumana(tx: Consulta, whatsapp: string, tex
   return true;
 }
 
+/**
+ * Resposta mandada pelo app WhatsApp Business do número da Shift (coexistência):
+ * entra na conversa como humana e pausa o agente. Só para quem já é contato do
+ * CRM; conversa pessoal pelo app com quem não é lead não é registrada.
+ */
+export async function registrarRespostaPeloAppWhatsApp(
+  tx: Consulta, eco: { id: string; whatsapp: string; texto: string; tipo: string; enviadoEm: Date },
+): Promise<boolean> {
+  const atendimento = await buscarAtendimentoWhatsApp(tx, eco.whatsapp);
+  if (!atendimento) return false;
+  const { rows } = await tx.query<{ id: string }>(
+    `insert into crm.conversa_whatsapp (id, lead_id, autor, texto, tipo, criado_em, meta_id, estado)
+     values ($1, $2, 'humano', $3, $4, $5, $6, 'enviado') on conflict do nothing returning id`,
+    [`a:${eco.id}`, atendimento.leadId, eco.texto, eco.tipo, eco.enviadoEm, eco.id],
+  );
+  if (!rows.length) return false;
+  await pausarSeRespostaHumana(tx, eco.whatsapp, eco.texto);
+  return true;
+}
+
 export interface ConversaWhatsApp {
   leadId: string; nome: string; empresa: string | null; whatsapp: string;
   modo: 'agente' | 'humano'; resumo: string; ultimaMensagem: string | null;

@@ -20,6 +20,13 @@ const nextConfig: NextConfig = {
           { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],
       },
+      {
+        // Precaução para o login do Facebook (Embedded Signup): com
+        // "same-origin" o navegador não manda a origem da página para a Meta.
+        // Aqui vai só a origem, nunca o caminho completo.
+        source: "/whatsapp/conectar",
+        headers: [{ key: "Referrer-Policy", value: "strict-origin-when-cross-origin" }],
+      },
     ];
   },
 };

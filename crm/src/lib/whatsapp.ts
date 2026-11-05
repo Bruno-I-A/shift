@@ -2,29 +2,44 @@ import "server-only";
 
 import * as z from "zod";
 
+/*
+ * Cada parte do aviso é lida sozinha. Um aviso pode trazer, junto com as
+ * mensagens, partes de outros tipos (account_update, os de coexistência…);
+ * validar o aviso inteiro com "messages" descartaria as mensagens junto.
+ */
 const esquemaWebhookMeta = z.object({
   object: z.literal("whatsapp_business_account"),
   entry: z.array(z.object({
-    changes: z.array(z.object({
-      field: z.literal("messages"),
-      value: z.object({
-        metadata: z.object({ phone_number_id: z.string().min(1).max(100) }),
-        messages: z.array(z.object({
-          from: z.string().regex(/^\d{10,15}$/),
-          id: z.string().min(1).max(200),
-          timestamp: z.union([z.number(), z.string()]),
-          type: z.string(),
-          text: z.object({ body: z.string() }).optional(),
-          image: z.object({ caption: z.string().optional() }).optional(),
-          document: z.object({ filename: z.string().optional(), caption: z.string().optional() }).optional(),
-        })).optional(),
-        statuses: z.array(z.object({ id: z.string().min(1).max(200),
-          status: z.enum(['sent', 'delivered', 'read', 'failed']), timestamp: z.union([z.number(), z.string()]),
-        })).optional(),
-      }),
-    })),
+    changes: z.array(z.object({ field: z.string(), value: z.unknown() })),
   })),
 });
+
+const esquemaValorMensagens = z.object({
+  metadata: z.object({ phone_number_id: z.string().min(1).max(100) }),
+  messages: z.array(z.object({
+    from: z.string().regex(/^\d{10,15}$/),
+    id: z.string().min(1).max(200),
+    timestamp: z.union([z.number(), z.string()]),
+    type: z.string(),
+    text: z.object({ body: z.string() }).optional(),
+    image: z.object({ caption: z.string().optional() }).optional(),
+    document: z.object({ filename: z.string().optional(), caption: z.string().optional() }).optional(),
+  })).optional(),
+  statuses: z.array(z.object({ id: z.string().min(1).max(200),
+    status: z.enum(['sent', 'delivered', 'read', 'failed']), timestamp: z.union([z.number(), z.string()]),
+  })).optional(),
+});
+
+/** As partes "messages" do aviso que vieram para o número informado. */
+function valoresDeMensagens(corpo: unknown, phoneNumberId: string): z.infer<typeof esquemaValorMensagens>[] {
+  const lido = esquemaWebhookMeta.safeParse(corpo);
+  if (!lido.success) return [];
+  return lido.data.entry.flatMap((entrada) => entrada.changes).flatMap((mudanca) => {
+    if (mudanca.field !== "messages") return [];
+    const valor = esquemaValorMensagens.safeParse(mudanca.value);
+    return valor.success && valor.data.metadata.phone_number_id === phoneNumberId ? [valor.data] : [];
+  });
+}
 
 export interface MensagemRecebida { id: string; whatsapp: string; texto: string; tipo?: string; recebidoEm?: Date }
 
@@ -37,12 +52,8 @@ function recente(valor: number | string): boolean {
 
 /** Lê apenas textos recentes recebidos pelo número oficial configurado na Meta. */
 export function lerMensagensMeta(corpo: unknown, phoneNumberId: string, incluirMidias = false): MensagemRecebida[] {
-  const lido = esquemaWebhookMeta.safeParse(corpo);
-  if (!lido.success) return [];
-
-  return lido.data.entry.flatMap((entrada) => entrada.changes).flatMap((mudanca) => {
-    if (mudanca.value.metadata.phone_number_id !== phoneNumberId) return [];
-    return (mudanca.value.messages ?? []).flatMap((mensagem) => {
+  return valoresDeMensagens(corpo, phoneNumberId).flatMap((valor) => {
+    return (valor.messages ?? []).flatMap((mensagem) => {
       const tipos: Record<string, string> = { image: 'Imagem', audio: 'Áudio', video: 'Vídeo', document: 'Documento', sticker: 'Figurinha', location: 'Localização', contacts: 'Contato' };
       const legenda = mensagem.image?.caption || mensagem.document?.caption || mensagem.document?.filename || '';
       const texto = mensagem.type === 'text' ? mensagem.text?.body.trim()
@@ -57,14 +68,51 @@ export function lerMensagensMeta(corpo: unknown, phoneNumberId: string, incluirM
 }
 
 export function lerStatusMeta(corpo: unknown, phoneNumberId: string): { id: string; estado: string; ocorridoEm: Date }[] {
+  return valoresDeMensagens(corpo, phoneNumberId).flatMap(valor => (valor.statuses ?? []).flatMap(s => {
+    const n = Number(s.timestamp);
+    if (!Number.isFinite(n) || n <= 0) return [];
+    return [{ id: s.id, estado: s.status, ocorridoEm: new Date(n > 1_000_000_000_000 ? n : n * 1000) }];
+  }));
+}
+
+const esquemaValorEcos = z.object({
+  metadata: z.object({ phone_number_id: z.string().min(1).max(100) }),
+  message_echoes: z.array(z.object({
+    to: z.string().regex(/^\d{10,15}$/),
+    id: z.string().min(1).max(200),
+    timestamp: z.union([z.number(), z.string()]),
+    type: z.string(),
+    text: z.object({ body: z.string() }).optional(),
+    image: z.object({ caption: z.string().optional() }).optional(),
+    video: z.object({ caption: z.string().optional() }).optional(),
+    document: z.object({ filename: z.string().optional(), caption: z.string().optional() }).optional(),
+  })).optional(),
+});
+
+export interface MensagemPeloApp { id: string; whatsapp: string; texto: string; tipo: string; enviadoEm: Date }
+
+/**
+ * Mensagens que alguém mandou pelo app WhatsApp Business do número oficial
+ * (coexistência). São respostas humanas: entram na conversa e pausam o agente.
+ * Apagar e editar pelo app não mudam o histórico do CRM.
+ */
+export function lerEcosMeta(corpo: unknown, phoneNumberId: string): MensagemPeloApp[] {
   const lido = esquemaWebhookMeta.safeParse(corpo);
   if (!lido.success) return [];
-  return lido.data.entry.flatMap(e => e.changes).flatMap(c => c.value.metadata.phone_number_id !== phoneNumberId ? []
-    : (c.value.statuses ?? []).flatMap(s => {
-      const n = Number(s.timestamp);
-      if (!Number.isFinite(n) || n <= 0) return [];
-      return [{ id: s.id, estado: s.status, ocorridoEm: new Date(n > 1_000_000_000_000 ? n : n * 1000) }];
-    }));
+  const tipos: Record<string, string> = { image: "Imagem", video: "Vídeo", document: "Documento", audio: "Áudio", sticker: "Figurinha" };
+  return lido.data.entry.flatMap((entrada) => entrada.changes).flatMap((mudanca) => {
+    if (mudanca.field !== "smb_message_echoes") return [];
+    const valor = esquemaValorEcos.safeParse(mudanca.value);
+    if (!valor.success || valor.data.metadata.phone_number_id !== phoneNumberId) return [];
+    return (valor.data.message_echoes ?? []).flatMap((eco) => {
+      if (eco.type === "revoke" || eco.type === "edit" || !recente(eco.timestamp)) return [];
+      const legenda = eco.image?.caption || eco.video?.caption || eco.document?.caption || eco.document?.filename || "";
+      const texto = eco.type === "text" ? eco.text?.body.trim() : `[${tipos[eco.type] ?? "Mensagem não textual"} enviada pelo app]${legenda ? ` ${legenda}` : ""}`;
+      if (!texto || texto.length > 4000) return [];
+      const n = Number(eco.timestamp);
+      return [{ id: eco.id, whatsapp: eco.to, texto, tipo: eco.type, enviadoEm: new Date(n > 1_000_000_000_000 ? n : n * 1000) }];
+    });
+  });
 }
 
 export async function enviarTextoMeta(whatsapp: string, texto: string): Promise<string> {

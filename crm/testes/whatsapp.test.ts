@@ -37,6 +37,15 @@ describe("ponte oficial da Meta e base de conhecimento", () => {
     expect(lerMensagensMeta(antiga, "123456")).toEqual([]);
   });
 
+  it("lê as mensagens mesmo quando o aviso traz partes de outro tipo junto", () => {
+    const misto = structuredClone(evento) as { object: string; entry: { changes: { field: string; value: unknown }[] }[] };
+    misto.entry[0].changes.unshift(
+      { field: "account_update", value: { event: "PARTNER_ADDED", waba_info: { waba_id: "999" } } },
+      { field: "smb_message_echoes", value: { qualquer: "formato" } },
+    );
+    expect(lerMensagensMeta(misto, "123456")).toEqual([{ id: "wamid.ABC1", whatsapp: "5554999991234", texto: "Vocês atendem indústrias?" }]);
+  });
+
   it("encontra conteúdo publicado da Shift sobre o setor perguntado", () => {
     const trechos = buscarConhecimento("Vocês trabalham com indústria?");
     expect(trechos[0].texto).toMatch(/indústria/i);

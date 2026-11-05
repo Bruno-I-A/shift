@@ -204,23 +204,24 @@ export function precisaRenovar(renovadoEm: Date, expiraEm: Date, agora = new Dat
 // Cifra da permissão
 // -----------------------------------------------------------------------------
 
-function chaveDaCifra(segredo: string): Buffer {
+/** `uso` separa as chaves: a permissão de um serviço não abre a de outro. */
+function chaveDaCifra(segredo: string, uso: string): Buffer {
   if (!segredo || segredo.length < 32) throw new Error("SESSAO_SEGREDO ausente ou curto para cifrar a permissão.");
-  return Buffer.from(hkdfSync("sha256", segredo, "shift-crm", "permissao-instagram", 32));
+  return Buffer.from(hkdfSync("sha256", segredo, "shift-crm", uso, 32));
 }
 
 /** AES-256-GCM: `v1.<iv>.<etiqueta>.<cifrado>`, tudo em base64url. */
-export function cifrar(texto: string, segredo: string): string {
+export function cifrar(texto: string, segredo: string, uso = "permissao-instagram"): string {
   const iv = randomBytes(12);
-  const cifra = createCipheriv("aes-256-gcm", chaveDaCifra(segredo), iv);
+  const cifra = createCipheriv("aes-256-gcm", chaveDaCifra(segredo, uso), iv);
   const cifrado = Buffer.concat([cifra.update(texto, "utf8"), cifra.final()]);
   return ["v1", iv, cifra.getAuthTag(), cifrado].map((p) => (typeof p === "string" ? p : p.toString("base64url"))).join(".");
 }
 
-export function decifrar(guardado: string, segredo: string): string {
+export function decifrar(guardado: string, segredo: string, uso = "permissao-instagram"): string {
   const [versao, iv, etiqueta, cifrado] = guardado.split(".");
   if (versao !== "v1" || !iv || !etiqueta || !cifrado) throw new Error("Permissão guardada em formato desconhecido.");
-  const decifra = createDecipheriv("aes-256-gcm", chaveDaCifra(segredo), Buffer.from(iv, "base64url"));
+  const decifra = createDecipheriv("aes-256-gcm", chaveDaCifra(segredo, uso), Buffer.from(iv, "base64url"));
   decifra.setAuthTag(Buffer.from(etiqueta, "base64url"));
   return Buffer.concat([decifra.update(Buffer.from(cifrado, "base64url")), decifra.final()]).toString("utf8");
 }

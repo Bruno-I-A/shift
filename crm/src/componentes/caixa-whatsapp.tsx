@@ -154,7 +154,7 @@ export function CaixaWhatsApp({ iniciais, agenteAtivo, modelos = [], erroModelos
   return <div data-caixa-whatsapp className="flex h-[calc(100dvh-81px)] min-h-0 flex-col">
     <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
       <h1 className="text-lg font-semibold tracking-tight">WhatsApp</h1>
-      <span className="flex items-center gap-3"><Link href="/whatsapp/modelos" className="text-[11px] text-suave hover:text-texto">Modelos</Link><span className="text-[11px] text-apagado" role="status">{conexao}</span></span>
+      <span className="flex items-center gap-3"><Link href="/whatsapp/conectar" className="text-[11px] text-suave hover:text-texto">Conectar números</Link><Link href="/whatsapp/modelos" className="text-[11px] text-suave hover:text-texto">Modelos</Link><span className="text-[11px] text-apagado" role="status">{conexao}</span></span>
     </div>
     {!agenteAtivo && <p className="mb-2 shrink-0 text-xs text-destaque">Agente desligado · atendimento manual disponível</p>}
     {exclusao && <p role={exclusao.erro ? 'alert' : 'status'} className={`mb-2 shrink-0 text-xs ${exclusao.erro ? 'text-perigo' : 'text-sucesso'}`}>{exclusao.texto}</p>}
