@@ -153,7 +153,8 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
       config_id: configuracao.configId,
       response_type: "code",
       override_default_response_type: true,
-      extras: { setup: {}, featureType: "whatsapp_business_app_onboarding", sessionInfoVersion: "3" },
+      // Na v5 a conexão pelo app WhatsApp Business já vem ligada por padrão.
+      extras: { version: "v5" },
     });
   }
 
