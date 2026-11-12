@@ -92,12 +92,24 @@ async function lerNumero(phoneNumberId: string, token: string): Promise<EstadoNu
   }));
 }
 
+/** A conta do WhatsApp que a permissão alcança, lida com o token do app. */
+async function contaDaPermissao(token: string, c: ReturnType<typeof configuracaoConexoes>): Promise<string> {
+  const lido = z.object({ data: z.object({
+    granular_scopes: z.array(z.object({ scope: z.string(), target_ids: z.array(z.string().regex(ID)).optional() })).optional(),
+  }) }).parse(await graph("debug_token", { consulta: { input_token: token, access_token: `${c.appId}|${c.segredoApp}` } }));
+  const contas = new Set((lido.data.granular_scopes ?? [])
+    .filter((s) => s.scope === "whatsapp_business_management").flatMap((s) => s.target_ids ?? []));
+  if (contas.size !== 1) throw new ErroDeDominio("A Meta não informou qual conta do WhatsApp foi conectada. Tente de novo.");
+  return [...contas][0];
+}
+
 const esquemaConectar = z.object({
   codigo: z.string().min(10).max(4000),
-  wabaId: z.string().regex(ID),
+  wabaId: z.string().regex(ID).optional(),
   phoneNumberId: z.string().regex(ID).optional(),
   businessId: z.string().regex(ID).optional(),
-  evento: z.string().max(80),
+  /** Vem do aviso da sessão, que a v5 nem sempre entrega à página. */
+  evento: z.string().max(80).optional(),
   numeroDaShift: z.boolean().default(false),
 });
 
@@ -108,7 +120,7 @@ const esquemaConectar = z.object({
  */
 export async function conectarNumero(executar: Executor, entrada: unknown): Promise<{ id: string; numero: EstadoNumero }> {
   const d = esquemaConectar.parse(entrada);
-  if (d.evento !== "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING") {
+  if (d.evento && d.evento !== "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING") {
     throw new ErroDeDominio("Por enquanto só conectamos números que continuam no app WhatsApp Business (coexistência).");
   }
   const c = configuracaoConexoes();
@@ -116,21 +128,31 @@ export async function conectarNumero(executar: Executor, entrada: unknown): Prom
     await graph("oauth/access_token", { consulta: { client_id: c.appId, client_secret: c.segredoApp, code: d.codigo } }),
   );
 
+  // Sem o aviso da sessão, a conta sai da própria permissão: a Meta diz a que
+  // conta do WhatsApp ela dá acesso.
+  const wabaId = d.wabaId ?? await contaDaPermissao(token, c);
+  if (!d.wabaId) console.info("[whatsapp] conexão sem aviso da sessão; conta achada pela permissão.");
+
   let phoneNumberId = d.phoneNumberId;
   if (!phoneNumberId) {
     const lista = z.object({ data: z.array(z.object({ id: z.string().regex(ID) })) })
-      .parse(await graph(`${d.wabaId}/phone_numbers`, { token, consulta: { fields: "id" } }));
+      .parse(await graph(`${wabaId}/phone_numbers`, { token, consulta: { fields: "id" } }));
     if (lista.data.length !== 1) throw new ErroDeDominio("A Meta não informou qual número foi conectado. Tente de novo.");
     phoneNumberId = lista.data[0].id;
+  }
+
+  // Sem o evento, quem confirma a coexistência é o próprio número.
+  const numero = await lerNumero(phoneNumberId, token);
+  if (!d.evento && numero.is_on_biz_app !== true) {
+    throw new ErroDeDominio("Esse número não está no app WhatsApp Business. Por enquanto só conectamos números em coexistência.");
   }
 
   // Número de cliente: os avisos vão para o webhook separado, que só conta.
   // Número da Shift: sem desvio (POST sem corpo também desfaz um desvio
   // anterior), para o agente continuar atendendo pelo webhook principal.
-  await graph(`${d.wabaId}/subscribed_apps`, d.numeroDaShift
+  await graph(`${wabaId}/subscribed_apps`, d.numeroDaShift
     ? { token, metodo: "POST" }
     : { token, metodo: "POST", corpo: { override_callback_uri: c.webhook, verify_token: c.verifyToken } });
-  const numero = await lerNumero(phoneNumberId, token);
 
   const id = await executar(async (tx) => {
     if (d.numeroDaShift) {
@@ -147,7 +169,7 @@ export async function conectarNumero(executar: Executor, entrada: unknown): Prom
          numero_da_shift = excluded.numero_da_shift,
          sinc_contatos_id = null, sinc_contatos_em = null, sinc_historico_id = null, sinc_historico_em = null
        returning id`,
-      [d.wabaId, phoneNumberId, d.businessId ?? null, numero.display_phone_number ?? null,
+      [wabaId, phoneNumberId, d.businessId ?? null, numero.display_phone_number ?? null,
         numero.verified_name ?? null, cifrar(token, c.segredo, USO_DA_CIFRA), d.numeroDaShift],
     );
     await tx.query("insert into crm.evento (ator, tipo, dados) values ('bruno', 'whatsapp_numero_conectado', $1::jsonb)",

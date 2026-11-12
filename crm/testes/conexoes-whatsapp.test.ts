@@ -65,9 +65,9 @@ describe("conexão de número em coexistência", () => {
     const chamadas = metaFalsa();
     const resultado = await conectarNumero(executar, fimDoFluxo);
 
-    expect(chamadas.map((c) => c.caminho)).toEqual(["oauth/access_token", "111/subscribed_apps", "222"]);
+    expect(chamadas.map((c) => c.caminho)).toEqual(["oauth/access_token", "222", "111/subscribed_apps"]);
     expect(Object.fromEntries(chamadas[0].consulta)).toEqual({ client_id: "1234567890", client_secret: "segredo-do-app", code: fimDoFluxo.codigo });
-    expect(chamadas[1]).toMatchObject({
+    expect(chamadas[2]).toMatchObject({
       metodo: "POST", autorizacao: `Bearer ${TOKEN}`,
       corpo: { override_callback_uri: "https://crm.exemplo.com/api/whatsapp/conexoes/webhook", verify_token: "token-de-verificacao" },
     });
@@ -86,6 +86,32 @@ describe("conexão de número em coexistência", () => {
     await conectarNumero(executar, { ...fimDoFluxo, phoneNumberId: undefined });
     expect(chamadas.map((c) => c.caminho)).toContain("111/phone_numbers");
     expect((await listarConexoes(tx))[0].phoneNumberId).toBe("222");
+  });
+
+  it("sem o aviso da sessão, acha a conta pela permissão e confirma a coexistência no número", async () => {
+    const chamadas = metaFalsa({ debug_token: { data: { granular_scopes: [
+      { scope: "whatsapp_business_messaging", target_ids: ["111"] },
+      { scope: "whatsapp_business_management", target_ids: ["111"] },
+    ] } } });
+    await conectarNumero(executar, { codigo: fimDoFluxo.codigo });
+    expect(chamadas.map((c) => c.caminho)).toEqual(["oauth/access_token", "debug_token", "111/phone_numbers", "222", "111/subscribed_apps"]);
+    expect(Object.fromEntries(chamadas[1].consulta)).toEqual({ input_token: TOKEN, access_token: "1234567890|segredo-do-app" });
+    expect((await listarConexoes(tx))[0]).toMatchObject({ wabaId: "111", phoneNumberId: "222" });
+  });
+
+  it("sem o aviso da sessão, recusa número fora do app sem assinar a conta", async () => {
+    const chamadas = metaFalsa({
+      debug_token: { data: { granular_scopes: [{ scope: "whatsapp_business_management", target_ids: ["111"] }] } },
+      "222": { display_phone_number: "+55 54 99999-0000", is_on_biz_app: false, platform_type: "CLOUD_API" },
+    });
+    await expect(conectarNumero(executar, { codigo: fimDoFluxo.codigo })).rejects.toThrow(/app WhatsApp Business/);
+    expect(chamadas.map((c) => c.caminho)).not.toContain("111/subscribed_apps");
+    expect(await listarConexoes(tx)).toHaveLength(0);
+  });
+
+  it("sem o aviso da sessão, não escolhe entre contas", async () => {
+    metaFalsa({ debug_token: { data: { granular_scopes: [{ scope: "whatsapp_business_management", target_ids: ["111", "444"] }] } } });
+    await expect(conectarNumero(executar, { codigo: fimDoFluxo.codigo })).rejects.toThrow(/qual conta/);
   });
 
   it("recusa número novo (fora da coexistência) sem chamar a Meta", async () => {
@@ -127,7 +153,7 @@ describe("o número da própria Shift em coexistência", () => {
   it("assina a conta sem desviar os avisos, fica marcado e não sincroniza", async () => {
     const chamadas = metaFalsa();
     const { id } = await conectarNumero(executar, { ...fimDoFluxo, numeroDaShift: true });
-    expect(chamadas[1]).toMatchObject({ caminho: "111/subscribed_apps", metodo: "POST", corpo: undefined });
+    expect(chamadas[2]).toMatchObject({ caminho: "111/subscribed_apps", metodo: "POST", corpo: undefined });
     expect((await listarConexoes(tx))[0]).toMatchObject({ numeroDaShift: true, phoneNumberId: "222" });
     await expect(sincronizar(executar, id, "historico")).rejects.toThrow(/número da Shift/);
 

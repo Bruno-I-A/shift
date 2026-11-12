@@ -15,8 +15,8 @@ export async function GET(): Promise<Response> {
 
 const comando = z.discriminatedUnion("acao", [
   z.object({
-    acao: z.literal("conectar"), codigo: z.string(), waba_id: z.string(),
-    phone_number_id: z.string().optional(), business_id: z.string().optional(), evento: z.string(),
+    acao: z.literal("conectar"), codigo: z.string(), waba_id: z.string().optional(),
+    phone_number_id: z.string().optional(), business_id: z.string().optional(), evento: z.string().optional(),
     numero_da_shift: z.boolean().optional(),
   }),
   z.object({ acao: z.literal("conferir"), id: z.uuid() }),
@@ -35,8 +35,8 @@ export async function POST(pedido: Request): Promise<Response> {
     switch (d.acao) {
       case "conectar":
         return Response.json(await conectarNumero(emTransacao, {
-          codigo: d.codigo, wabaId: d.waba_id, phoneNumberId: d.phone_number_id || undefined,
-          businessId: d.business_id || undefined, evento: d.evento, numeroDaShift: d.numero_da_shift ?? false,
+          codigo: d.codigo, wabaId: d.waba_id || undefined, phoneNumberId: d.phone_number_id || undefined,
+          businessId: d.business_id || undefined, evento: d.evento || undefined, numeroDaShift: d.numero_da_shift ?? false,
         }));
       case "conferir":
         return Response.json({ numero: await conferirEstado(emTransacao, d.id) });

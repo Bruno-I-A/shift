@@ -79,13 +79,14 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
   const sessao = useRef<SessaoMeta | null>(null);
   const enviado = useRef(false);
 
-  const concluir = useCallback(async () => {
-    if (enviado.current || !codigo.current || !sessao.current?.waba_id) return;
+  /** `semAviso`: segue só com o código; o servidor acha a conta pela permissão. */
+  const concluir = useCallback(async (semAviso = false) => {
+    if (enviado.current || !codigo.current || (!sessao.current?.waba_id && !semAviso)) return;
     enviado.current = true;
     try {
       const r = await chamar({
-        acao: "conectar", codigo: codigo.current, waba_id: sessao.current.waba_id,
-        phone_number_id: sessao.current.phone_number_id, business_id: sessao.current.business_id, evento: sessao.current.event,
+        acao: "conectar", codigo: codigo.current, waba_id: sessao.current?.waba_id,
+        phone_number_id: sessao.current?.phone_number_id, business_id: sessao.current?.business_id, evento: sessao.current?.event,
         numero_da_shift: numeroDaShift.current,
       });
       const numero = r.numero as { display_phone_number?: string } | undefined;
@@ -124,6 +125,8 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
       if (dados?.type !== "WA_EMBEDDED_SIGNUP" || typeof dados.event !== "string") return;
       if (dados.event === "CANCEL") { setAviso({ texto: "Conexão cancelada antes do fim.", erro: true }); setConectando(false); return; }
       if (dados.event === "ERROR") { setAviso({ texto: "A Meta informou um erro no fluxo. Tente de novo.", erro: true }); setConectando(false); return; }
+      // Só os nomes, para entender o formato da v5 sem expor dados.
+      console.info("[whatsapp] aviso do cadastro:", dados.event, Object.keys(dados.data ?? {}));
       const texto = (chave: string) => (typeof dados.data?.[chave] === "string" ? (dados.data[chave] as string) : undefined);
       sessao.current = { event: dados.event, waba_id: texto("waba_id"), phone_number_id: texto("phone_number_id"), business_id: texto("business_id") };
       void concluir();
@@ -142,13 +145,8 @@ export function ConectarNumeros({ configuracao, erroConfiguracao, iniciais }: {
       if (!recebido) { setConectando(false); return; }
       codigo.current = recebido;
       void concluir();
-      // O código vale 30 segundos; se o aviso com o número não chegar, para aqui.
-      setTimeout(() => {
-        if (!enviado.current) {
-          setConectando(false);
-          setAviso({ texto: "A Meta não informou qual número foi conectado. Tente de novo.", erro: true });
-        }
-      }, 10_000);
+      // O código vale 30 segundos. Se o aviso da sessão não chegar logo, segue sem ele.
+      setTimeout(() => { void concluir(true); }, 3_000);
     }, {
       config_id: configuracao.configId,
       response_type: "code",
