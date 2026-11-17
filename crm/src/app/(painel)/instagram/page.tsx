@@ -29,6 +29,8 @@ const AVISOS: Record<string, { texto: string; bom?: boolean }> = {
   estado: { texto: "O retorno do Instagram não bateu com o pedido de login. Conecte de novo." },
   falhou: { texto: "O Instagram não concluiu o login. Tente de novo; se repetir, confira o app na Meta." },
   configuracao: { texto: "Falta configurar o app da Meta no Ambiente do Easypanel." },
+  extra: { texto: "Perfil conectado só para campanhas de comentário. Escolha-o em Comentários para DM.", bom: true },
+  "ja-principal": { texto: "Esse perfil já é a conta principal. Para o perfil de fundador, saia dele no Instagram e entre com o outro." },
 };
 
 const NOME_ESTADO: Record<string, string> = {

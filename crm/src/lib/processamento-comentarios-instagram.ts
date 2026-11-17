@@ -8,7 +8,7 @@ export async function processarComentarioInstagram():Promise<void>{
   if(process.env.INSTAGRAM_DIRECT_ATIVO!=='sim')return;
   const lote=await emTransacao(reservarComentarioInstagram);
   if(!lote)return;
-  const acesso=await emTransacao(acessoDaConta);
+  const acesso=await emTransacao(tx=>acessoDaConta(tx,lote.conta_id));
   if(!acesso || acesso.usuarioId!==lote.conta_id || acesso.expiraEm.getTime()<=Date.now()){
     await emTransacao(tx=>falharConsultaComentario(tx,lote,true));return;
   }

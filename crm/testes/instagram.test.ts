@@ -396,6 +396,23 @@ describe("agendador do Instagram", () => {
     expect((await instagram.acessoDaConta(tx))?.token).toBe("IGAA-renovada");
   });
 
+  it("renova também a permissão do perfil de fundador, sem tocar na principal", async () => {
+    const { tx } = await preparar();
+    await instagram.salvarConta(tx, { usuarioId: "2789", nomeUsuario: "bruno_fundador", token: "IGAA-fundador", expiraEm: daquiA(50 * 24 * 60) }, { principal: false });
+    await tx.query("update crm.conta_instagram set token_renovado_em = now() - interval '8 days' where usuario_id = '2789'");
+    const chamadas = meta(({ url }) =>
+      url.pathname === "/refresh_access_token"
+        ? { corpo: { access_token: "IGAA-fundador-renovada", token_type: "bearer", expires_in: 5_184_000 } }
+        : { status: 404, corpo: {} },
+    );
+    await passarAgendaInstagram();
+    expect(chamadas.filter((c) => c.url.pathname === "/refresh_access_token")).toHaveLength(1);
+    expect(chamadas[0].url.searchParams.get("access_token")).toBe("IGAA-fundador");
+    expect((await instagram.acessoDaConta(tx, "2789"))?.token).toBe("IGAA-fundador-renovada");
+    expect((await instagram.acessoDaConta(tx, "@Bruno_Fundador"))?.usuarioId).toBe("2789");
+    expect((await instagram.acessoDaConta(tx))?.token).toBe("IGAA-atual");
+  });
+
   it("sem app configurado ou sem conta, não chama a Meta", async () => {
     const { tx } = await preparar();
     await instagram.criarPublicacao(

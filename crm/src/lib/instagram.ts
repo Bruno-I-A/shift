@@ -57,57 +57,95 @@ export interface ContaInstagram {
   conectadaEm: Date;
   /** A permissão ainda vale. Calculado no banco, para a tela não depender do relógio. */
   valida: boolean;
+  /** A da Shift: publica e tem o agente no Direct. As outras só têm campanhas. */
+  principal: boolean;
+  comentariosAssinados: boolean;
 }
 
-export async function lerConta(tx: Consulta): Promise<ContaInstagram | null> {
-  const { rows } = await tx.query<ContaInstagram>(
-    `select usuario_id as "usuarioId", nome_usuario as "nomeUsuario", token_expira_em as "tokenExpiraEm",
+const COLUNAS_CONTA = `usuario_id as "usuarioId", nome_usuario as "nomeUsuario", token_expira_em as "tokenExpiraEm",
             token_renovado_em as "tokenRenovadoEm", conectada_em as "conectadaEm",
-            token_expira_em > now() as valida
-       from crm.conta_instagram`,
-  );
+            token_expira_em > now() as valida, principal, comentarios_assinados as "comentariosAssinados"`;
+
+/** A conta principal, a da Shift. */
+export async function lerConta(tx: Consulta): Promise<ContaInstagram | null> {
+  const { rows } = await tx.query<ContaInstagram>(`select ${COLUNAS_CONTA} from crm.conta_instagram where principal`);
   return rows[0] ?? null;
 }
 
+/** Todas as contas, a principal primeiro. */
+export async function listarContas(tx: Consulta): Promise<ContaInstagram[]> {
+  const { rows } = await tx.query<ContaInstagram>(
+    `select ${COLUNAS_CONTA} from crm.conta_instagram order by principal desc, conectada_em`,
+  );
+  return rows;
+}
+
+/**
+ * Guarda a permissão de uma conta. A principal substitui a anterior, como
+ * sempre foi. Uma conta extra (o perfil de fundador) entra ao lado e nunca
+ * toma o lugar da principal.
+ */
 export async function salvarConta(
   tx: Consulta,
   conta: { usuarioId: string; nomeUsuario: string; token: string; expiraEm: Date },
+  opcoes: { principal?: boolean } = {},
 ): Promise<void> {
+  const principal = opcoes.principal ?? true;
+  const valores = [conta.usuarioId, conta.nomeUsuario, cifrar(conta.token, segredo()), conta.expiraEm];
+  if (principal) {
+    await tx.query("delete from crm.conta_instagram where principal and usuario_id <> $1", [conta.usuarioId]);
+    await tx.query(
+      `insert into crm.conta_instagram (usuario_id, nome_usuario, token_cifrado, token_expira_em, principal)
+       values ($1, $2, $3, $4, true)
+       on conflict (usuario_id) do update
+          set nome_usuario = excluded.nome_usuario, token_cifrado = excluded.token_cifrado,
+              token_expira_em = excluded.token_expira_em, principal = true,
+              token_renovado_em = now(), conectada_em = now()`,
+      valores,
+    );
+    return;
+  }
+  const { rows } = await tx.query(
+    `insert into crm.conta_instagram (usuario_id, nome_usuario, token_cifrado, token_expira_em, principal)
+     values ($1, $2, $3, $4, false)
+     on conflict (usuario_id) do update
+        set nome_usuario = excluded.nome_usuario, token_cifrado = excluded.token_cifrado,
+            token_expira_em = excluded.token_expira_em, token_renovado_em = now(), conectada_em = now()
+      where not conta_instagram.principal
+     returning usuario_id`,
+    valores,
+  );
+  if (!rows.length) throw new ErroDeDominio("Essa conta já é a principal do CRM. Entre com o perfil de fundador.");
+}
+
+export interface AcessoDaConta { token: string; usuarioId: string; nomeUsuario: string; principal: boolean; renovadoEm: Date; expiraEm: Date }
+
+/** A permissão de uma conta, pelo ID ou pelo nome de usuário. Sem conta indicada, a principal. */
+export async function acessoDaConta(tx: Consulta, conta?: string): Promise<AcessoDaConta | null> {
+  const { rows } = await tx.query<Omit<AcessoDaConta, "token"> & { cifrado: string }>(
+    `select usuario_id as "usuarioId", nome_usuario as "nomeUsuario", principal, token_cifrado as cifrado,
+            token_renovado_em as "renovadoEm", token_expira_em as "expiraEm"
+       from crm.conta_instagram
+      where ${conta ? "usuario_id = $1 or lower(nome_usuario) = lower(ltrim($1, '@'))" : "principal"}`,
+    conta ? [conta] : [],
+  );
+  const lida = rows[0];
+  if (!lida) return null;
+  const { cifrado, ...resto } = lida;
+  return { ...resto, token: decifrar(cifrado, segredo()) };
+}
+
+export async function atualizarToken(tx: Consulta, usuarioId: string, token: string, expiraEm: Date): Promise<void> {
   await tx.query(
-    `insert into crm.conta_instagram (usuario_id, nome_usuario, token_cifrado, token_expira_em)
-     values ($1, $2, $3, $4)
-     on conflict (unica) do update
-        set usuario_id = excluded.usuario_id, nome_usuario = excluded.nome_usuario,
-            token_cifrado = excluded.token_cifrado, token_expira_em = excluded.token_expira_em,
-            direct_assinado = case when conta_instagram.usuario_id = excluded.usuario_id then conta_instagram.direct_assinado else false end,
-            comentarios_assinados = case when conta_instagram.usuario_id = excluded.usuario_id then conta_instagram.comentarios_assinados else false end,
-            token_renovado_em = now(), conectada_em = now()`,
-    [conta.usuarioId, conta.nomeUsuario, cifrar(conta.token, segredo()), conta.expiraEm],
+    "update crm.conta_instagram set token_cifrado = $2, token_expira_em = $3, token_renovado_em = now() where usuario_id = $1",
+    [usuarioId, cifrar(token, segredo()), expiraEm],
   );
 }
 
-export async function acessoDaConta(
-  tx: Consulta,
-): Promise<{ token: string; usuarioId: string; renovadoEm: Date; expiraEm: Date } | null> {
-  const { rows } = await tx.query<{ usuarioId: string; cifrado: string; renovadoEm: Date; expiraEm: Date }>(
-    `select usuario_id as "usuarioId", token_cifrado as cifrado, token_renovado_em as "renovadoEm",
-            token_expira_em as "expiraEm"
-       from crm.conta_instagram`,
-  );
-  const conta = rows[0];
-  if (!conta) return null;
-  return { token: decifrar(conta.cifrado, segredo()), usuarioId: conta.usuarioId, renovadoEm: conta.renovadoEm, expiraEm: conta.expiraEm };
-}
-
-export async function atualizarToken(tx: Consulta, token: string, expiraEm: Date): Promise<void> {
-  await tx.query(
-    "update crm.conta_instagram set token_cifrado = $1, token_expira_em = $2, token_renovado_em = now()",
-    [cifrar(token, segredo()), expiraEm],
-  );
-}
-
-export async function desconectarConta(tx: Consulta): Promise<void> {
-  await tx.query("delete from crm.conta_instagram");
+/** Sem conta indicada, desconecta a principal. */
+export async function desconectarConta(tx: Consulta, usuarioId?: string): Promise<void> {
+  if (usuarioId) await tx.query("delete from crm.conta_instagram where usuario_id = $1", [usuarioId]);
+  else await tx.query("delete from crm.conta_instagram where principal");
 }
 
 // -----------------------------------------------------------------------------

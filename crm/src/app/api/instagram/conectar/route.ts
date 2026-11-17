@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { COOKIE_ESTADO, configuracaoInstagram, urlDeAutorizacao } from "@/lib/instagram-meta";
+import { COOKIE_ESTADO, COOKIE_EXTRA, configuracaoInstagram, urlDeAutorizacao } from "@/lib/instagram-meta";
 import { temSessao } from "@/lib/sessao";
 
 /**
@@ -13,20 +13,26 @@ import { temSessao } from "@/lib/sessao";
  */
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+/** `?conta=extra` conecta um perfil ao lado da conta principal, só para campanhas. */
+export async function GET(pedido: Request) {
   if (!(await temSessao())) redirect("/entrar");
+  const extra = new URL(pedido.url).searchParams.get("conta") === "extra";
 
   let destino: string;
   try {
     const estado = randomBytes(24).toString("base64url");
     destino = urlDeAutorizacao(estado, configuracaoInstagram());
-    (await cookies()).set(COOKIE_ESTADO, estado, {
+    const deposito = await cookies();
+    const opcoes = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "lax" as const,
       path: "/api/instagram",
       maxAge: 10 * 60,
-    });
+    };
+    deposito.set(COOKIE_ESTADO, estado, opcoes);
+    if (extra) deposito.set(COOKIE_EXTRA, "sim", opcoes);
+    else deposito.delete({ name: COOKIE_EXTRA, path: "/api/instagram" });
   } catch {
     redirect("/instagram?aviso=configuracao");
   }
