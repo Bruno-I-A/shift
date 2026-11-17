@@ -1,5 +1,5 @@
 import { emTransacao } from '@/lib/banco';
-import { lerConta } from '@/lib/instagram';
+import { listarContas } from '@/lib/instagram';
 import { assinaturaDirectValida, lerEventosDirect } from '@/lib/instagram-direct-meta';
 import { receberDirect } from '@/lib/leads';
 import { receberComentarioInstagram } from '@/lib/leads';
@@ -26,11 +26,12 @@ export async function POST(pedido:Request):Promise<Response> {
   let objeto:unknown;
   try { objeto=JSON.parse(corpo); } catch { return new Response(null,{status:400}); }
   try {
-    const conta=await emTransacao(lerConta);
-    if (!conta) return Response.json({recebidas:0});
-    const eventos=lerEventosDirect(objeto,conta.usuarioId);
+    const contas=await emTransacao(listarContas);
+    const principal=contas.find(c=>c.principal);
+    // O Direct das contas extras é respondido pelo dono, no app: o CRM não lê.
+    const eventos=principal?lerEventosDirect(objeto,principal.usuarioId):[];
     for (const e of eventos) await emTransacao(tx=>receberDirect(tx,e,process.env.INSTAGRAM_DIRECT_ATIVO==='sim'));
-    const comentarios=lerComentariosInstagram(objeto,conta.usuarioId);
+    const comentarios=contas.flatMap(c=>lerComentariosInstagram(objeto,c.usuarioId));
     let enfileirados=0;
     for(const c of comentarios)if(await emTransacao(tx=>receberComentarioInstagram(tx,c)))enfileirados++;
     if(comentarios.length)console.info(`[instagram-comentarios] recebidos=${comentarios.length}; enfileirados=${enfileirados}`);

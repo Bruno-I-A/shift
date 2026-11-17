@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHmac } from 'node:crypto';
-const mocks=vi.hoisted(()=>({receber:vi.fn(),comentario:vi.fn(),conta:vi.fn(),tx:vi.fn(),sessao:vi.fn()}));
+const mocks=vi.hoisted(()=>({receber:vi.fn(),comentario:vi.fn(),conta:vi.fn(),contas:vi.fn(),tx:vi.fn(),sessao:vi.fn()}));
 vi.mock('@/lib/banco',()=>({emTransacao:async(f:(tx:unknown)=>unknown)=>f(mocks.tx)}));
-vi.mock('@/lib/instagram',()=>({lerConta:mocks.conta,acessoDaConta:vi.fn()}));
+vi.mock('@/lib/instagram',()=>({lerConta:mocks.conta,listarContas:mocks.contas,acessoDaConta:vi.fn()}));
 vi.mock('@/lib/leads',()=>({receberDirect:mocks.receber,receberComentarioInstagram:mocks.comentario,listarDirect:vi.fn(),historicoDirect:vi.fn(),mudarModoDirect:vi.fn(),prepararManualDirect:vi.fn()}));
 vi.mock('@/lib/sessao',()=>({temSessao:mocks.sessao}));
 import { GET, POST } from '@/app/api/instagram/webhook/route';
@@ -12,6 +12,7 @@ beforeEach(()=>{
   vi.stubEnv('INSTAGRAM_WEBHOOK_APP_SECRET','');vi.stubEnv('INSTAGRAM_WEBHOOK_VERIFY_TOKEN','verificacao');
   vi.stubEnv('INSTAGRAM_DIRECT_ATIVO','sim');
   mocks.conta.mockResolvedValue({usuarioId:'17841400000001'});
+  mocks.contas.mockResolvedValue([{usuarioId:'17841400000001',principal:true},{usuarioId:'17841400000009',principal:false}]);
   mocks.sessao.mockResolvedValue(true);
 });
 afterEach(()=>vi.unstubAllEnvs());
@@ -21,6 +22,17 @@ function pedido(corpo:string,segredo='segredo') {
   },body:corpo});
 }
 describe('webhook do Direct',()=>{
+  it('leva à fila os comentários do perfil de fundador e ignora o Direct dele',async()=>{
+    const corpo=JSON.stringify({object:'instagram',entry:[
+      {id:'17841400000009',changes:[{field:'comments',value:{id:'101',from:{id:'201'},media:{id:'301'},text:'QUERO'}}]},
+      {id:'17841400000009',time:Date.now(),messaging:[{sender:{id:'201'},recipient:{id:'17841400000009'},timestamp:Date.now(),message:{mid:'m-1',text:'oi'}}]},
+    ]});
+    mocks.comentario.mockResolvedValueOnce(true);
+    const resposta=await POST(pedido(corpo));
+    expect(resposta.status).toBe(200);expect(await resposta.json()).toMatchObject({recebidas:0,comentarios:1});
+    expect(mocks.comentario).toHaveBeenCalledWith(mocks.tx,expect.objectContaining({conta:'17841400000009',id:'101'}));
+    expect(mocks.receber).not.toHaveBeenCalled();
+  });
   it('encaminha comentários autenticados à fila e pede reentrega se não conseguir persistir',async()=>{
     const corpo=JSON.stringify({object:'instagram',entry:[{id:'17841400000001',changes:[{field:'comments',value:{
       id:'100',from:{id:'200'},media:{id:'300'},text:'QUERO',

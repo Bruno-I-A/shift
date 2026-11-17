@@ -22,6 +22,8 @@ const ESCOPOS = ["instagram_business_basic", "instagram_business_content_publish
 
 /** O `state` do login, guardado entre a ida ao Instagram e o retorno. */
 export const COOKIE_ESTADO = "crm_instagram_estado";
+/** Marca que o login em andamento é de uma conta extra (o perfil de fundador). */
+export const COOKIE_EXTRA = "crm_instagram_extra";
 
 export interface ConfiguracaoInstagram {
   appId: string;

@@ -1066,8 +1066,23 @@ export async function enviarRespostaComentario(tx:Consulta,lote:RespostaComentar
   if(process.env.INSTAGRAM_DIRECT_ATIVO!=='sim'){
     await tx.query("update crm.resposta_comentario_instagram set estado='cancelada',erro='Atendimento automático desligado.' where id=$1",[lote.id]);return;
   }
-  const {rows:contas}=await tx.query('select 1 from crm.conta_instagram where usuario_id=$1 and comentarios_assinados and direct_assinado and token_expira_em>now() for share',[lote.conta_id]);
+  const {rows:contas}=await tx.query<{principal:boolean}>('select principal from crm.conta_instagram where usuario_id=$1 and comentarios_assinados and direct_assinado and token_expira_em>now() for share',[lote.conta_id]);
   if(!contas.length){await tx.query("update crm.resposta_comentario_instagram set estado='cancelada',erro='Conta desconectada.' where id=$1",[lote.id]);return;}
+  if(!contas[0].principal){
+    // Conta extra (perfil de fundador): o CRM só entrega a DM. A conversa segue no app, com o dono.
+    let enviado:{id:string;contato:string};
+    try{enviado=await enviar();}catch(erro){
+      const rejeitado=erro instanceof Error && 'rejeitado' in erro && erro.rejeitado===true;
+      await tx.query(`update crm.resposta_comentario_instagram set estado=$2,erro=$3 where id=$1`,[lote.id,rejeitado?'falhou':'incerta',
+        rejeitado?'A Meta recusou o envio. Verifique as permissões e o comentário.':'Envio sem confirmação. Confira no Instagram; não reenviar.']);
+      return;
+    }
+    const outro=enviado.contato!==lote.contato_id;
+    await tx.query(`update crm.resposta_comentario_instagram set estado=$3,meta_id=$2,enviada_em=case when $3='enviada' then now() end,
+      erro=case when $3='enviada' then null else 'A Meta retornou outro identificador de destinatário. Confira no Instagram.' end where id=$1`,
+      [lote.id,enviado.id,outro?'incerta':'enviada']);
+    return;
+  }
   const {rows}=await tx.query<{id:string}>(`insert into crm.conversa_instagram(conta_id,contato_id,ultima_recebida)
     values($1,$2,to_timestamp(0)) on conflict(conta_id,contato_id) do update set atualizada_em=now() returning id`,[lote.conta_id,lote.contato_id]);
   const c=await travarDirect(tx,rows[0].id);

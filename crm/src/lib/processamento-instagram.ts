@@ -30,6 +30,8 @@ const estado = globalThis as unknown as {
   agendaInstagram?: ReturnType<typeof setInterval>;
   passandoInstagram?: boolean;
   ultimaRenovacaoInstagram?: number;
+  /** Última tentativa de renovar cada conta extra, por ID. */
+  renovacaoContasExtras?: Map<string, number>;
   ultimaLimpezaInstagram?: number;
 };
 
@@ -131,7 +133,7 @@ async function acessoValido(): Promise<Acesso | null> {
     estado.ultimaRenovacaoInstagram = agora;
     try {
       const novo = await renovarToken(conta.token);
-      await emTransacao((tx) => instagram.atualizarToken(tx, novo.token, novo.expiraEm));
+      await emTransacao((tx) => instagram.atualizarToken(tx, conta.usuarioId, novo.token, novo.expiraEm));
       return { token: novo.token, usuarioId: conta.usuarioId };
     } catch {
       console.error("[instagram] não renovou a permissão; nova tentativa em uma hora.");
@@ -139,6 +141,28 @@ async function acessoValido(): Promise<Acesso | null> {
   }
   if (new Date(conta.expiraEm).getTime() <= agora) return null;
   return { token: conta.token, usuarioId: conta.usuarioId };
+}
+
+/**
+ * As contas extras (o perfil de fundador) não publicam, mas a permissão delas
+ * também vence em 60 dias. Uma tentativa por hora por conta.
+ */
+export async function renovarContasExtras(): Promise<void> {
+  const contas = (await emTransacao(instagram.listarContas)).filter((c) => !c.principal && c.valida);
+  const tentativas = (estado.renovacaoContasExtras ??= new Map());
+  const agora = Date.now();
+  for (const c of contas) {
+    if (!precisaRenovar(c.tokenRenovadoEm, c.tokenExpiraEm) || agora - (tentativas.get(c.usuarioId) ?? 0) <= 3_600_000) continue;
+    tentativas.set(c.usuarioId, agora);
+    try {
+      const acesso = await emTransacao((tx) => instagram.acessoDaConta(tx, c.usuarioId));
+      if (!acesso) continue;
+      const novo = await renovarToken(acesso.token);
+      await emTransacao((tx) => instagram.atualizarToken(tx, c.usuarioId, novo.token, novo.expiraEm));
+    } catch {
+      console.error("[instagram] não renovou a permissão de uma conta extra; nova tentativa em uma hora.");
+    }
+  }
 }
 
 /** Uma passagem. Exportada para o teste ensaiar sem relógio. */
@@ -151,6 +175,8 @@ export async function passarAgendaInstagram(): Promise<void> {
     const antigos = await emTransacao(instagram.liberarArquivosAntigos);
     if (antigos.length) await apagarArquivos(antigos).catch(() => {});
   }
+
+  await renovarContasExtras();
 
   const acesso = await acessoValido();
   if (!acesso) return;

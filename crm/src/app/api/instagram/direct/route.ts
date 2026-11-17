@@ -21,7 +21,7 @@ export async function GET(pedido:Request):Promise<Response> {
       const {rows}=await tx.query('select 1 from crm.conversa_instagram where id=$1 and conta_id=$2',[id,conta?.usuarioId||'']);
       if (!rows.length) throw new ErroDeDominio('Conversa não encontrada.');
     }
-    const {rows:estado}=await tx.query<{direct_assinado:boolean}>('select direct_assinado from crm.conta_instagram');
+    const {rows:estado}=await tx.query<{direct_assinado:boolean}>('select direct_assinado from crm.conta_instagram where principal');
     return {conta,ativo:process.env.INSTAGRAM_DIRECT_ATIVO==='sim',assinado:estado[0]?.direct_assinado||false,
       conversas,mensagens:id?await historicoDirect(tx,id,antes||undefined):[]};
   }).catch(()=>null);

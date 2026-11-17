@@ -1,7 +1,7 @@
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
 import {bancoDeTeste} from './banco-de-teste';
 import {emTransacao} from '@/lib/banco';
-import {salvarConta} from '@/lib/instagram';
+import {salvarConta,listarContas,lerConta} from '@/lib/instagram';
 import * as leads from '@/lib/leads';
 import {processarComentarioInstagram} from '@/lib/processamento-comentarios-instagram';
 import {ErroComentarioMeta,enviarRespostaPrivada,assinarComentariosInstagram} from '@/lib/comentarios-instagram-meta';
@@ -182,5 +182,50 @@ describe('campanhas do Instagram com banco restrito',()=>{
     await db.exec("reset role; update crm.resposta_comentario_instagram set recebida_em=now()-interval '91 days'; set role shift_crm_app");
     await tx.query('select crm.limpar_comentarios_instagram()');
     expect((await leads.listarCampanhasInstagram(tx,conta)).respostas).toHaveLength(0);
+  });
+});
+
+describe('perfil de fundador ao lado da conta da Shift',()=>{
+  const fundador='17841400000009';
+  async function comFundador(){
+    const b=await iniciar();
+    await salvarConta(b.tx,{usuarioId:fundador,nomeUsuario:'bruno_fundador',token:'token-falso-fundador',expiraEm:new Date(Date.now()+86400_000)},{principal:false});
+    await b.tx.query('update crm.conta_instagram set comentarios_assinados=true,direct_assinado=true where usuario_id=$1',[fundador]);
+    await leads.salvarCampanhaInstagram(b.tx,fundador,{...dados,contexto:''},'https://www.instagram.com/p/fundador/');
+    return b;
+  }
+  it('entra ao lado da principal, não a substitui e não vira principal por engano',async()=>{
+    const {tx}=await comFundador();
+    expect((await listarContas(tx)).map(c=>[c.nomeUsuario,c.principal])).toEqual([['shift_systemss',true],['bruno_fundador',false]]);
+    expect((await lerConta(tx))?.usuarioId).toBe(conta);
+    await expect(salvarConta(tx,{usuarioId:conta,nomeUsuario:'shift_systemss',token:'x',expiraEm:new Date(Date.now()+86400_000)},{principal:false}))
+      .rejects.toThrow('já é a principal');
+    // Reconectar a principal mantém o perfil de fundador.
+    await salvarConta(tx,{usuarioId:conta,nomeUsuario:'shift_systemss',token:'token-novo',expiraEm:new Date(Date.now()+86400_000)});
+    expect(await listarContas(tx)).toHaveLength(2);
+  });
+  it('manda só a DM da campanha, sem abrir conversa nem chamar IA',async()=>{
+    const {tx}=await comFundador();
+    expect(await leads.receberComentarioInstagram(tx,comentario('500',{conta:fundador}))).toBe(true);
+    const lote=(await leads.reservarComentarioInstagram(tx))!;
+    expect(lote.conta_id).toBe(fundador);
+    expect(await leads.prepararRespostaComentario(tx,lote,'QUERO',new Date())).toBe(true);
+    const enviar=vi.fn().mockResolvedValue({id:'mid-fundador',contato});
+    await leads.enviarRespostaComentario(tx,lote,enviar);
+    expect(enviar).toHaveBeenCalledTimes(1);
+    expect((await leads.listarCampanhasInstagram(tx,fundador)).respostas[0]).toMatchObject({estado:'enviada',meta_id:'mid-fundador'});
+    expect((await tx.query('select * from crm.conversa_instagram where conta_id=$1',[fundador])).rows).toHaveLength(0);
+    expect((await tx.query('select * from crm.uso_ia_instagram')).rows).toHaveLength(0);
+  });
+  it('o worker usa a permissão da conta do comentário',async()=>{
+    await comFundador();
+    const fetch=vi.fn().mockResolvedValueOnce(Response.json({id:'600',text:'QUERO',timestamp:new Date().toISOString()}))
+      .mockResolvedValueOnce(Response.json({message_id:'privada-fundador',recipient_id:contato}));
+    vi.stubGlobal('fetch',fetch);
+    await emTransacao(t=>leads.receberComentarioInstagram(t,comentario('600',{conta:fundador})));
+    await processarComentarioInstagram();await processarComentarioInstagram();
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(String(fetch.mock.calls[1][0])).toContain(fundador);
+    expect(fetch.mock.calls[1][1].headers.Authorization).toBe('Bearer token-falso-fundador');
   });
 });
