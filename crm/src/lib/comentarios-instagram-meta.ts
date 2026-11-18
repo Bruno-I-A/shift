@@ -38,3 +38,8 @@ export async function enviarRespostaPrivada(acesso:Acesso,comentarioId:string,te
   }));
   return {id:r.message_id,contato:r.recipient_id};
 }
+/** Resposta pública ao comentário, visível no post. */
+export async function responderComentarioPublico(acesso:Acesso,comentarioId:string,texto:string):Promise<string>{
+  const r=z.object({id}).parse(await chamar(acesso,`${id.parse(comentarioId)}/replies`,{message:z.string().min(1).max(300).parse(texto)}));
+  return r.id;
+}

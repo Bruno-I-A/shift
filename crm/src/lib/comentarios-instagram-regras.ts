@@ -8,6 +8,11 @@ export function palavrasDaCampanha(texto:string):string[] {
   const palavras=[...new Set(texto.split(/[,;\n]/).map(normalizarPalavra).filter(Boolean))];
   return z.array(z.string().min(1).max(60)).min(1).max(10).parse(palavras);
 }
+/** Respostas públicas ao comentário: uma por linha, até 3, cada uma com até 300 caracteres. */
+export function respostasPublicasDaCampanha(texto:string):string[] {
+  const linhas=[...new Set(texto.split(/\r?\n/).map(l=>l.trim()).filter(Boolean))];
+  return z.array(z.string().min(1).max(300)).max(3).parse(linhas);
+}
 /** Palavra inteira/frase, sem disparar por substring ou por uma negação direta. */
 export function correspondeComentario(texto:string,palavras:string[]):boolean {
   const termos=normalizarPalavra(texto).split(' ');

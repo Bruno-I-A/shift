@@ -2,14 +2,15 @@
 import Link from 'next/link';
 import {useCallback,useEffect,useState} from 'react';
 
-interface Campanha{id:string;nome:string;midia_id:string;link:string;palavras:string[];mensagem:string;contexto:string;ativa:boolean}
-interface Resposta{id:string;campanha_id:string;texto:string;mensagem:string;estado:string;erro:string|null;recebida_em:string}
+interface Campanha{id:string;nome:string;midia_id:string;link:string;palavras:string[];mensagem:string;contexto:string;ativa:boolean;respostas_publicas:string[]}
+interface Resposta{id:string;campanha_id:string;texto:string;mensagem:string;estado:string;erro:string|null;recebida_em:string;resposta_publica_estado:string|null;resposta_publica_erro:string|null}
 interface Midia{id:string;caption:string;permalink:string}
 interface Conta{usuarioId:string;nomeUsuario:string;principal:boolean;valida:boolean}
 interface Dados{conta:{usuarioId:string;nomeUsuario:string;principal:boolean}|null;contas:Conta[];ativo:boolean;assinado:boolean;campanhas:Campanha[];respostas:Resposta[];midias?:Midia[]}
 const botao='rounded-md border border-linha px-3 py-2 text-sm hover:bg-superficie-2 disabled:opacity-50';
 const campo='mt-1 w-full rounded-md border border-linha bg-fundo px-3 py-2 text-sm';
-const vazio={id:'',midiaId:'',nome:'',palavras:'QUERO',mensagem:'',contexto:''};
+const vazio={id:'',midiaId:'',nome:'',palavras:'QUERO',mensagem:'',contexto:'',respostasPublicas:''};
+const publicas:Record<string,string>={pendente:'resposta no comentário na fila',enviando:'respondendo o comentário',enviada:'comentário respondido',falhou:'resposta no comentário recusada',incerta:'resposta no comentário sem confirmação'};
 const estados:Record<string,string>={pendente:'Na fila',preparando:'Preparando',enviada:'DM enviada',falhou:'Falha confirmada',incerta:'Envio sem confirmação',cancelada:'Cancelada'};
 export function CampanhasInstagram(){
   const [dados,setDados]=useState<Dados|null>(null),[midias,setMidias]=useState<Midia[]>([]);
@@ -36,7 +37,7 @@ export function CampanhasInstagram(){
     }catch(e){setErro(e instanceof Error?e.message:'Falha de conexão.');return false;}
     finally{setOcupado(false);}
   }
-  function editar(c:Campanha){setForm({id:c.id,midiaId:c.midia_id,nome:c.nome,palavras:c.palavras.join(', '),mensagem:c.mensagem,contexto:c.contexto});setAviso('Ao salvar alterações, a campanha fica pausada para você conferir e ativar.');}
+  function editar(c:Campanha){setForm({id:c.id,midiaId:c.midia_id,nome:c.nome,palavras:c.palavras.join(', '),mensagem:c.mensagem,contexto:c.contexto,respostasPublicas:(c.respostas_publicas||[]).join('\n')});setAviso('Ao salvar alterações, a campanha fica pausada para você conferir e ativar.');}
   const opcoes=[...midias];
   if(form.midiaId&&!opcoes.some(m=>m.id===form.midiaId)){
     const c=dados?.campanhas.find(c=>c.id===form.id);if(c)opcoes.unshift({id:c.midia_id,caption:c.nome,permalink:c.link});
@@ -66,16 +67,18 @@ export function CampanhasInstagram(){
         <label className="block text-sm">Palavras ou frases<input required maxLength={650} className={campo} value={form.palavras} onChange={e=>setForm({...form,palavras:e.target.value})} placeholder="QUERO, EU QUERO"/></label>
         <p className="text-xs text-apagado">Separe por vírgula. Não diferencia maiúsculas ou acentos.</p>
         <label className="block text-sm">DM enviada ao comentar<textarea required rows={4} maxLength={1000} className={`${campo} resize-y`} value={form.mensagem} onChange={e=>setForm({...form,mensagem:e.target.value})} placeholder="Aqui está o material que você pediu: https://… Quer me contar o que você precisa?"/></label>
+        <label className="block text-sm">Resposta no comentário (opcional)<textarea rows={3} maxLength={1000} className={`${campo} resize-y`} value={form.respostasPublicas} onChange={e=>setForm({...form,respostasPublicas:e.target.value})} placeholder={'Enviado na sua DM, confere lá!\nTe mandei no Direct 👊'}/></label>
+        <p className="text-xs text-apagado">Até 3, uma por linha. O CRM alterna entre elas e só responde depois que a DM foi entregue.</p>
         {!extra&&<label className="block text-sm">Contexto para o agente<textarea rows={2} maxLength={1000} className={`${campo} resize-y`} value={form.contexto} onChange={e=>setForm({...form,contexto:e.target.value})} placeholder="O que a publicação oferece? Informação interna para continuar a conversa."/></label>}
         <div className="flex gap-2"><button className={botao} disabled={ocupado}>Salvar como pausada</button>{form.id&&<button className={botao} type="button" onClick={()=>{setForm(vazio);setAviso('');}}>Cancelar edição</button>}</div>
         <p className="text-xs text-apagado">Uma DM por pessoa nesta campanha enquanto o histórico for mantido (90 dias). {extra?'Quando ela responder, a conversa aparece no seu Direct.':'O agente continua quando ela responder; o comentário não abre a janela de atendimento.'}</p>
       </form>
       <div className="space-y-3"><h2 className="font-medium">Campanhas</h2>{dados?.campanhas.length===0&&<p className="text-sm text-apagado">Crie a primeira campanha para uma publicação desta conta.</p>}
-        {dados?.campanhas.map(c=><article key={c.id} className="space-y-3 rounded-lg border border-linha p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-medium">{c.nome}</h3><span className={`text-xs ${c.ativa?'text-sucesso':'text-apagado'}`}>{c.ativa?'Ativa':'Pausada'}</span></div><p className="text-xs text-suave">Comentou: {c.palavras.join(' · ')}</p><p className="rounded-md bg-superficie-2 p-3 text-sm whitespace-pre-wrap break-words">{c.mensagem}</p><div className="flex flex-wrap gap-2"><a className={botao} href={c.link} target="_blank" rel="noopener noreferrer">Ver publicação ↗</a><button className={botao} disabled={ocupado} onClick={()=>editar(c)}>Editar</button><button className={botao} disabled={ocupado} onClick={()=>void agir({acao:'ativar',id:c.id,ativa:!c.ativa})}>{c.ativa?'Pausar':'Ativar'}</button></div></article>)}
+        {dados?.campanhas.map(c=><article key={c.id} className="space-y-3 rounded-lg border border-linha p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-medium">{c.nome}</h3><span className={`text-xs ${c.ativa?'text-sucesso':'text-apagado'}`}>{c.ativa?'Ativa':'Pausada'}</span></div><p className="text-xs text-suave">Comentou: {c.palavras.join(' · ')}</p>{c.respostas_publicas?.length>0&&<p className="text-xs text-suave">Responde no comentário: {c.respostas_publicas.join(' · ')}</p>}<p className="rounded-md bg-superficie-2 p-3 text-sm whitespace-pre-wrap break-words">{c.mensagem}</p><div className="flex flex-wrap gap-2"><a className={botao} href={c.link} target="_blank" rel="noopener noreferrer">Ver publicação ↗</a><button className={botao} disabled={ocupado} onClick={()=>editar(c)}>Editar</button><button className={botao} disabled={ocupado} onClick={()=>void agir({acao:'ativar',id:c.id,ativa:!c.ativa})}>{c.ativa?'Pausar':'Ativar'}</button></div></article>)}
       </div>
     </div>
     <section className="space-y-3"><h2 className="font-medium">Últimos envios</h2>{dados?.respostas.length===0&&<p className="text-sm text-apagado">Comentários que combinarem com uma campanha ativa aparecerão aqui.</p>}
-      <ul className="divide-y divide-linha rounded-lg border border-linha">{dados?.respostas.map(r=><li className="space-y-1 p-3 text-sm" key={r.id}><div className="flex flex-wrap justify-between gap-2"><strong>{dados.campanhas.find(c=>c.id===r.campanha_id)?.nome||'Campanha'}</strong><span className="text-xs text-suave">{estados[r.estado]||r.estado} · {new Date(r.recebida_em).toLocaleString('pt-BR')}</span></div><p className="line-clamp-2 break-words text-suave">Comentário: {r.texto}</p>{r.erro&&<p className="text-xs text-perigo">{r.erro}</p>}{r.estado==='falhou'&&<button className={botao} disabled={ocupado} onClick={()=>void agir({acao:'repetir',id:r.id})}>Tentar novamente</button>}</li>)}</ul>
+      <ul className="divide-y divide-linha rounded-lg border border-linha">{dados?.respostas.map(r=><li className="space-y-1 p-3 text-sm" key={r.id}><div className="flex flex-wrap justify-between gap-2"><strong>{dados.campanhas.find(c=>c.id===r.campanha_id)?.nome||'Campanha'}</strong><span className="text-xs text-suave">{estados[r.estado]||r.estado}{r.resposta_publica_estado?` · ${publicas[r.resposta_publica_estado]||r.resposta_publica_estado}`:''} · {new Date(r.recebida_em).toLocaleString('pt-BR')}</span></div><p className="line-clamp-2 break-words text-suave">Comentário: {r.texto}</p>{r.erro&&<p className="text-xs text-perigo">{r.erro}</p>}{r.resposta_publica_erro&&<p className="text-xs text-perigo">{r.resposta_publica_erro}</p>}{r.estado==='falhou'&&<button className={botao} disabled={ocupado} onClick={()=>void agir({acao:'repetir',id:r.id})}>Tentar novamente</button>}</li>)}</ul>
     </section>
   </div>;
 }
