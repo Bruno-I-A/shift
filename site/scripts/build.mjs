@@ -11,6 +11,8 @@ for (const file of await readdir('.')) {
   if (/\.(html|svg|png|txt|xml)$/.test(file)) await copyFile(file, path.join('dist', file));
 }
 await cp('assets', 'dist/assets', { recursive: true, filter: p => !p.endsWith('.input.css') });
+// Materiais para baixar (guias das campanhas): shiftsys.com.br/guias/<arquivo>.pdf
+await cp('guias', 'dist/guias', { recursive: true });
 await mkdir('dist/.openai', { recursive: true });
 const manifest = JSON.parse((await readFile('.openai/hosting.json', 'utf8')).replace(/^\uFEFF/, ''));
 await writeFile('dist/.openai/hosting.json', JSON.stringify(manifest, null, 2));
