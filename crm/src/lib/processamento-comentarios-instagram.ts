@@ -1,8 +1,8 @@
 import 'server-only';
 import {emTransacao} from './banco';
 import {acessoDaConta} from './instagram';
-import {consultarComentario,enviarRespostaPrivada,ErroComentarioMeta} from './comentarios-instagram-meta';
-import {reservarComentarioInstagram,prepararRespostaComentario,enviarRespostaComentario,falharConsultaComentario} from './leads';
+import {consultarComentario,enviarRespostaPrivada,responderComentarioPublico,ErroComentarioMeta} from './comentarios-instagram-meta';
+import {reservarComentarioInstagram,prepararRespostaComentario,enviarRespostaComentario,falharConsultaComentario,reservarRespostaPublica,concluirRespostaPublica} from './leads';
 
 export async function processarComentarioInstagram():Promise<void>{
   if(process.env.INSTAGRAM_DIRECT_ATIVO!=='sim')return;
@@ -22,6 +22,24 @@ export async function processarComentarioInstagram():Promise<void>{
     console.error('[instagram-comentarios] envio sem confirmação; confira a campanha no painel.');
   }
 }
+/** Uma resposta pública por passagem, só depois da DM confirmada. A falha não mexe na DM. */
+export async function processarRespostaPublica():Promise<void>{
+  if(process.env.INSTAGRAM_DIRECT_ATIVO!=='sim')return;
+  const pendente=await emTransacao(reservarRespostaPublica);
+  if(!pendente)return;
+  const acesso=await emTransacao(tx=>acessoDaConta(tx,pendente.conta_id));
+  if(!acesso || acesso.expiraEm.getTime()<=Date.now()){
+    await emTransacao(tx=>concluirRespostaPublica(tx,pendente.id,{erro:'Conta desconectada ou permissão vencida.',rejeitado:true}));return;
+  }
+  try{
+    const metaId=await responderComentarioPublico(acesso,pendente.comentario_id,pendente.resposta_publica);
+    await emTransacao(tx=>concluirRespostaPublica(tx,pendente.id,{metaId}));
+  }catch(e){
+    const rejeitado=e instanceof ErroComentarioMeta&&e.rejeitado;
+    await emTransacao(tx=>concluirRespostaPublica(tx,pendente.id,{rejeitado,
+      erro:rejeitado?'A Meta recusou a resposta no comentário. Confira a permissão de comentários.':'Resposta no comentário sem confirmação. Confira no post; não repetir.'}));
+  }
+}
 const estado=globalThis as unknown as {comentariosTimer?:ReturnType<typeof setInterval>;comentariosOcupado?:boolean;limpezaComentarios?:number};
 export function iniciarComentariosInstagram():void{
   if(estado.comentariosTimer)return;
@@ -33,6 +51,7 @@ export function iniciarComentariosInstagram():void{
         await emTransacao(tx=>tx.query('select crm.limpar_comentarios_instagram()'));estado.limpezaComentarios=Date.now();
       }
       await processarComentarioInstagram();
+      await processarRespostaPublica();
     }catch{console.error('[instagram-comentarios] fila indisponível.');}
     finally{estado.comentariosOcupado=false;}
   },2000);

@@ -3,7 +3,7 @@ import {bancoDeTeste} from './banco-de-teste';
 import {emTransacao} from '@/lib/banco';
 import {salvarConta,listarContas,lerConta} from '@/lib/instagram';
 import * as leads from '@/lib/leads';
-import {processarComentarioInstagram} from '@/lib/processamento-comentarios-instagram';
+import {processarComentarioInstagram,processarRespostaPublica} from '@/lib/processamento-comentarios-instagram';
 import {ErroComentarioMeta,enviarRespostaPrivada,assinarComentariosInstagram} from '@/lib/comentarios-instagram-meta';
 import {POST as comandoCampanha} from '@/app/api/instagram/campanhas/route';
 import {POST as comandoDirect} from '@/app/api/instagram/direct/route';
@@ -227,5 +227,63 @@ describe('perfil de fundador ao lado da conta da Shift',()=>{
     expect(fetch).toHaveBeenCalledTimes(2);
     expect(String(fetch.mock.calls[1][0])).toContain(fundador);
     expect(fetch.mock.calls[1][1].headers.Authorization).toBe('Bearer token-falso-fundador');
+  });
+});
+
+describe('resposta pública ao comentário',()=>{
+  async function comRespostas(){
+    const b=await iniciar();
+    await leads.salvarCampanhaInstagram(b.tx,conta,{...dados,id:b.campanha.id,respostasPublicas:'Enviado na sua DM, confere lá!\nTe mandei no Direct',ativa:true},'https://www.instagram.com/p/teste/');
+    return b;
+  }
+  async function entregar(tx:Awaited<ReturnType<typeof bancoDeTeste>>['tx'],id:string,pessoa:string,enviar=vi.fn().mockResolvedValue({id:`mid-${id}`,contato:pessoa})){
+    expect(await leads.receberComentarioInstagram(tx,comentario(id,{contato:pessoa}))).toBe(true);
+    const lote=(await leads.reservarComentarioInstagram(tx))!;
+    expect(await leads.prepararRespostaComentario(tx,lote,'QUERO',new Date())).toBe(true);
+    await leads.enviarRespostaComentario(tx,lote,enviar);
+    return lote;
+  }
+  it('só agenda depois da DM confirmada e alterna os textos',async()=>{
+    const {tx}=await comRespostas();
+    await entregar(tx,'701','301');await entregar(tx,'702','302');
+    await entregar(tx,'703','303',vi.fn().mockRejectedValue(Object.assign(new Error('recusado'),{rejeitado:true})));
+    const {rows}=await tx.query<{comentario_id:string;estado:string;resposta_publica:string|null;resposta_publica_estado:string|null}>(
+      'select comentario_id,estado,resposta_publica,resposta_publica_estado from crm.resposta_comentario_instagram order by comentario_id');
+    expect(rows).toEqual([
+      {comentario_id:'701',estado:'enviada',resposta_publica:'Enviado na sua DM, confere lá!',resposta_publica_estado:'pendente'},
+      {comentario_id:'702',estado:'enviada',resposta_publica:'Te mandei no Direct',resposta_publica_estado:'pendente'},
+      {comentario_id:'703',estado:'falhou',resposta_publica:null,resposta_publica_estado:null},
+    ]);
+  });
+  it('responde no comentário pelo worker e a falha não muda a DM',async()=>{
+    const {tx}=await comRespostas();
+    await entregar(tx,'801','401');await entregar(tx,'802','402');
+    const fetch=vi.fn().mockResolvedValueOnce(Response.json({id:'9001'}))
+      .mockResolvedValueOnce(Response.json({error:{message:'sem permissão'}},{status:403}));
+    vi.stubGlobal('fetch',fetch);
+    await processarRespostaPublica();await processarRespostaPublica();await processarRespostaPublica();
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(String(fetch.mock.calls[0][0])).toContain('/801/replies');
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({message:'Enviado na sua DM, confere lá!'});
+    const {rows}=await tx.query<{comentario_id:string;estado:string;resposta_publica_estado:string;resposta_publica_id:string|null}>(
+      'select comentario_id,estado,resposta_publica_estado,resposta_publica_id from crm.resposta_comentario_instagram order by comentario_id');
+    expect(rows).toEqual([
+      {comentario_id:'801',estado:'enviada',resposta_publica_estado:'enviada',resposta_publica_id:'9001'},
+      {comentario_id:'802',estado:'enviada',resposta_publica_estado:'falhou',resposta_publica_id:null},
+    ]);
+  });
+  it('envio interrompido vira sem confirmação e não se repete',async()=>{
+    const {tx}=await comRespostas();
+    await entregar(tx,'901','501');
+    expect(await leads.reservarRespostaPublica(tx)).not.toBeNull();
+    await tx.query("update crm.resposta_comentario_instagram set resposta_publica_em=now()-interval '3 minutes'");
+    expect(await leads.reservarRespostaPublica(tx)).toBeNull();
+    expect((await tx.query('select resposta_publica_estado from crm.resposta_comentario_instagram')).rows[0].resposta_publica_estado).toBe('incerta');
+  });
+  it('aceita no máximo 3 respostas, uma por linha',async()=>{
+    const {tx,campanha}=await iniciar();
+    await expect(leads.salvarCampanhaInstagram(tx,conta,{...dados,id:campanha.id,respostasPublicas:'a\nb\nc\nd'},'https://www.instagram.com/p/teste/')).rejects.toThrow();
+    const salva=await leads.salvarCampanhaInstagram(tx,conta,{...dados,id:campanha.id,respostasPublicas:' a \n\nb\na'},'https://www.instagram.com/p/teste/');
+    expect(salva.respostas_publicas).toEqual(['a','b']);
   });
 });
