@@ -53,9 +53,9 @@ if (!readFileSync('sitemap.xml', 'utf8').includes('/segmentos.html')) issues.pus
 
 const home = readFileSync('index.html', 'utf8');
 const homeMeta = {
-  title: '<title>Shift · Inteligência artificial nos processos da sua empresa</title>',
-  description: 'Colocamos inteligência artificial nos processos da sua empresa para automatizar tarefas, organizar o trabalho e apoiar decisões. Começamos por um processo, com sua equipe no controle. Diagnóstico gratuito.',
-  socialTitle: 'Shift · IA nos processos. Agilidade na sua empresa.'
+  title: '<title>Grupo Shift | Automação, inteligência artificial e educação</title>',
+  description: 'O Grupo Shift implanta automação e IA nos processos das empresas e ensina equipes a usá-las. Encontre o primeiro processo a melhorar no diagnóstico gratuito.',
+  socialTitle: 'Grupo Shift | IA na prática, do aprendizado à implantação'
 };
 if (!home.includes(homeMeta.title)) issues.push('index.html: required title is missing');
 if ((home.match(new RegExp(homeMeta.description.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length < 3) issues.push('index.html: description must match meta, OG and Twitter');
@@ -65,19 +65,21 @@ if (!/TODO Bruno: preencher com case real e remover hidden\. Nunca publicar dado
 }
 
 const diagnostic = readFileSync('diagnostico.html', 'utf8');
-for (const key of ['segmento', 'controle', 'dor', 'ia', 'equipe', 'prazo']) {
+for (const key of ['segmento', 'area', 'tempo', 'controle', 'ia', 'equipe', 'prazo']) {
   if (!diagnostic.includes(`data-q="${key}"`)) issues.push(`diagnostico.html: missing question key ${key}`);
 }
 const crmEndpoint = diagnostic.match(/(?:const|var) CRM_ENDPOINT\s*=\s*['"]([^'"]*)['"]/)?.[1];
 if (!['', 'https://crm.shiftsys.com.br/api/leads'].includes(crmEndpoint)) issues.push('diagnostico.html: unexpected CRM_ENDPOINT');
 if (!diagnostic.includes('type="checkbox"') || /type="checkbox"[^>]*\bchecked\b/.test(diagnostic)) issues.push('diagnostico.html: consent checkbox missing or checked by default');
-if (/estimativa de horas|horas por semana|treasure-/i.test(diagnostic)) issues.push('diagnostico.html: unsupported time estimate remains');
+if (!diagnostic.includes("setAttribute('data-q', 'dor')") || !diagnostic.includes('id="pain-options"')) issues.push('diagnostico.html: missing adaptive question');
+if (!diagnostic.includes('não economia garantida') || !diagnostic.includes('4 semanas')) issues.push('diagnostico.html: time estimate must disclose its basis');
 
 const privacy = readFileSync('privacidade.html', 'utf8');
 if (!/consentimento/i.test(privacy) || !/exclus[aã]o/i.test(privacy)) issues.push('privacidade.html: consent or deletion disclosure missing');
 for (const file of pages) {
   const source = readFileSync(file, 'utf8');
   if (!source.includes('assets/brand-linho.css')) issues.push(file + ': missing current brand theme');
+  if (/shift systems(?! ltda\.)|shift_systemss|(?:6|seis) perguntas/i.test(source)) issues.push(file + ': outdated public brand or quiz copy');
   if (!source.includes('assets/brand/shift-logo-linho.png')) issues.push(file + ': missing approved Shift identity');
   if (source.includes('assets/brand-logo.js') || source.includes('shift-logo-navy-site.svg')) issues.push(file + ': legacy logo still active');
 }

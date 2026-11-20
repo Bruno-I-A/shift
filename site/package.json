@@ -3,12 +3,14 @@
   "version": "3.0.0",
   "private": true,
   "scripts": {
+    "test:journey": "node scripts/test-journey.mjs",
     "build": "node scripts/build.mjs",
     "dev": "node scripts/serve.mjs",
     "preview": "node scripts/serve.mjs dist"
   },
   "devDependencies": {
-    "tailwindcss": "3.4.17",
-    "sharp": "0.34.3"
+    "playwright-core": "1.65.1",
+    "sharp": "0.34.3",
+    "tailwindcss": "3.4.17"
   }
 }

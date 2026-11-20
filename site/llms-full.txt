@@ -1,4 +1,4 @@
-# Shift Systems — conteúdo completo
+# SHIFT — conteúdo completo
 
 > Colocamos IA nos processos da sua empresa: automatizamos tarefas, organizamos o trabalho e apoiamos decisões.
 
@@ -6,7 +6,9 @@ Fonte: https://shiftsys.com.br · SHIFT SYSTEMS LTDA. · Getúlio Vargas/RS · A
 
 ## Posicionamento
 
-A Shift Systems implanta inteligência artificial nos processos de pequenas e médias empresas de qualquer setor. Automatiza tarefas, organiza o trabalho das equipes, acompanha a operação e apoia decisões da diretoria. Começa por um processo, com a equipe da empresa no controle, e acompanha a evolução da implantação. Essa transformação é chamada de AI-first. A Shift aproveita os sistemas que funcionam, integra IA quando eles permitem e constrói a estrutura que falta quando não há integração ou quando a operação depende de planilhas e WhatsApp.
+O Grupo Shift combina implantação de tecnologia e educação prática para empresários e equipes. SHIFT é a assinatura pública do grupo.
+
+A SHIFT implanta inteligência artificial nos processos de pequenas e médias empresas de qualquer setor. Automatiza tarefas, organiza o trabalho das equipes, acompanha a operação e apoia decisões da diretoria. Começa por um processo, com a equipe da empresa no controle, e acompanha a evolução da implantação. Essa transformação é chamada de AI-first. A Shift aproveita os sistemas que funcionam, integra IA quando eles permitem e constrói a estrutura que falta quando não há integração ou quando a operação depende de planilhas e WhatsApp.
 
 Na visão da Shift, empresas que colocam IA na operação passam a responder mais rápido, errar menos e decidir com dados, e competir sem IA vai ficar cada vez mais difícil nos próximos anos. A IA não substitui a equipe: tira o trabalho braçal e repetitivo e deixa as pessoas com o que exige relacionamento, julgamento e criatividade.
 
@@ -125,7 +127,7 @@ Qualquer outro setor pode ser atendido: o ponto de partida é onde o tempo e o d
 
 Página: https://shiftsys.com.br/diagnostico.html
 
-O diagnóstico tem seis perguntas: segmento, forma de controle do trabalho, tarefa que mais consome tempo, uso atual de IA, tamanho da operação e prazo desejado. O resultado identifica Fundação, Início do Nível 1, Nível 1 ou Nível 2; mostra o próximo passo, o primeiro processo sugerido e recomenda implantação ou consultoria/correção.
+O diagnóstico tem oito perguntas: segmento, área, gargalo daquela área, tempo semanal informado, controle do trabalho, uso de IA ou automação, equipe e prazo. Indica uma prioridade, um primeiro processo e uma medida para o piloto. A faixa de tempo em quatro semanas não é promessa de economia.
 
 Antes do resultado, nome, empresa e WhatsApp podem ser informados de forma opcional. O resultado aparece mesmo se a pessoa pular essa etapa. As respostas e os dados de contato só podem ser enviados ao CRM da Shift com consentimento explícito em checkbox. Sem consentimento, nenhum dado do diagnóstico é enviado automaticamente. O botão de WhatsApp abre uma mensagem preenchida para a pessoa revisar e enviar por decisão própria.
 
@@ -143,9 +145,9 @@ Projetos publicados apresentados na página:
 ## Contato
 
 - WhatsApp: +55 54 98418-4808 — https://wa.me/5554984184808
-- Instagram: @shift_systemss — https://instagram.com/shift_systemss
+- Instagram: @shift.grupo — https://instagram.com/shift.grupo
 - E-mail: hello@shift.systems
 
 Resposta em até 24h.
 
-Conteúdo livre para citação, desde que atribuído à Shift Systems com link para https://shiftsys.com.br.
+Conteúdo livre para citação, desde que atribuído à SHIFT com link para https://shiftsys.com.br.

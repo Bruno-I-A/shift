@@ -793,6 +793,28 @@
   color: rgba(234,229,220, 0.72);
 }
 
+.diagnostic-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid currentColor;
+}
+.diagnostic-summary span, .diagnostic-summary small { display: block; color: var(--muted, #bdb7ad); }
+.diagnostic-summary strong { display: block; font-size: 1.5rem; margin: .25rem 0; }
+.recommendation-list { list-style: none; margin: 0; padding: 0; }
+.recommendation-list li {
+  display: grid;
+  grid-template-columns: 2rem minmax(0,1fr);
+  gap: .5rem;
+  border-top: 1px solid rgb(234 229 220 / 23%);
+  padding: 1rem 0;
+}
+.recommendation-list li > span { font-family: monospace; }
+.recommendation-list li p { margin: .3rem 0 0; }
+#quiz-progress[hidden], #result-alert-block[hidden], #hours-basis[hidden] { display: none; }
+.quiz-step h2 { scroll-margin-top: 7rem; }
 .result-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
