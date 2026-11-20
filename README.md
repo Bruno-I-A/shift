@@ -1,6 +1,6 @@
 # Shift
 
-Tudo da Shift Systems que roda na VPS, num repositório só:
+Site institucional e CRM do Grupo Shift que rodam na VPS, num repositório só:
 
 | Pasta | O que é | Endereço |
 |---|---|---|

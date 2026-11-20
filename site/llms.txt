@@ -1,8 +1,8 @@
-# Shift Systems
+# Grupo Shift
 
 > Colocamos IA nos processos da sua empresa: automatizamos tarefas, organizamos o trabalho e apoiamos decisões.
 
-A Shift Systems implanta inteligência artificial nos processos de pequenas e médias empresas de qualquer setor. Automatiza tarefas, organiza o trabalho das equipes, acompanha a operação e apoia decisões. Começa por um processo, com a equipe da empresa no controle, e acompanha a evolução da implantação. Essa transformação é chamada de AI-first. Conecta a IA aos sistemas já usados e, quando a integração não é possível ou a operação depende de planilhas e WhatsApp, constrói a estrutura necessária. A IA tira o trabalho repetitivo e deixa as pessoas com o que exige julgamento. Sede em Getúlio Vargas/RS e atendimento em todo o Brasil.
+A SHIFT ensina empresários e equipes a usar IA e implanta inteligência artificial nos processos de pequenas e médias empresas de qualquer setor. Automatiza tarefas, organiza o trabalho das equipes, acompanha a operação e apoia decisões. Começa por um processo, com a equipe da empresa no controle, e acompanha a evolução da implantação. Essa transformação é chamada de AI-first. Conecta a IA aos sistemas já usados e, quando a integração não é possível ou a operação depende de planilhas e WhatsApp, constrói a estrutura necessária. A IA tira o trabalho repetitivo e deixa as pessoas com o que exige julgamento. Sede em Getúlio Vargas/RS e atendimento em todo o Brasil.
 
 ## Como a IA atua
 
@@ -25,7 +25,7 @@ A Shift Systems implanta inteligência artificial nos processos de pequenas e m�
 Contato:
 
 - WhatsApp: +55 54 98418-4808 — https://wa.me/5554984184808
-- Instagram: @shift_systemss — https://instagram.com/shift_systemss
+- Instagram: @shift.grupo — https://instagram.com/shift.grupo
 - E-mail: hello@shift.systems
 - Diagnóstico gratuito: https://shiftsys.com.br/diagnostico.html
 
@@ -35,7 +35,7 @@ Contato:
 - [Como funciona](https://shiftsys.com.br/processo.html): seis passos de implantação e modelo comercial em três etapas.
 - [Soluções](https://shiftsys.com.br/solucoes.html): soluções organizadas pelos quatro níveis de maturidade e pela base técnica necessária.
 - [Segmentos](https://shiftsys.com.br/segmentos.html): exemplos em comércio, indústria, serviços, saúde, logística e educação, com escritórios contábeis, advocacia e imobiliárias detalhados por nível.
-- [Diagnóstico](https://shiftsys.com.br/diagnostico.html): seis perguntas para identificar o nível atual, o próximo passo, o primeiro processo e a oferta recomendada.
+- [Diagnóstico](https://shiftsys.com.br/diagnostico.html): oito perguntas para identificar um gargalo, estimar o esforço em quatro semanas e escolher uma primeira mudança.
 - [Contato](https://shiftsys.com.br/contato.html): WhatsApp, Instagram e e-mail.
 
 ## Solução complementar
@@ -50,4 +50,4 @@ O diagnóstico funciona mesmo sem cadastro. Nome, empresa e WhatsApp são opcion
 - [Termos de Uso](https://shiftsys.com.br/termos.html)
 - [Conteúdo completo em markdown](https://shiftsys.com.br/llms-full.txt)
 
-Conteúdo livre para citação, desde que atribuído à Shift Systems com link para https://shiftsys.com.br.
+Conteúdo livre para citação, desde que atribuído à SHIFT com link para https://shiftsys.com.br.
