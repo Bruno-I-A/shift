@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { chromium } from 'playwright-core';
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
-const routes = ['index', 'solucoes', 'processo', 'segmentos', 'sites', 'contato', 'termos', 'privacidade', '404', 'diagnostico'];
+const routes = ['index', 'solucoes', 'processo', 'segmentos', 'sites', 'cases', 'contato', 'termos', 'privacidade', '404', 'diagnostico'];
 const cases = [
   ['vendas', 'followup-manual', '3-5', '12 a 20', 'skip'],
   ['atendimento', 'triagem-manual', '6-10', '24 a 40', 'consent'],
@@ -72,7 +72,7 @@ try {
     }
     assert.deepEqual(errors, []);
     await page.close();
-    console.log('PASS: 10 routes, 5 adaptive journeys and CRM consent/error states at', width);
+    console.log('PASS:', routes.length, 'routes, 5 adaptive journeys and CRM consent/error states at', width);
   }
 } finally {
   await browser.close();
