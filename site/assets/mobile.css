@@ -149,6 +149,17 @@
   footer .grid.md\:grid-cols-12 { grid-template-columns:1fr 1fr; column-gap:1.25rem; row-gap:2.25rem; }
   footer .grid.md\:grid-cols-12 > :first-child { grid-column:1 / -1; }
   footer li > a { flex-wrap:wrap; column-gap:.5em; }
-  footer li > a > span.font-mono { color:rgba(234,229,220,.5); }
+  footer li > a > span.font-mono { color:rgba(234,229,220,.62); }
   footer .hr-grad + div { align-items:flex-start; text-align:left; }
+
+  /* ── fim do topo da home: frase e atalhos no mesmo alinhamento (antes os atalhos ficavam centralizados) ── */
+  .hero-bottomline { align-items:flex-start; gap:.4rem; }
+  .hero-bottom-links { align-items:flex-start; gap:0; margin-top:.4rem; }
+  .hero-bottom-links a { justify-content:flex-start; min-width:0; margin-block:-6px; }
+
+  /* ── "Sabemos implantar": um passo por bloco, desenho em cima e texto embaixo, sem colunas espremidas ── */
+  .pilot-story { gap:2rem; }
+  .pilot-story li { display:flex; flex-direction:column; align-items:flex-start; padding-top:1rem; }
+  .pilot-story .pilot-illustration { width:100%; max-width:22rem; height:120px; margin:.75rem 0 1rem; align-self:flex-start; }
+  .pilot-story h3 { font-size:1.45rem; margin:0 0 .35rem; }
 }
