@@ -144,6 +144,12 @@ footer { background:#141513; }
 .case-list li {position:relative;padding-left:1.1rem;line-height:1.55;color:var(--visual-muted)}
 .case-list li::before {content:"";position:absolute;left:0;top:.65em;width:.4rem;height:1px;background:var(--linen)}
 .case-list strong {color:var(--linen);font-weight:550}
+.case-shot {position:relative;margin:0;overflow:hidden;border:1px solid var(--border);background:#20211e}
+.case-shot img {display:block;width:100%;height:auto;border:0}
+.case-shot figcaption {position:absolute;left:1rem;bottom:1rem;display:flex;align-items:baseline;gap:.7rem;max-width:calc(100% - 2rem);padding:.8rem 1rem;background:rgba(25,25,24,.92);border:1px solid var(--border);backdrop-filter:blur(6px)}
+.case-shot figcaption strong {font-size:2rem;line-height:1;font-weight:560;letter-spacing:-.03em;color:var(--linen);white-space:nowrap}
+.case-shot figcaption span {font-size:.85rem;line-height:1.35;color:var(--visual-muted)}
+@media(max-width:767px){.case-shot figcaption {position:static;max-width:none;border:0;border-top:1px solid var(--border)}.case-shot figcaption strong {font-size:1.6rem}}
 .case-visual {position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:.6rem;min-height:22rem;padding:2rem;background:#20211e;border:1px solid var(--border)}
 .case-visual-mark {position:absolute;right:-12%;top:-10%;width:70%;height:auto;opacity:.06;pointer-events:none}
 .case-visual-label {position:absolute;top:2rem;left:2rem;font:500 .8rem/1 'Geist Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--visual-muted)}
@@ -156,6 +162,20 @@ footer { background:#141513; }
   .case-visual strong {font-size:3.5rem}
   .casebook h2.case-group {margin-top:3.5rem}
 }
+
+/* Home: abertura de ~3 s com a logo, só na primeira visita da sessão. Termina sozinha, mesmo sem JavaScript. */
+.abertura {position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--ink);pointer-events:none;animation:abertura-sai .6s 2.4s cubic-bezier(.7,0,.2,1) forwards}
+.sem-abertura .abertura,.motion-paused .abertura {display:none}
+.abertura-logo {position:relative;width:min(72vw,480px);aspect-ratio:1400/424}
+.abertura-logo img {position:absolute;inset:0;width:100%;height:100%}
+.abertura-onca {clip-path:inset(0 65% 0 0);animation:abertura-onca 1s .15s cubic-bezier(.2,.8,.2,1) both}
+.abertura-nome {clip-path:inset(0 0 0 35%);animation:abertura-nome .8s .8s cubic-bezier(.2,.8,.2,1) both}
+.abertura-linha {position:absolute;left:0;right:0;bottom:-1.4rem;height:1px;background:var(--linen);opacity:.45;transform:scaleX(0);transform-origin:left;animation:abertura-linha .7s 1.5s cubic-bezier(.7,0,.2,1) both}
+@keyframes abertura-onca {from{opacity:0;transform:translateX(-14%) scale(.94)}to{opacity:1;transform:none}}
+@keyframes abertura-nome {from{clip-path:inset(0 65% 0 35%);opacity:0}to{clip-path:inset(0 0 0 35%);opacity:1}}
+@keyframes abertura-linha {to{transform:scaleX(1)}}
+@keyframes abertura-sai {to{opacity:0;visibility:hidden;transform:translateY(-3%)}}
+@media(prefers-reduced-motion:reduce){.abertura {display:none}}
 
 /* Home: os cases logo abaixo do topo. */
 .home-cases-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:2.5rem;background:var(--border);border:1px solid var(--border)}

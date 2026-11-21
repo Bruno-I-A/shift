@@ -141,8 +141,22 @@
 <link rel="stylesheet" href="assets/brand-linho.css" />
 <link rel="stylesheet" href="assets/mobile.css" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<script>
+  /* Abertura com a logo: uma vez por sessão. Sem armazenamento ou com movimento reduzido, não aparece. */
+  try {
+    if (sessionStorage.getItem('shift-abertura') || matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('sem-abertura');
+    else sessionStorage.setItem('shift-abertura', '1');
+  } catch (e) { document.documentElement.classList.add('sem-abertura'); }
+</script>
 </head>
 <body class="page-bg cinema-home ai-home">
+<div class="abertura" aria-hidden="true">
+  <div class="abertura-logo">
+    <img class="abertura-onca" src="assets/brand/shift-logo-linho.png" alt="" width="1400" height="424">
+    <img class="abertura-nome" src="assets/brand/shift-logo-linho.png" alt="" width="1400" height="424">
+    <span class="abertura-linha"></span>
+  </div>
+</div>
 <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 <div id="scroll-progress" aria-hidden="true"></div>
 
@@ -223,9 +237,9 @@
       <div class="section-intro"><div><p class="eyebrow reveal">Cases realizados</p><h2 id="cases-title" class="reveal-words">Sistemas e agentes que <em>já estão rodando.</em></h2></div><p class="reveal d2">O problema, o que construímos e como funciona. <a href="cases.html" class="text-link">Ver todos os cases <span aria-hidden="true">→</span></a></p></div>
       <div class="home-cases-grid">
         <a href="cases.html#shift-crm"><span class="tipo">Sistema próprio</span><strong>Shift CRM</strong><span>WhatsApp oficial, Instagram e projetos num lugar só, com agentes de IA.</span></a>
-        <a href="cases.html#guilda"><span class="tipo">Scharff Contabilidade</span><strong>Guilda</strong><span>Gestão do escritório: missões, honorários e 1.235 XML coletados em 52 segundos.</span></a>
+        <a href="cases.html#guilda"><span class="tipo">Scharff Contabilidade</span><strong>Guilda</strong><span>Ecossistema dos processos do escritório: missões, setores e IA no atendimento.</span></a>
         <a href="cases.html#impulse"><span class="tipo">Impulse Tech</span><strong>Agente de triagem</strong><span>IA no WhatsApp oficial que qualifica o interessado e avisa o dono na hora certa.</span></a>
-        <a href="cases.html#tero"><span class="tipo">Produto SHIFT · SaaS</span><strong>Tero</strong><span>Emissão de NFS-e e coleta de XML para escritórios contábeis, por assinatura.</span></a>
+        <a href="cases.html#tero"><span class="tipo">Produto SHIFT · SaaS</span><strong>Tero</strong><span>NFS-e e XML para escritórios contábeis: 1.235 XML de 120 empresas em 52 segundos.</span></a>
         <a href="cases.html#tailine"><span class="tipo">Site · Saúde</span><strong>Tailine Giacometti</strong><span>Do método da nutricionista ao agendamento da consulta.</span></a>
         <a href="cases.html#smart-control"><span class="tipo">Site · Assessoria contábil</span><strong>Smart Control</strong><span>Uma página para cada serviço, do INSS de obra ao IR rural.</span></a>
       </div>
