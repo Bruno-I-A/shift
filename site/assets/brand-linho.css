@@ -129,3 +129,41 @@ footer { background:#141513; }
 .purpose-example:has([value="manual"]:checked) .flow-manual + ol,
 .purpose-example:has([value="manual"]:checked) .purpose-outcome {display:none}
 .casebook > .btn-primary {display:inline-flex;padding:.9rem 1.3rem}
+
+/* Cases: índice, grupos e o painel de destaque dos sistemas (sem tela, para não expor dados de cliente). */
+.case-index {display:flex;flex-wrap:wrap;gap:.5rem;margin-top:2rem}
+.case-index a {font:500 .8rem/1 'Geist Mono',monospace;padding:.6rem .8rem;border:1px solid var(--border);color:var(--visual-muted)}
+.case-index a:hover {color:var(--linen);border-color:var(--linen)}
+.casebook h2.case-group {font:500 .8rem/1.4 'Geist Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--visual-muted);margin:5rem 0 0}
+.casebook article {scroll-margin-top:7rem}
+.casebook .case-system {align-items:start}
+.case-problem {color:var(--linen);font-size:1.08rem;line-height:1.5}
+.casebook article p {line-height:1.6}
+.casebook article h3 {font:500 .75rem/1.4 'Geist Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--visual-muted);margin:1.6rem 0 .8rem}
+.case-list {display:grid;gap:.7rem;margin:0;padding:0;list-style:none}
+.case-list li {position:relative;padding-left:1.1rem;line-height:1.55;color:var(--visual-muted)}
+.case-list li::before {content:"";position:absolute;left:0;top:.65em;width:.4rem;height:1px;background:var(--linen)}
+.case-list strong {color:var(--linen);font-weight:550}
+.case-visual {position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:.6rem;min-height:22rem;padding:2rem;background:#20211e;border:1px solid var(--border)}
+.case-visual-mark {position:absolute;right:-12%;top:-10%;width:70%;height:auto;opacity:.06;pointer-events:none}
+.case-visual-label {position:absolute;top:2rem;left:2rem;font:500 .8rem/1 'Geist Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--visual-muted)}
+.case-visual strong {font-size:5rem;line-height:1;font-weight:560;letter-spacing:-.04em;color:var(--linen)}
+.case-visual-caption {max-width:24rem;color:var(--visual-muted);line-height:1.5}
+.case-visual-tags {margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font:500 .72rem/1.5 'Geist Mono',monospace;letter-spacing:.08em;color:var(--visual-muted)}
+@media(max-width:767px){
+  .case-visual {min-height:16rem;padding:1.5rem}
+  .case-visual-label {top:1.5rem;left:1.5rem}
+  .case-visual strong {font-size:3.5rem}
+  .casebook h2.case-group {margin-top:3.5rem}
+}
+
+/* Home: os cases logo abaixo do topo. */
+.home-cases-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:2.5rem;background:var(--border);border:1px solid var(--border)}
+.home-cases-grid a {display:flex;flex-direction:column;gap:.55rem;min-height:11rem;padding:1.5rem;background:var(--ink);transition:background .2s}
+.home-cases-grid a:hover,.home-cases-grid a:focus-visible {background:#20211e}
+.home-cases-grid .tipo {font:500 .72rem/1.4 'Geist Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--visual-muted)}
+.home-cases-grid strong {font-size:1.35rem;font-weight:560;letter-spacing:-.02em;color:var(--linen)}
+.home-cases-grid span:last-child {color:var(--visual-muted);line-height:1.5;font-size:.95rem}
+.home-cases-head {display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:1rem}
+@media(max-width:900px){.home-cases-grid {grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.home-cases-grid {grid-template-columns:1fr}.home-cases-grid a {min-height:0}}
