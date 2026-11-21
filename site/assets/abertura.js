@@ -39,8 +39,8 @@
   setTimeout(() => {
     if (iniciou) return;
     iniciou = true;
-    tela.classList.add('abertura-pronta');
-    setTimeout(encerrar, 900);
+    tela.classList.add('abertura-direta', 'abertura-pronta');
+    setTimeout(encerrar, 1100);
   }, 900);
 
   imagem.onload = () => {
@@ -67,7 +67,7 @@
     const alvos = [];
     for (let y = 0; y < amostraA; y++) {
       for (let x = 0; x < amostraL; x++) {
-        if (dados[(y * amostraL + x) * 4 + 3] > 120) alvos.push([area.left + x * escala, area.top + y * escala, x / amostraL]);
+        if (dados[(y * amostraL + x) * 4 + 3] > 120) alvos.push([area.left + (x + 0.5) * escala, area.top + (y + 0.5) * escala, x / amostraL]);
       }
     }
     const limite = largura < 700 ? 2600 : 5200;
@@ -91,10 +91,15 @@
     const suave = (t) => 1 - Math.pow(1 - t, 5);
     const inicio = performance.now();
     const DURACAO = 1050;
+    // Linha do tempo (ms): os pontos chegam; entre FUNDE e TROCA eles viram a imagem
+    // dentro do próprio canvas; em TROCA a logo do DOM, idêntica, assume sem salto.
+    const FUNDE = 1250, TROCA = 1850, SAI = 2700;
 
     const quadro = (agora) => {
       if (encerrada) return;
       const decorrido = agora - inicio;
+      const f = Math.min(1, Math.max(0, (decorrido - FUNDE) / (TROCA - FUNDE)));
+      const fusao = f * f * (3 - 2 * f);
       ctx.clearRect(0, 0, largura, altura);
       for (const p of pontos) {
         const t = Math.min(1, Math.max(0, (decorrido - p.atraso) / DURACAO));
@@ -109,16 +114,22 @@
         z = x * sin * 0.35 + z * cos;
         x = xr;
         const k = foco / (foco + Math.max(z, -foco * 0.6));
-        const r = p.tam * k;
-        ctx.fillStyle = `rgba(${p.tom},${(0.15 + 0.85 * e).toFixed(3)})`;
+        // Na fusão, cada ponto incha um pouco e some enquanto a imagem aparece por baixo dele.
+        const r = p.tam * k * (1 + fusao * 0.9);
+        ctx.fillStyle = `rgba(${p.tom},${((0.15 + 0.85 * e) * (1 - fusao)).toFixed(3)})`;
         ctx.fillRect(cx + x * k - r / 2, cy + y * k - r / 2, r, r);
       }
-      if (decorrido < 1700) requestAnimationFrame(quadro);
+      if (fusao > 0) {
+        ctx.globalAlpha = fusao;
+        ctx.drawImage(imagem, area.left, area.top, area.width, area.height);
+        ctx.globalAlpha = 1;
+      }
+      if (decorrido < TROCA) requestAnimationFrame(quadro);
+      else tela.classList.add('abertura-pronta');
     };
     requestAnimationFrame(quadro);
 
-    setTimeout(() => tela.classList.add('abertura-pronta'), 1450);
-    setTimeout(encerrar, 2550);
+    setTimeout(encerrar, SAI);
   };
   imagem.src = caixa.querySelector('img').src;
 })();

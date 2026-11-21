@@ -142,11 +142,8 @@
 <link rel="stylesheet" href="assets/mobile.css" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <script>
-  /* Abertura com a logo: uma vez por sessão. Sem armazenamento ou com movimento reduzido, não aparece. */
-  try {
-    if (sessionStorage.getItem('shift-abertura') || matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('sem-abertura');
-    else sessionStorage.setItem('shift-abertura', '1');
-  } catch (e) { document.documentElement.classList.add('sem-abertura'); }
+  /* Abertura com a logo a cada carregamento da home. Com movimento reduzido, não aparece. */
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('sem-abertura');
 </script>
 </head>
 <body class="page-bg cinema-home ai-home">
