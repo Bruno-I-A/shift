@@ -192,12 +192,15 @@ footer { background:#141513; }
 @media(prefers-reduced-motion:reduce){.abertura {display:none}}
 
 /* Home: os cases logo abaixo do topo. */
-.home-cases-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:2.5rem;background:var(--border);border:1px solid var(--border)}
+/* 4 sistemas numa linha (3 colunas de 12 cada) e 3 sites na outra (4 de 12). */
+.home-cases-grid {display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:1px;margin-top:2.5rem;background:var(--border);border:1px solid var(--border)}
+.home-cases-grid a {grid-column:span 4}
+.home-cases-grid a:nth-child(-n+4) {grid-column:span 3}
 .home-cases-grid a {display:flex;flex-direction:column;gap:.55rem;min-height:11rem;padding:1.5rem;background:var(--ink);transition:background .2s}
 .home-cases-grid a:hover,.home-cases-grid a:focus-visible {background:#20211e}
 .home-cases-grid .tipo {font:500 .72rem/1.4 'Geist Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--visual-muted)}
 .home-cases-grid strong {font-size:1.35rem;font-weight:560;letter-spacing:-.02em;color:var(--linen)}
 .home-cases-grid span:last-child {color:var(--visual-muted);line-height:1.5;font-size:.95rem}
 .home-cases-head {display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:1rem}
-@media(max-width:900px){.home-cases-grid {grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.home-cases-grid {grid-template-columns:repeat(2,minmax(0,1fr))}.home-cases-grid a,.home-cases-grid a:nth-child(-n+4) {grid-column:auto}.home-cases-grid a:last-child {grid-column:1 / -1}}
 @media(max-width:560px){.home-cases-grid {grid-template-columns:1fr}.home-cases-grid a {min-height:0}}
